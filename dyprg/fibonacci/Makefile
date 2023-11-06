@@ -1,15 +1,15 @@
 CC=gcc
-CFLAGS=-ggdb -c -Wall 
-TARGETS=kv.o kvs.o
+CFLAGS=-ggdb -Wall 
+TARGETS=fib2.c kv.c
 
-all: kv
+all: fib2
 
-kv: $(TARGETS)
-	$(CC) $^ -o $@
+fib2: $(TARGETS)
+	$(CC) $(CFLAGS) $^ -o $@
 
 
 .PHONY: clean
 clean:
 	@echo "Cleaning..."
-	-rm -f client kv kv.o
+	-rm -f client fib2 fib2.o kv.o
 	@echo "Finished cleaning."
