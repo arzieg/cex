@@ -1,0 +1,15 @@
+CC=gcc
+CFLAGS=-I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/lib64/glib-2.0/include -ggdb -Wall -Wextra 
+TARGETS=fib2.c
+
+all: fib2
+
+fib2: $(TARGETS)
+	$(CC) $(CFLAGS) $^ -lglib-2.0 -o $@
+
+
+.PHONY: clean
+clean:
+	@echo "Cleaning..."
+	-rm -f glibtest
+	@echo "Finished cleaning."
