@@ -5,6 +5,7 @@
 int main()
 {
     gint *lookup = g_new(int, 1);
+    int *tmp;
 
     GHashTable *hash = g_hash_table_new(g_int_hash, g_int_equal);
     gint *k_one = g_new(gint, 1), *k_two = g_new(gint, 1);
@@ -16,7 +17,10 @@ int main()
 
     printf("\nThere are %d keys in the hash\n", g_hash_table_size(hash));
     *lookup = 2;
-    printf("Lookup for k_two = 2 is value %d\n", *(int *)g_hash_table_lookup(hash, lookup));
+    tmp = g_hash_table_lookup(hash, lookup);
+    if (tmp != NULL)
+        printf("Lookup for k_two = 2 is value %d\n", *(int *)tmp);
     g_hash_table_destroy(hash);
     return 0;
+    //*(int *)
 }
