@@ -6,17 +6,13 @@
 
 #include <stdio.h>
 #include <stdint.h>
-#include <glib.h>
+#include "kv.h"
 
-GHashTable *hash;
-
-int fib(int num);
+int fib(uint64_t number);
 
 int main()
 {
     int i, f;
-    // initialize hash table
-    hash = g_hash_table_new(g_int_hash, g_int_equal);
 
     printf("\nFibonacci Wert von : ");
     scanf("%d", &f);
@@ -26,33 +22,18 @@ int main()
     }
 
     printf("\n=== MAP ===\n");
-
-    printf("\nThere are %d keys in the hash\n", g_hash_table_size(hash));
-    g_hash_table_destroy(hash);
+    kv_printMap();
 
     return 0;
 }
 
-int fib(int num)
+int fib(uint64_t num)
 {
-    gint *key = g_new(gint, 1);
-    gint *value = g_new(gint, 1);
-    gint *value1 = g_new(gint, 1);
-    gint *value2 = g_new(gint, 1);
-
-    *key = num;
-
-    /*if (*(int *)g_hash_table_lookup(hash, key) != NULL)
-        return (*(int *)g_hash_table_lookup(hash, key));
+    if (kv_get(num) != -1)
+        return kv_get(num);
     if (num <= 2)
         return num;
-    */
-    *value1 = *(int *)g_hash_table_lookup(hash, key - 1);
-    *value2 = *(int *)g_hash_table_lookup(hash, key - 2);
-    *value = *value1 + *value2;
-
-    g_hash_table_insert(hash, key, value);
-    // kv_insert(num, fib(num - 1) + fib(num - 2));
-    return (*(int *)g_hash_table_lookup(hash, key));
-    // return kv_get(num);
+    kv_insert(num, fib(num - 1) + fib(num - 2));
+    // kvs_insert(fibkvs, &num, (int *)fib(num - 1, fibkvs) + (int *)fib(num - 2, fibkvs));
+    return kv_get(num);
 }
