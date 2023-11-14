@@ -11,7 +11,7 @@
 
     Komplexität
       O(time)      2^(n+m)
-      O(space)
+      O(space)     n+m
    */
 #include <stdio.h>
 

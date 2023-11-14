@@ -14,6 +14,7 @@
       O(space)
    */
 #include <stdio.h>
+#include "kv.h"
 
 long gT(int columns, int rows);
 
