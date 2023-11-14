@@ -33,13 +33,18 @@ int main()
     return 0;
 }
 
-long gT(int col, int row)
+long gT(int col, int row, memo{})
 {
     // printf("\ncol=%d   row=%d ", col, row);
+    const key = m + "," + n;
+    if (key in memo)
+        return memo(key);
+
     if (col == 1 || row == 1)
         return 1;
     if (col == 0 || row == 0)
         return 0;
 
-    return (gT(col - 1, row) + gT(col, row - 1));
+    memo[key] = (gT(col - 1, row) + gT(col, row - 1));
+    return memo[key];
 }
