@@ -14,30 +14,33 @@
       O(space)
    */
 #include <stdio.h>
-#include "kv.h"
+#include <glib.h> // hash tables
 
-long gT(int columns, int rows);
+long gT(int columns, int rows, GHashTable *hash);
 
 int main()
 {
     int n, m;
     unsigned long paths;
 
+    GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
+
     printf("\nTraveler Problem:\n");
     printf("\nAnzahl Spalten: ");
     scanf("%d", &n);
     printf("\nAnzahl Zeilen: ");
     scanf("%d", &m);
-    paths = gT(n, m);
+    paths = gT(n, m, hash);
     printf("\nAnzahl Pfade: %ld\n", paths);
 
     return 0;
 }
 
-long gT(int col, int row, memo{})
+long gT(int col, int row, GHashTable *hash)
 {
     // printf("\ncol=%d   row=%d ", col, row);
-    const key = m + "," + n;
+    // https: // www.delftstack.com/howto/c/concatenate-string-and-int-in-c/
+    char *key[6] = m + "," + n;
     if (key in memo)
         return memo(key);
 
@@ -46,6 +49,6 @@ long gT(int col, int row, memo{})
     if (col == 0 || row == 0)
         return 0;
 
-    memo[key] = (gT(col - 1, row) + gT(col, row - 1));
+    memo[key] = (gT(col - 1, row, hash) + gT(col, row - 1, hash));
     return memo[key];
 }
