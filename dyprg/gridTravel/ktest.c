@@ -1,30 +1,20 @@
 #include <stdio.h>
 #include <string.h>
-#include "kvs.h"
+#include <glib.h>
 
 int main()
 {
-    char key[100][6];
-    int value[100];
-    char searchkey[6];
-    char *p_searchkey;
+    GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-    KVSstore *kv;
+    // some values
+    gint *v_one = g_new(gint, 1), *v_two = g_new(gint, 1), *v_three = g_new(gint, 1);
+    *v_one = 1, *v_two = 2, *v_three = 3;
 
-    kv = kvs_create();
-
-    strcpy(key[0], "ABCDE");
-    value[0] = 10;
-    strcpy(key[1], "FGHIJ");
-    value[1] = 5;
-
-    kvs_insert(kv, key[0], &value[0]);
-    kvs_insert(kv, key[1], &value[1]);
-
-    strcpy(searchkey, "ABCDE");
-    p_searchkey = searchkey;
-
-    printf("\nValue of Key %s is %d", p_searchkey, *(int *)kvs_get(kv, p_searchkey));
-
+    g_hash_table_insert(hash, "ONE", v_one);
+    g_hash_table_insert(hash, "TWO", v_two);
+    g_hash_table_insert(hash, "THREE", v_three);
+    printf("\nThere are %d keys in the hash\n", g_hash_table_size(hash));
+    printf("Key TWO %d\n", *(int *)g_hash_table_lookup(hash, "TWO"));
+    g_hash_table_destroy(hash);
     return 0;
 }
