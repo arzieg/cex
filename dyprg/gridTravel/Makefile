@@ -1,7 +1,7 @@
 CC=gcc
-CFLAGS=-ggdb -Wall -ftrapv
-DEPS=kv.h kvs.h
-OBJ=kv.o kvs.o
+CFLAGS=-I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/lib64/glib-2.0/include -ggdb -Wall -ftrapv -lglib-2.0 
+DEPS=kv.h 
+OBJ=kv.o 
 #TARGETS=gridtravel.c kv.c kvs.c
 
 all: gridtravel
