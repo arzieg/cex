@@ -14,41 +14,55 @@
       O(space)
    */
 #include <stdio.h>
-#include <glib.h> // hash tables
+#include <string.h>
 
-long gT(int columns, int rows, GHashTable *hash);
+#define COUNT 100
+
+struct s_matrix
+{
+    char *key[6];
+    int value;
+};
+
+struct s_matrix matrix[COUNT];
+
+long gT(int columns, int rows, int iter);
 
 int main()
 {
-    int n, m;
+    int n, m, iter = 0;
     unsigned long paths;
-
-    GHashTable *hash = g_hash_table_new(g_str_hash, g_str_equal);
 
     printf("\nTraveler Problem:\n");
     printf("\nAnzahl Spalten: ");
     scanf("%d", &n);
     printf("\nAnzahl Zeilen: ");
     scanf("%d", &m);
-    paths = gT(n, m, hash);
+    paths = gT(n, m, iter);
     printf("\nAnzahl Pfade: %ld\n", paths);
 
     return 0;
 }
 
-long gT(int col, int row, GHashTable *hash)
+long gT(int col, int row, int iter)
 {
-    // printf("\ncol=%d   row=%d ", col, row);
-    // https: // www.delftstack.com/howto/c/concatenate-string-and-int-in-c/
-    char *key[6] = m + "," + n;
-    if (key in memo)
-        return memo(key);
+    char tmp[6]; /* key = "m,n" */
+    sprintf(tmp, "%d,%d", row, col);
+    printf("\n String = %s", tmp);
 
+    /*if (key in memo)
+        return memo(key);
+*/
     if (col == 1 || row == 1)
         return 1;
     if (col == 0 || row == 0)
         return 0;
 
-    memo[key] = (gT(col - 1, row, hash) + gT(col, row - 1, hash));
-    return memo[key];
+    *matrix[iter].key = tmp;
+    matrix[iter].value = 5;
+
+    // memo[key] = (gT(col - 1, row, hash) + gT(col, row - 1, hash));
+    // return memo[key];
+
+    return 0;
 }
