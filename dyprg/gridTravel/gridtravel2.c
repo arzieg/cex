@@ -35,6 +35,7 @@ int main()
     printf("\nAnzahl Zeilen: ");
     scanf("%d", &m);
     paths = gT(n, m);
+    printf("\nThere are %d keys in the hash\n", g_hash_table_size(hash));
     printf("\nAnzahl Pfade: %ld\n", paths);
 
     return 0;
