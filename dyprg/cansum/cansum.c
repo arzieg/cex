@@ -18,6 +18,10 @@
    canSum(7, [2,4]) -> false
    canSum(8, [2,3,5]) -> true
    canSum(300, [7,14]) -> false
+
+   Complexity:
+   time = O(n^m)
+   space = O(m)
    */
 
 #include <stdio.h>
