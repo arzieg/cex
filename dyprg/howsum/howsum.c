@@ -16,7 +16,9 @@ howSum(7, [2,4]) -> null
 howSum(8, [2,3,5]) -> [2,2,2,2]
 howSum(300, [7,14]) -> null
 
-
+Complexity:
+  time = O(n^m * m) *m wg. copy der Arrays mit gefundenen Lösungen je Durchlauf
+  space = O(m)
 
 */
 
