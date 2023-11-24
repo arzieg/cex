@@ -26,23 +26,24 @@ Complexity:
 #include <stdbool.h>
 
 #define MAXSIZE 10
+#define MAXSIZE_RESULT 300
 
 int array[MAXSIZE];
+int result[MAXSIZE_RESULT];
+int resultcnt = 0;
 
 void printArray(int targetSum, int *array, int maxvalues)
 {
     int i = 0;
-    printf("\nhowSum %d of array [", targetSum);
     for (i = 0; i < maxvalues; i++)
         printf("%d,", array[i]);
-    printf("] is ");
     return;
 }
 
-bool howSum(int targetSum, int *array, int maxvalues)
+int *howSum(int targetSum, int *array, int maxvalues)
 {
     if (targetSum == 0)
-        return *array;
+        return result;
     if (targetSum < 0)
         return NULL;
 
@@ -51,10 +52,13 @@ bool howSum(int targetSum, int *array, int maxvalues)
     for (num = 0; num < maxvalues; num++)
     {
         remainder = targetSum - array[num];
-        remainderResult = howSum(remainder, array, maxvalues);
+
+        int *remainderResult = howSum(remainder, array, maxvalues);
         if (remainderResult != NULL)
         {
-            return [... remainderResult, array[num] ]; // array
+            result[resultcnt] = array[num];
+            resultcnt++;
+            return result;
         }
     }
     return NULL;
@@ -62,32 +66,57 @@ bool howSum(int targetSum, int *array, int maxvalues)
 
 int main()
 {
-    int array[MAXSIZE] = {2, 3};
-    printArray(7, array, 2);
-    printf("%s\n", canSum(7, array, 2) ? "true" : "false");
 
+    int array[MAXSIZE] = {2, 3};
+    printf("\nhowSum 7 of array [");
+    printArray(7, array, 2);
+    howSum(7, array, 2);
+    printf("] is [");
+    printArray(7, result, resultcnt);
+    printf("]\n\n");
+
+    resultcnt = 0;
     array[0] = 5;
     array[1] = 3;
     array[2] = 4;
     array[3] = 7;
+    printf("\nhowSum 7 of array [");
     printArray(7, array, 4);
-    printf("%s\n", canSum(7, array, 4) ? "true" : "false");
+    howSum(7, array, 4);
+    printf("] is [");
+    printArray(7, result, resultcnt);
+    printf("]\n\n");
 
+    resultcnt = 0;
     array[0] = 2;
     array[1] = 4;
+    printf("\nhowSum 7 of array [");
     printArray(7, array, 2);
-    printf("%s\n", canSum(7, array, 2) ? "true" : "false");
+    howSum(7, array, 2);
+    printf("] is [");
+    printArray(7, result, resultcnt);
+    printf("]\n\n");
 
+    resultcnt = 0;
     array[0] = 2;
     array[1] = 3;
     array[2] = 5;
+    printf("\nhowSum 8 of array [");
     printArray(8, array, 3);
-    printf("%s\n", canSum(8, array, 3) ? "true" : "false");
+    howSum(8, array, 3);
+    printf("] is [");
+    printArray(7, result, resultcnt);
+    printf("]\n\n");
 
+    resultcnt = 0;
     array[0] = 7;
     array[1] = 14;
+    printf("\nhowSum 300 of array [");
     printArray(300, array, 2);
-    printf("%s\n", canSum(300, array, 2) ? "true" : "false");
+    howSum(300, array, 2);
+    printf("] is [");
+    printArray(300, result, resultcnt);
+    printf("]\n\n");
 
     return 0;
 }
