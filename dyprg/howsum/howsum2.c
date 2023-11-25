@@ -34,6 +34,7 @@ hash
 #define MAXSIZE 10
 
 int array[MAXSIZE];
+GSList *value;
 
 void printArray(int targetSum, int *array, int maxvalues)
 {
@@ -43,7 +44,7 @@ void printArray(int targetSum, int *array, int maxvalues)
     return;
 }
 
-void printArray2(GSList *value)
+void printArray2()
 {
     GSList *iterator = NULL;
     for (iterator = value; iterator; iterator = value->next)
@@ -53,7 +54,7 @@ void printArray2(GSList *value)
     return;
 }
 
-int howSum(int targetSum, int *array, int maxvalues, GSList *value)
+int *howSum(int targetSum, int *array, int maxvalues)
 {
     gint *tmpval = g_new(gint, 1);
 
@@ -68,9 +69,10 @@ int howSum(int targetSum, int *array, int maxvalues, GSList *value)
     {
         remainder = targetSum - array[num];
 
-        int remainderResult = howSum(remainder, array, maxvalues, value);
+        int *remainderResult = howSum(remainder, array, maxvalues);
         if (remainderResult != NULL)
         {
+            printf("Reminder Result !=0");
             *tmpval = remainderResult;
             g_slist_append(value, tmpval);
             return remainderResult;
@@ -81,15 +83,20 @@ int howSum(int targetSum, int *array, int maxvalues, GSList *value)
 
 int main()
 {
-
     GSList *value = NULL; // list of values
 
     int array[MAXSIZE] = {2, 3};
     printf("\nhowSum 7 of array [");
     printArray(7, array, 2);
-    value = howSum(7, array, 2, value);
-    printf("] is [");
-    printArray2(value);
+    if (howSum(7, array, 2) == 0)
+    {
+        printf("] is [");
+        printArray2();
+    }
+    else
+    {
+        printf("] has no solution.");
+    }
 
     // resultcnt = 0;
     // array[0] = 5;
