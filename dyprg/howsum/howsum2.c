@@ -57,9 +57,14 @@ void printArray2()
 int *howSum(int targetSum, int *array, int maxvalues)
 {
     gint *tmpval = g_new(gint, 1);
-
+    printf("\ntargetSum=%d", targetSum);
     if (targetSum == 0)
-        return value;
+    {
+        printf("\nPrint value\n");
+        printArray2();
+        return g_list_last(value);
+    }
+
     if (targetSum < 0)
         return NULL;
 
