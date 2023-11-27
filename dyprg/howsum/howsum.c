@@ -42,6 +42,7 @@ void printArray(int targetSum, int *array, int maxvalues)
 
 int *howSum(int targetSum, int *array, int maxvalues)
 {
+    printf("\ntargetSum = %d", targetSum);
     if (targetSum == 0)
         return result;
     if (targetSum < 0)
@@ -56,6 +57,7 @@ int *howSum(int targetSum, int *array, int maxvalues)
         int *remainderResult = howSum(remainder, array, maxvalues);
         if (remainderResult != NULL)
         {
+            printf("\nEnter remainderResult!");
             result[resultcnt] = array[num];
             resultcnt++;
             return result;
@@ -75,48 +77,49 @@ int main()
     printArray(7, result, resultcnt);
     printf("]\n\n");
 
-    resultcnt = 0;
-    array[0] = 5;
-    array[1] = 3;
-    array[2] = 4;
-    array[3] = 7;
-    printf("\nhowSum 7 of array [");
-    printArray(7, array, 4);
-    howSum(7, array, 4);
-    printf("] is [");
-    printArray(7, result, resultcnt);
-    printf("]\n\n");
+    /*
+        resultcnt = 0;
+        array[0] = 5;
+        array[1] = 3;
+        array[2] = 4;
+        array[3] = 7;
+        printf("\nhowSum 7 of array [");
+        printArray(7, array, 4);
+        howSum(7, array, 4);
+        printf("] is [");
+        printArray(7, result, resultcnt);
+        printf("]\n\n");
 
-    resultcnt = 0;
-    array[0] = 2;
-    array[1] = 4;
-    printf("\nhowSum 7 of array [");
-    printArray(7, array, 2);
-    howSum(7, array, 2);
-    printf("] is [");
-    printArray(7, result, resultcnt);
-    printf("]\n\n");
+        resultcnt = 0;
+        array[0] = 2;
+        array[1] = 4;
+        printf("\nhowSum 7 of array [");
+        printArray(7, array, 2);
+        howSum(7, array, 2);
+        printf("] is [");
+        printArray(7, result, resultcnt);
+        printf("]\n\n");
 
-    resultcnt = 0;
-    array[0] = 2;
-    array[1] = 3;
-    array[2] = 5;
-    printf("\nhowSum 8 of array [");
-    printArray(8, array, 3);
-    howSum(8, array, 3);
-    printf("] is [");
-    printArray(7, result, resultcnt);
-    printf("]\n\n");
+        resultcnt = 0;
+        array[0] = 2;
+        array[1] = 3;
+        array[2] = 5;
+        printf("\nhowSum 8 of array [");
+        printArray(8, array, 3);
+        howSum(8, array, 3);
+        printf("] is [");
+        printArray(7, result, resultcnt);
+        printf("]\n\n");
 
-    resultcnt = 0;
-    array[0] = 7;
-    array[1] = 14;
-    printf("\nhowSum 300 of array [");
-    printArray(300, array, 2);
-    howSum(300, array, 2);
-    printf("] is [");
-    printArray(300, result, resultcnt);
-    printf("]\n\n");
-
+        resultcnt = 0;
+        array[0] = 7;
+        array[1] = 14;
+        printf("\nhowSum 300 of array [");
+        printArray(300, array, 2);
+        howSum(300, array, 2);
+        printf("] is [");
+        printArray(300, result, resultcnt);
+        printf("]\n\n");
+    */
     return 0;
 }
