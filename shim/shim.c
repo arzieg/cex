@@ -24,3 +24,14 @@ int rand() {
   int (*original_rand)(void) = dlsym(RTLD_NEXT, "rand");
   return original_rand() % 100;
 }
+
+/* Debugging shim with gdb
+
+    gdb ./randtest
+
+    in gdb
+      set environment LD_PRELOAD=./shim.so
+      break rand()
+
+
+*/
