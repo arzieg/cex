@@ -13,6 +13,13 @@
 //   ...
 
 // int rand() { return 42; }
+
+// run
+// LD_PRELOAD=./shim.so ./randtest
+// output
+//   83
+//   86
+//  ....
 int rand() {
   int (*original_rand)(void) = dlsym(RTLD_NEXT, "rand");
   return original_rand() % 100;
