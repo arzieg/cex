@@ -31,6 +31,8 @@ Complexity:
 int array[MAXSIZE];
 int result[MAXSIZE_RESULT];
 int resultcnt = 0;
+int memo[MAXSIZE_RESULT];
+int memocnt = 0;
 
 void printArray(int targetSum, int *array, int maxvalues) {
   int i = 0;
@@ -40,7 +42,11 @@ void printArray(int targetSum, int *array, int maxvalues) {
 
 int *howSum(int targetSum, int *array, int maxvalues) {
   // printf("\ntargetSum = %d", targetSum);
-  if (targetSum == 0) return result;
+  // check if targetSum in memo-Array
+  for (int i = 0; i < memocnt; i++) {
+    if (targetSum == memo[i]) return memo[i];
+  }
+  if (targetSum == 0) return memo;
   if (targetSum < 0) return NULL;
 
   int num = 0;
@@ -51,12 +57,16 @@ int *howSum(int targetSum, int *array, int maxvalues) {
     int *remainderResult = howSum(remainder, array, maxvalues);
     if (remainderResult != NULL) {
       // printf("\nEnter remainderResult!");
-      result[resultcnt] = array[num];
+      // memo[targetSum] = [... remainderResult, num ];
+      // return memo[targetSum]
+      memo[memocnt] =
+
+          result[resultcnt] = array[num];
       resultcnt++;
       return result;
     }
   }
-
+  memo[targetSum] = null;
   return NULL;
 }
 

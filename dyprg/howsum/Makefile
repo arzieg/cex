@@ -2,11 +2,15 @@ CC=gcc
 CFLAGS=-I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include -I/usr/lib64/glib-2.0/include -ggdb -Wall -ftrapv  
 TARGETSPRG=howsum.c
 TARGETSTST=howsum2.c
+TARGETSOPT=howsumopt.c
 TARGETMP=glist.c
 
 all: howsum 
 
 howsum: $(TARGETSPRG)
+	$(CC) $(CFLAGS) $^ -o $@
+
+howsumopt: $(TARGETSOPT)
 	$(CC) $(CFLAGS) $^ -o $@
 
 howsum2: $(TARGETSTST)
