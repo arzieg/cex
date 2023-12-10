@@ -61,7 +61,7 @@ int howSum(int targetSum, gpointer array, gpointer result) {
       printf("Reminder Result !=0");
       result = g_slist_append(result, GPOINTER_TO_INT(remainderResult));
       return result;
-    }
+        }
   }
   return NULL;
 }
