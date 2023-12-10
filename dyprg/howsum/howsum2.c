@@ -22,9 +22,6 @@ Complexity:
 
 
 result = glist 3->2->2
-
-
-
 */
 
 #include <glib.h>
@@ -32,11 +29,11 @@ result = glist 3->2->2
 #include <stdio.h>
 
 #define MAXSIZE 10
+GSList *result = NULL;  // list of results
 
 void print_iterator(gpointer item) { printf("%d\n", GPOINTER_TO_INT(item)); }
 
-int howSum(int targetSum, gpointer array, gpointer result) {
-  printf("\ntargetSum=%d", targetSum);
+int *howSum(int targetSum, gpointer array) {
   if (targetSum == 0) {
     g_slist_foreach(result, (GFunc)print_iterator, NULL);
     return result;
@@ -55,27 +52,28 @@ int howSum(int targetSum, gpointer array, gpointer result) {
     printf("\nremainder = targetSum - numdata : %d = %d - %d", remainder,
            targetSum, numdata);
 
-    int remainderResult = howSum(remainder, array, result);
-
+    int *remainderResult = howSum(remainder, array);
     if (remainderResult != NULL) {
-      printf("Reminder Result !=0");
-      result = g_slist_append(result, GPOINTER_TO_INT(remainderResult));
-      return result;
-        }
+      printf("\nReminder Result %d", *(int *)remainderResult);
+      result = g_slist_append(result, *(int *)remainderResult);
+      return result->data;
+    }
   }
+  printf("\nRETURN NULL\n");
   return NULL;
 }
 
 int main() {
-  GSList *result = NULL;  // list of results
-  GSList *array = NULL;   // list of available numbers
+  // GSList *result = NULL;  // list of results
+  GSList *array = NULL;  // list of available numbers
 
   // initialize array and print
   array = g_slist_append(array, (int *)2);
   array = g_slist_append(array, (int *)3);
+  result = g_slist_append(result, (int *)5);
   g_slist_foreach(array, (GFunc)print_iterator, NULL);
-  howSum(7, array, result);
-
+  result = howSum(7, array);
+  g_slist_foreach(result, (GFunc)print_iterator, NULL);
   /*
     printf("\nhowSum 7 of array [");
 
