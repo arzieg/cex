@@ -33,8 +33,9 @@ GSList *result = NULL;  // list of results
 
 void print_iterator(gpointer item) { printf("%d\n", GPOINTER_TO_INT(item)); }
 
-int *howSum(int targetSum, gpointer array) {
+int *howSum(int targetSum, GSList array, gpointer result) {
   if (targetSum == 0) {
+    printf("\ntargetSum == 0\n");
     g_slist_foreach(result, (GFunc)print_iterator, NULL);
     return result;
   }
@@ -52,11 +53,11 @@ int *howSum(int targetSum, gpointer array) {
     printf("\nremainder = targetSum - numdata : %d = %d - %d", remainder,
            targetSum, numdata);
 
-    int *remainderResult = howSum(remainder, array);
+    int *remainderResult = howSum(remainder, array, result);
     if (remainderResult != NULL) {
       printf("\nReminder Result %d", *(int *)remainderResult);
       result = g_slist_append(result, *(int *)remainderResult);
-      return result->data;
+      return result;
     }
   }
   printf("\nRETURN NULL\n");
@@ -64,15 +65,16 @@ int *howSum(int targetSum, gpointer array) {
 }
 
 int main() {
-  // GSList *result = NULL;  // list of results
-  GSList *array = NULL;  // list of available numbers
+  GSList *result = NULL;  // list of results
+  GSList *array = NULL;   // list of available numbers
 
   // initialize array and print
   array = g_slist_append(array, (int *)2);
   array = g_slist_append(array, (int *)3);
   result = g_slist_append(result, (int *)5);
   g_slist_foreach(array, (GFunc)print_iterator, NULL);
-  result = howSum(7, array);
+  result = howSum(7, array, result);
+  printf("\nPRINT RESULT IN MAIN\n");
   g_slist_foreach(result, (GFunc)print_iterator, NULL);
   /*
     printf("\nhowSum 7 of array [");
