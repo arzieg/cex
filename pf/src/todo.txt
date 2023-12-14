@@ -1,0 +1,17 @@
+Erzeuge die PF4SH neu
+
+Abfragen der notwendigen Informationen
+
+JSON Library: https://github.com/json-c/json-c
+
+Funktionen:
+    add host | sid |  (tag, clustername, role, hostname, ...)
+    delete  (tag, clustername,role, hostname, ...)
+    remove  
+    update 
+    list clustename | host| storage | SID | 
+    load config
+    save config
+    save config as 
+    validate config <system>
+    
