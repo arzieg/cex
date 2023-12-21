@@ -1,87 +1,109 @@
 #include <argp.h>
-#include <assert.h>
-#include <stdio.h>
+#include <stdbool.h>
+#include <stdlib.h>
 
-/* =============================================== */
-/* ARGP */
-/* =============================================== */
+#include "pf.h"
+
+/* -------------------------------------------
+   Arg Parse
+  -------------------------------------------*/
+
 const char *argp_program_version = "pf 0.1";
-const char *argp_program_bug_address = "bug@to.me";
+const char *argp_program_bug_address = "<bug@to.me>";
 
-// this struct is used by main to communicate with parse_opt
-struct arguments {
-  char *args[1];  // arg1
-  int verbose;    // -v
-  char *outfile;  // arguments for -o
-  char *sid;      // arguments for -c
-};
+/* Program documentation. */
+static char doc[] = "pf -- ein Programm zur Pflege der pf-Datei";
 
-// order of field: {NAME, KEY, ARG, FLAGS, DOC}
+/* A description of the arguments we accept. */
+static char args_doc[] = "PFFILE";
+
+/* The options we understand. */
 static struct argp_option options[] = {
-    {"verbose", 'v', 0, 0, "Verbose Output"},
+    {"verbose", 'v', 0, 0, "Produce verbose output"},
+    {"interactive", 'i', 0, 0, "Interactive Mode"},
     {"output", 'o', "OUTFILE", 0, "Save File to <Outfile>"},
     {"check", 'c', "SID", 0, "Check Configuration of SID"},
     {0}};
 
-// parser: order of parameters: KEY, ARG, STATE
+/* Used by main to communicate with parse_opt. */
+struct arguments {
+  char *args[1]; /* PFILE */
+  char *output_file;
+  char *sid;
+  bool pinteractive, verbose;
+};
+
+/* Parse a single option. */
 static error_t parse_opt(int key, char *arg, struct argp_state *state) {
+  /* Get the input argument from argp_parse, which we
+     know is a pointer to our arguments structure. */
   struct arguments *arguments = state->input;
+
   switch (key) {
+    case 'i':
+      arguments->pinteractive = true;
+      break;
     case 'v':
-      arguments->verbose = 1;
+      arguments->verbose = true;
+      break;
+    case 'o':
+      arguments->output_file = arg;
       break;
     case 'c':
       arguments->sid = arg;
       break;
-    case 'o':
-      arguments->outfile = arg;
-      break;
+
     case ARGP_KEY_ARG:
-      if (state->arg_num >= 1) {
+      if (state->arg_num >= 1) /* Too many arguments. */
         argp_usage(state);
-      }
+
       arguments->args[state->arg_num] = arg;
+
       break;
+
     case ARGP_KEY_END:
-      if (state->arg_num < 1) {
+      if (state->arg_num < 1) /* Not enough arguments. */
         argp_usage(state);
-      }
-      arguments->args[state->arg_num] = arg;
       break;
+
     default:
       return ARGP_ERR_UNKNOWN;
   }
   return 0;
 }
 
-static char args_doc[] = "PFFILE";  // non-option command-line arguments
-static char doc[] = "pf -- ein Programm zur Pflege der pf-Datei";
+/* Our argp parser. */
 static struct argp argp = {options, parse_opt, args_doc, doc};
 
+/* ==============
+   main
+   ==============*/
 int main(int argc, char **argv) {
   struct arguments arguments;
   FILE *outstream;
 
-  // arguments default
-  arguments.outfile = NULL;
+  /* Default values. */
   arguments.sid = "";
-  arguments.verbose = 0;
+  arguments.pinteractive = false;
+  arguments.verbose = false;
+  arguments.output_file = NULL;
 
-  // parsing arguments
+  /* Parse our arguments; every option seen by parse_opt will
+     be reflected in arguments. */
   argp_parse(&argp, argc, argv, 0, 0, &arguments);
 
   /* Where do we send output? */
-  if (arguments.outfile)
-    outstream = fopen(arguments.outfile, "w");
+  if (arguments.output_file)
+    outstream = fopen(arguments.output_file, "w");
   else
     outstream = stdout;
 
-  /* Print argument values */
-  fprintf(outstream, "sid = %s\n\n", arguments.sid);
-  fprintf(outstream, "PFFILE = %s\n\n", arguments.args[0]);
+  fprintf(outstream, "PFFILE = %s\n", arguments.args[0]);
+  fprintf(outstream, "SID = %s\n", arguments.sid);
+  fprintf(outstream, "interactive = %d\n", arguments.pinteractive);
+  fprintf(outstream, "verbose = %d\n", arguments.verbose);
+  fprintf(outstream, "OUTPUT_FILE = %s\n", arguments.output_file);
 
-  /* If in verbose mode, print song stanza */
-  if (arguments.verbose) fprintf(outstream, "Verbose ON");
-
-  return 0;
+  if (arguments.pinteractive) interactive();
+  exit(0);
 }

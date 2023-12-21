@@ -15,3 +15,17 @@ Funktionen:
     save config as 
     validate config <system>
     
+
+interaktiv
+1. Abfrage Szenario
+    Single DC oder Replikation? 
+    SO oder SU
+    wenn SU, dann Single SID oder MCOS
+    Toolserver
+    ISCSI Server
+
+typedef struct system
+
+
+
+
