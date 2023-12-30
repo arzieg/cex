@@ -5,20 +5,28 @@
 // 1. Abfrage Szenario Single DC oder Replikation ? SO oder SU wenn SU,
 //     dann Single SID oder MCOS Toolserver ISCSI Server
 
-#define hostname_length 13
+#define HOSTNAME_LENGTH 13
+#define MAX_ENVIRONMENTS 10
+#define MAX_HOST_EACH_HANASYSTEM 13
+#define MAX_SID_PER_ENVIRONMENT 5
+#define SIDLENGTH 4  // SID Length + 1 für CR
+#define OK 0
+#define ERROR 1
 
-typedef struct sid {
-  char *sid[3];
+typedef struct sidtype {
+  char sid[SIDLENGTH];
   bool mcos;
   bool systemReplication;
-} SID;
+} SIDTYPE;
 
-typedef struct hanasystem {
-  char *physical_hostname[hostname_length];
-  char *virtual_hostname[hostname_length];
+typedef struct hanasystemtype {
+  char *physical_hostname[HOSTNAME_LENGTH];
+  char *virtual_hostname[HOSTNAME_LENGTH];
   char *mac_address[17];
-  SID sid;
-} HANASYSTEM;
+  SIDTYPE hanasid[MAX_SID_PER_ENVIRONMENT];
+} HANASYSTEMTYPE;
+
+HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 
 /* interactive.c */
 void get_sid_list(void);
