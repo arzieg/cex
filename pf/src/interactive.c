@@ -5,7 +5,7 @@
 
 #include "pf.h"
 
-#define DEBUG 0
+#define DEBUG 1
 
 #define debug_print(fmt, ...)                                           \
   do {                                                                  \
@@ -13,10 +13,6 @@
       fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, \
               __VA_ARGS__);                                             \
   } while (0)
-
-#define SIDLENGTH 4  // SID Length + 1 für CR
-#define OK 0
-#define ERROR 1
 
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
@@ -30,12 +26,12 @@
 */
 
 /* ---------------------------------------------
- getstring (char *buf, int n)
+ _getstring (char *buf, int n)
    get Userinput from stdin
      *buf = pointer to char*
      n    = size of characters including \0
    ---------------------------------------------*/
-int getstring(char *buf, int n) {
+int _getstring(char *buf, int n) {
   char *tmp;
   tmp = (char *)malloc(sizeof(char) * n);
 
@@ -100,17 +96,38 @@ int get_systemtype_choice(void) {
 
 void get_sid_list(void) {
   char input[SIDLENGTH] = {0};
+  int n = 0;
   size_t length;
   system("clear");
   printf("\nInteractive Mode");
   printf("\n================\n\n");
+  printf("Enter SID (q to return)?");
 
-  while (input[0] != 'q' && input[1] != '\n') {
+  while (_getstring(input, SIDLENGTH) == 0 && input[0] != 'q' &&
+         input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT) {
     printf("Enter SID (q to return)?");
-    if (getstring(input, SIDLENGTH) == 0) {
-      length = strlen(input);
-      debug_print("... You entered %s with length=%ld\n", input, length);
-    }
+    strncpy(hanasystem[0][0].hanasid[n].sid, input, SIDLENGTH);
+
+    /*TODO
+      mcos abfragen mit y/n/Y/N/Yes/No ebenfalls systemReplication
+      Erstelle eine Funktion, die das abfragt. Vlt. kann man _getstring
+      verwenden
+
+    */
+
+    hanasystem[0][0].hanasid[n].mcos = true;
+    hanasystem[0][0].hanasid[n].systemReplication = false;
+    length = strlen(input);
+    debug_print("... You entered %s with length=%ld\n", input, length);
+    n++;
+  }
+
+  printf("\nYou entered:\n");
+  n--;
+  for (int i = 0; i <= n; i++) {
+    printf("SID %d, %s  MCOS=%d  SR=%d\n", i, hanasystem[0][0].hanasid[i].sid,
+           hanasystem[0][0].hanasid[i].mcos,
+           hanasystem[0][0].hanasid[i].systemReplication);
   }
 
   // return *selection;
