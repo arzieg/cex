@@ -1,8 +1,22 @@
+#include <errno.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 #include "pf.h"
+
+#define DEBUG 0
+
+#define debug_print(fmt, ...)                                           \
+  do {                                                                  \
+    if (DEBUG)                                                          \
+      fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, \
+              __VA_ARGS__);                                             \
+  } while (0)
+
+#define SIDLENGTH 4  // SID Length + 1 für CR
+#define OK 0
+#define ERROR 1
 
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
@@ -15,6 +29,34 @@
 5. MCOS nur im SU
 */
 
+/* ---------------------------------------------
+ getstring (char *buf, int n)
+   get Userinput from stdin
+     *buf = pointer to char*
+     n    = size of characters including \0
+   ---------------------------------------------*/
+int getstring(char *buf, int n) {
+  char *tmp;
+  tmp = (char *)malloc(sizeof(char) * n);
+
+  printf(">> ");
+  if (fgets(tmp, n, stdin) != NULL) {
+    debug_print("... in function %s\n", tmp);
+    debug_print("... without null character: %ld\n", strlen(tmp));
+    strncpy(buf, tmp, n);
+    if (!strchr(tmp, '\n')) {
+      // consume rest of chars up to '\n'
+      int ch;
+      while (((ch = getchar()) != EOF) && (ch != '\n')) /* void */
+        ;
+      if (ch == EOF) /* input error */
+        ;
+    }
+    free(tmp);
+  }
+  return OK;
+}
+
 int interactive(void) {
   // int selection;
 
@@ -23,7 +65,7 @@ int interactive(void) {
   // selection = get_systemtype_choice();
   // printf("\nYou entered %d\n", selection);
 
-  return 0;
+  return OK;
 }
 
 int get_systemtype_choice(void) {
@@ -57,21 +99,19 @@ int get_systemtype_choice(void) {
 }
 
 void get_sid_list(void) {
-    char selection[3];
+  char input[SIDLENGTH] = {0};
   size_t length;
-
   system("clear");
+  printf("\nInteractive Mode");
+  printf("\n================\n\n");
 
-  do {
-    printf("\nInteractive Mode");
-    printf("\n================\n\n");
-    printf("\nEnter SID (blank line to return)?");
-    printf("\n>> ");
-    scanf("%s", selection);
-    length = strlen(selection);
-    printf("\nYou entered %s with length=%ld", selection, length);
-
-  } while (length != 0);
+  while (input[0] != 'q' && input[1] != '\n') {
+    printf("Enter SID (q to return)?");
+    if (getstring(input, SIDLENGTH) == 0) {
+      length = strlen(input);
+      debug_print("... You entered %s with length=%ld\n", input, length);
+    }
+  }
 
   // return *selection;
 }
