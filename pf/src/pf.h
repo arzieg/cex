@@ -26,8 +26,6 @@ typedef struct hanasystemtype {
   SIDTYPE hanasid[MAX_SID_PER_ENVIRONMENT];
 } HANASYSTEMTYPE;
 
-HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
-
 /* interactive.c */
 void get_sid_list(void);
 int get_systemtype_choice(void);

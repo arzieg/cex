@@ -14,6 +14,9 @@
               __VA_ARGS__);                                             \
   } while (0)
 
+/* global variables */
+HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
    type=so,su,toolserver,iscsi
@@ -94,33 +97,56 @@ int get_systemtype_choice(void) {
   return selection;
 }
 
+bool _get_yesno_status(char *text) {
+  char answer;
+  printf("%s", text);
+  while (scanf(" %c", &answer) == 1) {
+    return (answer == 'Y' || answer == 'y') ? true : false;
+  }
+  return false;
+}
+
 void get_sid_list(void) {
   char input[SIDLENGTH] = {0};
   int n = 0;
   size_t length;
+  bool mcos;
+  char text[255];
   system("clear");
   printf("\nInteractive Mode");
   printf("\n================\n\n");
-  printf("Enter SID (q to return)?");
 
-  while (_getstring(input, SIDLENGTH) == 0 && input[0] != 'q' &&
-         input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT) {
+  do {
+    // while (_getstring(input, SIDLENGTH) == 0 && input[0] != 'q' &&
+    //        input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT) {
     printf("Enter SID (q to return)?");
-    strncpy(hanasystem[0][0].hanasid[n].sid, input, SIDLENGTH);
+    if (_getstring(input, SIDLENGTH) == 0) {
+      debug_print("... You entered %s \n", input);
+      strncpy(hanasystem[0][0].hanasid[n].sid, input, SIDLENGTH);
 
-    /*TODO
-      mcos abfragen mit y/n/Y/N/Yes/No ebenfalls systemReplication
-      Erstelle eine Funktion, die das abfragt. Vlt. kann man _getstring
-      verwenden
+      /*TODO
+        Testen: mcos abfragen mit y/n/Y/N/Yes/No ebenfalls systemReplication
+        Erstelle eine Funktion, die das abfragt. Vlt. kann man _getstring
+        verwenden
+        Problem: _getstring, stdin noch nicht richtig geflusht; Die Schleife
+        läuft nicht richtig durch
 
-    */
+      */
 
-    hanasystem[0][0].hanasid[n].mcos = true;
-    hanasystem[0][0].hanasid[n].systemReplication = false;
-    length = strlen(input);
-    debug_print("... You entered %s with length=%ld\n", input, length);
-    n++;
-  }
+      strncpy(
+          text,
+          "\n is this System part of a MCOS System with multiples SIDs (Y/N)?",
+          255);
+      mcos = _get_yesno_status(text);
+      debug_print("... MCOS =  %d\n", mcos);
+
+      hanasystem[0][0].hanasid[n].mcos = mcos;
+      hanasystem[0][0].hanasid[n].systemReplication = false;
+      length = strlen(input);
+      debug_print("... You entered %s with length=%ld\n", input, length);
+      n++;
+    }
+  } while (input[0] != 'q' && input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT);
 
   printf("\nYou entered:\n");
   n--;
