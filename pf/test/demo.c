@@ -1,4 +1,7 @@
+// https://suchprogramming.com/c-strings-and-standard-input/
 #define _GNU_SOURCE
+#include <ctype.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -30,8 +33,24 @@ FancyString *fancy_getline(FILE *stream) {
   }
 }
 
+bool get_yesno_status(char *text) {
+  char c;
+  bool answer;
+  do {
+    printf("\nMCOS System? (y/n)");
+    scanf(" %c", &c);
+    c = toupper(c);
+
+    answer = (c == 'Y') || (c == 'N');
+
+  } while (!answer);
+  return (c == 'Y') ? true : false;
+}
+
 int main() {
   char text[2][4];
+  bool mcos[2];
+  char msg[255];
 
   for (int i = 0; i < 2; i++) {
     FancyString *line = fancy_getline(stdin);
@@ -41,10 +60,16 @@ int main() {
            line->buffer_size);
     printf("Line read:\n%s", line->string);
 
+    strncpy(
+        msg,
+        "\n is this System part of a MCOS System with multiples SIDs (Y/N)?",
+        255);
+    mcos[i] = get_yesno_status(msg);
+
     FancyString_free(line);
   }
   for (int i = 0; i < 2; i++) {
-    printf("\nString %d = %s", i, text[i]);
+    printf("\nString %d = %s, mcos = %d", i, text[i], mcos[i]);
   }
   return 0;
 }
