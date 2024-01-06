@@ -6,7 +6,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define SIDLENGTH 4
+#define SIDLENGTH 3
 
 typedef struct {
   ssize_t length;
@@ -21,16 +21,37 @@ void CustomString_free(CustomString *target) {
   free(target);
 }
 
+bool CustomString_isalphanumeric(CustomString *target) {
+  bool isalpha = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i])) {
+      isalpha = false;
+      break;
+    }
+  }
+  return isalpha;
+}
+
 CustomString *custom_getline(FILE *stream, int maxchars) {
   do {
+    bool checklength = true;
+    bool checkisalnum = false;
     CustomString *new = malloc(sizeof(*new));
     new->string = NULL;
     new->buffer_size = 0;
     new->length = getline(&(new->string), &(new->buffer_size), stream);
+    // do some checks
     if ((new->length == -1) || (new->length != maxchars)) {
       free(new);
-      printf("\nExpect %d characters, try again >> ", maxchars);
+      printf("\nExpect %d characters, try again >> ", maxchars - 1);
+      checklength = false;
+    }
+    if (CustomString_isalphanumeric(new)) {
+      checkisalnum = true;
     } else {
+      printf("Unvalid character found, valid characters are a-z,A-Z,0-9\n>> ");
+    }
+    if (checklength && checkisalnum) {
       return new;
     }
   } while (true);
@@ -59,16 +80,21 @@ bool get_yesno_status(char *text, FILE *stream) {
 }
 
 int main() {
-  char text[2][4];
+  char text[2][SIDLENGTH + 1];
   bool mcos[2];
   char msg[255];
 
   for (int i = 0; i < 2; i++) {
     printf("\nPlease enter SID: ");
-    CustomString *line = custom_getline(stdin, SIDLENGTH);
+    CustomString *line = custom_getline(stdin, SIDLENGTH + 1);
+
     strncpy(text[i], line->string, line->length);
     // add \0 Terminator at end of SID
     text[i][line->length - 1] = '\0';
+    // change to uppercase
+    for (int j = 0; j < strnlen(text[i], SIDLENGTH); j++) {
+      text[i][j] = toupper(text[i][j]);
+    }
 
     printf("Read %zd bytes, buffer is %zd bytes\n", line->length,
            line->buffer_size);
