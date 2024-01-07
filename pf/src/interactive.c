@@ -1,4 +1,7 @@
+#define _GNU_SOURCE  // to use getline, define before stdio.h
+#include <ctype.h>
 #include <errno.h>
+#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -15,7 +18,10 @@
   } while (0)
 
 /* global variables */
+/* each hanasystemenvironment has 1 to n servers */
 HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+/* each hanasystemenvironment could have 1 to n SIDs */
+SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
@@ -28,32 +34,72 @@ HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 5. MCOS nur im SU
 */
 
-/* ---------------------------------------------
- _getstring (char *buf, int n)
-   get Userinput from stdin
-     *buf = pointer to char*
-     n    = size of characters including \0
-   ---------------------------------------------*/
-int _getstring(char *buf, int n) {
-  char *tmp;
-  tmp = (char *)malloc(sizeof(char) * n);
-
-  printf(">> ");
-  if (fgets(tmp, n, stdin) != NULL) {
-    debug_print("... in function %s\n", tmp);
-    debug_print("... without null character: %ld\n", strlen(tmp));
-    strncpy(buf, tmp, n);
-    if (!strchr(tmp, '\n')) {
-      // consume rest of chars up to '\n'
-      int ch;
-      while (((ch = getchar()) != EOF) && (ch != '\n')) /* void */
-        ;
-      if (ch == EOF) /* input error */
-        ;
-    }
-    free(tmp);
+/* CustomString - Hilfsfunktionen
+   Eingabe von Werten und Rückgabe des Wertes
+*/
+void CustomString_free(CustomString *target) {
+  if (target->string) {
+    free(target->string);
   }
-  return OK;
+  free(target);
+}
+
+bool CustomString_isalphanumeric(CustomString *target) {
+  bool isalpha = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i])) {
+      isalpha = false;
+      break;
+    }
+  }
+  return isalpha;
+}
+
+CustomString *custom_getline(FILE *stream, int maxchars) {
+  do {
+    bool checklength = true;
+    bool checkisalnum = false;
+    CustomString *new = malloc(sizeof(*new));
+    new->string = NULL;
+    new->buffer_size = 0;
+    new->length = getline(&(new->string), &(new->buffer_size), stream);
+    // do some checks
+    if ((new->length == -1) || (new->length != maxchars)) {
+      free(new);
+      printf("\nExpect %d characters, try again >> ", maxchars - 1);
+      checklength = false;
+    }
+    if (CustomString_isalphanumeric(new)) {
+      checkisalnum = true;
+    } else {
+      printf("Unvalid character found, valid characters are a-z,A-Z,0-9\n>> ");
+    }
+    if (checklength && checkisalnum) {
+      return new;
+    }
+  } while (true);
+}
+
+bool get_yesno_status(char *text, FILE *stream) {
+  bool answer = false;
+  char character;
+  printf(text);
+  CustomString *new = malloc(sizeof(*new));
+  new->string = NULL;
+  new->buffer_size = 0;
+
+  do {
+    new->length = getline(&(new->string), &(new->buffer_size), stream);
+    strncpy(&character, new->string, 1);
+    character = toupper(character);
+    answer = (character == 'Y') || (character == 'N');
+    if (!answer) {
+      printf("Please enter y or n >> ");
+    }
+  } while (!answer);
+
+  CustomString_free(new);
+  return (character == 'Y') ? true : false;
 }
 
 int interactive(void) {
@@ -97,63 +143,67 @@ int get_systemtype_choice(void) {
   return selection;
 }
 
-bool _get_yesno_status(char *text) {
-  char answer;
-  printf("%s", text);
-  while (scanf(" %c", &answer) == 1) {
-    return (answer == 'Y' || answer == 'y') ? true : false;
-  }
-  return false;
-}
-
+/* --------------------------------------------------------------
+ Enter the SID list. Each SID could be part of a systemReplication.
+ If more then one System is entered, the system is per definition part of a mcos
+ system
+   -------------------------------------------------------------- */
 void get_sid_list(void) {
-  char input[SIDLENGTH] = {0};
+  bool systemreplication;
+  bool get_next_sid = false;
+  bool next_loop = false;
+  char msg[255];
   int n = 0;
-  size_t length;
-  bool mcos;
-  char text[255];
+
   system("clear");
   printf("\nInteractive Mode");
   printf("\n================\n\n");
 
   do {
-    // while (_getstring(input, SIDLENGTH) == 0 && input[0] != 'q' &&
-    //        input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT) {
-    printf("Enter SID (q to return)?");
-    if (_getstring(input, SIDLENGTH) == 0) {
-      debug_print("... You entered %s \n", input);
-      strncpy(hanasystem[0][0].hanasid[n].sid, input, SIDLENGTH);
+    printf("\nPlease enter SID: ");
+    CustomString *line = custom_getline(stdin, SIDLENGTH + 1);
 
-      /*TODO
-        Testen: mcos abfragen mit y/n/Y/N/Yes/No ebenfalls systemReplication
-        Erstelle eine Funktion, die das abfragt. Vlt. kann man _getstring
-        verwenden
-        Problem: _getstring, stdin noch nicht richtig geflusht; Die Schleife
-        läuft nicht richtig durch
-
-      */
-
-      strncpy(
-          text,
-          "\n is this System part of a MCOS System with multiples SIDs (Y/N)?",
-          255);
-      mcos = _get_yesno_status(text);
-      debug_print("... MCOS =  %d\n", mcos);
-
-      hanasystem[0][0].hanasid[n].mcos = mcos;
-      hanasystem[0][0].hanasid[n].systemReplication = false;
-      length = strlen(input);
-      debug_print("... You entered %s with length=%ld\n", input, length);
-      n++;
+    strncpy(hanasid[0][n].sid, line->string, line->length);
+    // add \0 Terminator at end of SID
+    hanasid[0][n].sid[line->length - 1] = '\0';
+    // change to uppercase
+    for (int j = 0; j < strnlen(hanasid[0][n].sid, SIDLENGTH); j++) {
+      hanasid[0][n].sid[j] = toupper(hanasid[0][n].sid[j]);
     }
-  } while (input[0] != 'q' && input[1] != '\n' && n < MAX_SID_PER_ENVIRONMENT);
+
+    debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
+                line->buffer_size);
+    debug_print("Line read:%s\n", line->string);
+
+    strncpy(msg, "is the SAP SID part of a System Replication (Y/N)?", 255);
+    systemreplication = get_yesno_status(msg, stdin);
+    debug_print("... SR = %d\n", systemreplication);
+    hanasid[0][n].systemReplication = systemreplication;
+
+    n++;
+    CustomString_free(line);
+
+    strncpy(msg, "Enter an additional SAP SID (Y/N)?", 255);
+    get_next_sid = get_yesno_status(msg, stdin);
+    debug_print("... GET_NEXT_SID = %d\n", get_next_sid);
+
+    if (n > MAX_SID_PER_ENVIRONMENT) {
+      next_loop = false;
+      fprintf(stderr, "Maximum SIDs reached, leave loop!");
+    } else {
+      next_loop = get_next_sid;
+    }
+
+  } while (next_loop);
 
   printf("\nYou entered:\n");
   n--;
+  bool mcos;
+  (n > 0) ? (mcos = true) : (mcos = false);
+
   for (int i = 0; i <= n; i++) {
-    printf("SID %d, %s  MCOS=%d  SR=%d\n", i, hanasystem[0][0].hanasid[i].sid,
-           hanasystem[0][0].hanasid[i].mcos,
-           hanasystem[0][0].hanasid[i].systemReplication);
+    debug_print("SID %d, %s  MCOS=%d  SR=%d\n", i, hanasid[0][i].sid, mcos,
+                hanasid[0][i].systemReplication);
   }
 
   // return *selection;
