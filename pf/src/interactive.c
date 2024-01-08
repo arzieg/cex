@@ -34,8 +34,10 @@ SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 5. MCOS nur im SU
 */
 
-/* CustomString - Hilfsfunktionen
+/* -------------------------------------------------
+   CustomString - Hilfsfunktionen
    Eingabe von Werten und Rückgabe des Wertes
+   -------------------------------------------------
 */
 void CustomString_free(CustomString *target) {
   if (target->string) {
@@ -196,7 +198,6 @@ void get_sid_list(void) {
 
   } while (next_loop);
 
-  printf("\nYou entered:\n");
   n--;
   bool mcos;
   (n > 0) ? (mcos = true) : (mcos = false);
