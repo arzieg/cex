@@ -26,6 +26,16 @@ interaktiv
 
 typedef struct system
 
+building blocks: 
+0. main (pf)
+1. allgemeine Hilfsfunktionen (helpfkt)
+2. interaktiv
+3. batch
+4. SID Management (sidmgmt)
+5. Server Management (srvmgmt)
+6. allg. pf pflege
+
+
 
 
 

@@ -25,6 +25,21 @@ typedef struct {
 
 typedef struct sidtype {
   char sid[SIDLENGTH + 1];
+  int installation_number;
+  int uid_sidadm;
+  int uid_sapadm;
+  int gid_sidshm;
+  int gid_sapsys;
+  char nodes_dc1[MAX_HOST_EACH_HANASYSTEM][20];
+  char nodes_dc2[MAX_HOST_EACH_HANASYSTEM][20];
+  char nas_ports[4];
+  int num_numsp;
+  char nas_comment;
+  char dc1_name[3];
+  char dc2_name[3];
+  char xhana2_release[3];
+  char saprepo_version_dc1[24];
+  char saprepo_version_dc2[24];
   bool systemReplication;
 } SIDTYPE;
 
