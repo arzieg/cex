@@ -10,7 +10,7 @@
 #define HOSTNAME_LENGTH 13
 #define MAX_ENVIRONMENTS 10
 #define MAX_HOST_EACH_HANASYSTEM 13
-#define MAX_SID_PER_ENVIRONMENT 1
+#define MAX_SID_PER_ENVIRONMENT 6
 #define SIDLENGTH 3  // SID Length
 #define OK 0
 #define ERROR 1
@@ -30,8 +30,8 @@ typedef struct sidtype {
   int uid_sapadm;
   int gid_sidshm;
   int gid_sapsys;
-  char nodes_dc1[MAX_HOST_EACH_HANASYSTEM][20];
-  char nodes_dc2[MAX_HOST_EACH_HANASYSTEM][20];
+  char nodes_dc1[MAX_HOST_EACH_HANASYSTEM][21];
+  char nodes_dc2[MAX_HOST_EACH_HANASYSTEM][21];
   char nas_ports[4];
   int num_numsp;
   char nas_comment;
@@ -58,5 +58,4 @@ typedef struct hanasystemtype {
 void get_sid_list(void);
 int get_systemtype_choice(void);
 int interactive(void);
-
 #endif
