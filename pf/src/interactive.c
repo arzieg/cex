@@ -7,6 +7,7 @@
 #include <string.h>
 
 #include "pf.h"
+#include "pfhelper.h"
 
 #define DEBUG 1
 
@@ -33,76 +34,6 @@ SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 4. Im SO ist nur SingleSID erlaubt
 5. MCOS nur im SU
 */
-
-/* -------------------------------------------------
-   CustomString - Hilfsfunktionen
-   Eingabe von Werten und Rückgabe des Wertes
-   -------------------------------------------------
-*/
-void CustomString_free(CustomString *target) {
-  if (target->string) {
-    free(target->string);
-  }
-  free(target);
-}
-
-bool CustomString_isalphanumeric(CustomString *target) {
-  bool isalpha = true;
-  for (int i = 0; i < target->length - 1; i++) {
-    if (!isalnum(target->string[i])) {
-      isalpha = false;
-      break;
-    }
-  }
-  return isalpha;
-}
-
-CustomString *custom_getline(FILE *stream, int maxchars) {
-  do {
-    bool checklength = true;
-    bool checkisalnum = false;
-    CustomString *new = malloc(sizeof(*new));
-    new->string = NULL;
-    new->buffer_size = 0;
-    new->length = getline(&(new->string), &(new->buffer_size), stream);
-    // do some checks
-    if ((new->length == -1) || (new->length != maxchars)) {
-      free(new);
-      printf("\nExpect %d characters, try again >> ", maxchars - 1);
-      checklength = false;
-    }
-    if (CustomString_isalphanumeric(new)) {
-      checkisalnum = true;
-    } else {
-      printf("Unvalid character found, valid characters are a-z,A-Z,0-9\n>> ");
-    }
-    if (checklength && checkisalnum) {
-      return new;
-    }
-  } while (true);
-}
-
-bool get_yesno_status(char *text, FILE *stream) {
-  bool answer = false;
-  char character;
-  printf(text);
-  CustomString *new = malloc(sizeof(*new));
-  new->string = NULL;
-  new->buffer_size = 0;
-
-  do {
-    new->length = getline(&(new->string), &(new->buffer_size), stream);
-    strncpy(&character, new->string, 1);
-    character = toupper(character);
-    answer = (character == 'Y') || (character == 'N');
-    if (!answer) {
-      printf("Please enter y or n >> ");
-    }
-  } while (!answer);
-
-  CustomString_free(new);
-  return (character == 'Y') ? true : false;
-}
 
 int interactive(void) {
   // int selection;
@@ -163,27 +94,50 @@ void get_sid_list(void) {
 
   do {
     printf("\nPlease enter SID: ");
-    CustomString *line = custom_getline(stdin, SIDLENGTH + 1);
-
+    CustomString *line = custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1);
     strncpy(hanasid[0][n].sid, line->string, line->length);
-    // add \0 Terminator at end of SID
-    hanasid[0][n].sid[line->length - 1] = '\0';
-    // change to uppercase
-    for (int j = 0; j < strnlen(hanasid[0][n].sid, SIDLENGTH); j++) {
-      hanasid[0][n].sid[j] = toupper(hanasid[0][n].sid[j]);
-    }
-
+    hanasid[0][n].sid[line->length - 1] =
+        '\0';  // add \0 Terminator at end of SID
+    toUpperCase(hanasid[0][n].sid, strnlen(hanasid[0][n].sid, SIDLENGTH));
     debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
                 line->buffer_size);
     debug_print("Line read:%s\n", line->string);
+    free(line);
 
     strncpy(msg, "is the SAP SID part of a System Replication (Y/N)?", 255);
     systemreplication = get_yesno_status(msg, stdin);
     debug_print("... SR = %d\n", systemreplication);
     hanasid[0][n].systemReplication = systemreplication;
 
+    printf("\nInstallationnumber: ");
+    scanf("%d", &hanasid[0][n].installation_number);
+    printf("\nUID of SIDADM: ");
+    scanf("%d", &hanasid[0][n].uid_sidadm);
+    printf("\nUID of SAPADM: ");
+    scanf("%d", &hanasid[0][n].uid_sapadm);
+    printf("\nGID of SIDSHM: ");
+    scanf("%d", &hanasid[0][n].gid_sidshm);
+    printf("\nGID of SAPSYS: ");
+    scanf("%d", &hanasid[0][n].gid_sapsys);
+
+    // todo: change here code to use number of hosts / 2
+    for (int i = 0; i < 3;
+         i++) {  // iterate over each host each side - fix value for test = 3
+      printf("Rule for each HANA System: ");
+      CustomString *line = custom_getline(stdin, 10, 21);
+      strncpy(hanasid[0][n].nodes_dc1[i], line->string, line->length);
+      hanasid[0][n].nodes_dc1[i][line->length - 1] =
+          '\0';  // add \0 Terminator at end of SID
+      debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
+                  line->buffer_size);
+      debug_print("Line read:%s\n", line->string);
+      free(line);
+    };
+
+    printf("\nNumber of storage partitions (data+log volumes): ");
+    scanf("%d", &hanasid[0][n].num_numsp);
+
     n++;
-    CustomString_free(line);
 
     strncpy(msg, "Enter an additional SAP SID (Y/N)?", 255);
     get_next_sid = get_yesno_status(msg, stdin);
