@@ -94,7 +94,8 @@ void get_sid_list(void) {
 
   do {
     printf("\nPlease enter SID: ");
-    CustomString *line = custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1);
+    CustomString *line =
+        custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1, ISALPHANUMERIC);
     strncpy(hanasid[0][n].sid, line->string, line->length);
     hanasid[0][n].sid[line->length - 1] =
         '\0';  // add \0 Terminator at end of SID
@@ -124,7 +125,7 @@ void get_sid_list(void) {
     for (int i = 0; i < 3;
          i++) {  // iterate over each host each side - fix value for test = 3
       printf("Rule for each HANA System: ");
-      CustomString *line = custom_getline(stdin, 10, 21);
+      CustomString *line = custom_getline(stdin, 10, 21, ISALPHAANDPUNCTUATION);
       strncpy(hanasid[0][n].nodes_dc1[i], line->string, line->length);
       hanasid[0][n].nodes_dc1[i][line->length - 1] =
           '\0';  // add \0 Terminator at end of SID

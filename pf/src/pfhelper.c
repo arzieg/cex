@@ -2,6 +2,8 @@
    pf general helper functions
    =========================== */
 #define _GNU_SOURCE  // to use getline, define before stdio.h
+#include "pfhelper.h"
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdbool.h>
@@ -23,6 +25,7 @@ void CustomString_free(CustomString *target) {
   free(target);
 }
 
+/* Check if string is alphanumeric*/
 bool CustomString_isalphanumeric(CustomString *target) {
   bool isalpha = true;
   for (int i = 0; i < target->length - 1; i++) {
@@ -34,10 +37,28 @@ bool CustomString_isalphanumeric(CustomString *target) {
   return isalpha;
 }
 
-CustomString *custom_getline(FILE *stream, int minchars, int maxchars) {
+/* check if string is alphanumeric or has a punctuation*/
+/* TODO: check if only one colon is in the string */
+bool CustomString_isalphaORcolon(CustomString *target) {
+  bool isalphaorcolon = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i]) && !(target->string[i] == ':')) {
+      isalphaorcolon = false;
+      break;
+    }
+  }
+  /* check if : is only once in the string */
+  if (strchr(target->string, ':') != strrchr(target->string, ':'))
+    isalphaorcolon = false;
+
+  return isalphaorcolon;
+}
+
+CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
+                             int stringfunction) {
   do {
     bool checklength = true;
-    bool checkisalnum = false;
+    bool checkstring = false;
     CustomString *new = malloc(sizeof(*new));
     new->string = NULL;
     new->buffer_size = 0;
@@ -50,12 +71,25 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars) {
              maxchars - 1);
       checklength = false;
     }
-    if (CustomString_isalphanumeric(new)) {
-      checkisalnum = true;
-    } else {
-      printf("Unvalid character found, valid characters are a-z,A-Z,0-9\n>> ");
+
+    switch (stringfunction) {
+      case ISALPHANUMERIC:
+        checkstring = CustomString_isalphanumeric(new);
+        if (!checkstring)
+          printf("Invalid character found, valid is a-z,A-Z,0-9\n >> ");
+        break;
+      case ISALPHAORCOLON:
+        checkstring = CustomString_isalphaORcolon(new);
+        if (!checkstring)
+          printf(
+              "Invalid character found, valid is a-z,A-Z,0-9 and mandatory one "
+              "colon : \n >> ");
+        break;
+      default:
+        printf("Invalid character found. >> ");
     }
-    if (checklength && checkisalnum) {
+
+    if (checklength && checkstring) {
       return new;
     }
   } while (true);
