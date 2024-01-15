@@ -87,19 +87,24 @@ void get_sid_list(void) {
   bool next_loop = false;
   char msg[255];
   int n = 0;
+  int number_of_hosts = 6;
 
   system("clear");
   printf("\nInteractive Mode");
   printf("\n================\n\n");
 
   do {
+    // only temporary
+    printf("\nNumber of HANA Hosts in DC1: ");
+    scanf(" %d", &number_of_hosts);
+    clear_stdin();
     printf("\nPlease enter SID: ");
     CustomString *line =
         custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1, ISALPHANUMERIC);
     strncpy(hanasid[0][n].sid, line->string, line->length);
     hanasid[0][n].sid[line->length - 1] =
         '\0';  // add \0 Terminator at end of SID
-    toUpperCase(hanasid[0][n].sid, strnlen(hanasid[0][n].sid, SIDLENGTH));
+    to_upper_case(hanasid[0][n].sid, strnlen(hanasid[0][n].sid, SIDLENGTH));
     debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
                 line->buffer_size);
     debug_print("Line read:%s\n", line->string);
@@ -120,14 +125,28 @@ void get_sid_list(void) {
     scanf("%d", &hanasid[0][n].gid_sidshm);
     printf("\nGID of SAPSYS: ");
     scanf("%d", &hanasid[0][n].gid_sapsys);
+    clear_stdin();
 
-    // todo: change here code to use number of hosts / 2
-    for (int i = 0; i < 3;
-         i++) {  // iterate over each host each side - fix value for test = 3
-      printf("Rule for each HANA System: ");
-      CustomString *line = custom_getline(stdin, 10, 21, ISALPHAANDPUNCTUATION);
+    // todo: change here code to use number of hosts
+    printf("\n------------ DC 1 ------------");
+    for (int i = 0; i < number_of_hosts; i++) {
+      printf("\nRule for each HANA System in DC1: ");
+      CustomString *line = custom_getline(stdin, 10, 21, ISALPHAORCOLON);
       strncpy(hanasid[0][n].nodes_dc1[i], line->string, line->length);
       hanasid[0][n].nodes_dc1[i][line->length - 1] =
+          '\0';  // add \0 Terminator at end of SID
+      debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
+                  line->buffer_size);
+      debug_print("Line read:%s\n", line->string);
+      free(line);
+    };
+
+    printf("\n------------ DC 2 ------------");
+    for (int i = 0; i < number_of_hosts; i++) {
+      printf("\nRule for each HANA System in DC2: ");
+      CustomString *line = custom_getline(stdin, 10, 21, ISALPHAORCOLON);
+      strncpy(hanasid[0][n].nodes_dc2[i], line->string, line->length);
+      hanasid[0][n].nodes_dc2[i][line->length - 1] =
           '\0';  // add \0 Terminator at end of SID
       debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
                   line->buffer_size);
@@ -160,7 +179,18 @@ void get_sid_list(void) {
   for (int i = 0; i <= n; i++) {
     debug_print("SID %d, %s  MCOS=%d  SR=%d\n", i, hanasid[0][i].sid, mcos,
                 hanasid[0][i].systemReplication);
-  }
+    debug_print(
+        "InstNr: %d,  UID-SIDADM: %d, UID-SAPADM: %d, GID-SIDSHM: %d, "
+        "GID-SAPSYS: %d\n",
+        hanasid[0][i].installation_number, hanasid[0][i].uid_sidadm,
+        hanasid[0][i].uid_sapadm, hanasid[0][i].gid_sidshm,
+        hanasid[0][i].gid_sapsys);
 
-  // return *selection;
+    for (int j = 0; j < number_of_hosts; j++) {
+      debug_print("Rule: %s \n", hanasid[0][i].nodes_dc1[j]);
+    }
+    for (int j = 0; j < number_of_hosts; j++) {
+      debug_print("Rule: %s \n", hanasid[0][i].nodes_dc2[j]);
+    }
+  }
 }

@@ -39,7 +39,7 @@ bool CustomString_isalphanumeric(CustomString *target) {
 
 /* check if string is alphanumeric or has a punctuation*/
 /* TODO: check if only one colon is in the string */
-bool CustomString_isalphaORcolon(CustomString *target) {
+bool CustomString_isalpha_or_colon(CustomString *target) {
   bool isalphaorcolon = true;
   for (int i = 0; i < target->length - 1; i++) {
     if (!isalnum(target->string[i]) && !(target->string[i] == ':')) {
@@ -79,7 +79,7 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
           printf("Invalid character found, valid is a-z,A-Z,0-9\n >> ");
         break;
       case ISALPHAORCOLON:
-        checkstring = CustomString_isalphaORcolon(new);
+        checkstring = CustomString_isalpha_or_colon(new);
         if (!checkstring)
           printf(
               "Invalid character found, valid is a-z,A-Z,0-9 and mandatory one "
@@ -118,13 +118,26 @@ bool get_yesno_status(char *text, FILE *stream) {
 }
 
 /*
-toUpper - convert string to uppercase
+  to_upper_case - convert string to uppercase
 */
-void toUpperCase(char *line, int n) {
+void to_upper_case(char *line, int n) {
   int count = 0;
   while (*line != '\0' && count <= n) {
     *line = toupper(*line);
     line++;
     count++;
+  }
+}
+
+/*
+  clear stdin
+  https://stackoverflow.com/questions/7898215/how-can-i-clear-an-input-buffer-in-c
+*/
+void clear_stdin(void) {
+  while (true) {
+    int c = getc(stdin);
+    if (c == EOF || c == '\n') {
+      break;
+    }
   }
 }
