@@ -39,6 +39,21 @@ bool CustomString_isalphanumeric(CustomString *target) {
 
 /* check if string is alphanumeric or has a punctuation*/
 /* TODO: check if only one colon is in the string */
+bool CustomString_isalpha_and_one_colon(CustomString *target) {
+  bool isalphaandcolon = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i]) && !(target->string[i] == ':')) {
+      isalphaandcolon = false;
+      break;
+    }
+  }
+  /* check if : is only once in the string */
+  if (strchr(target->string, ':') != strrchr(target->string, ':'))
+    isalphaandcolon = false;
+
+  return isalphaandcolon;
+}
+
 bool CustomString_isalpha_or_colon(CustomString *target) {
   bool isalphaorcolon = true;
   for (int i = 0; i < target->length - 1; i++) {
@@ -47,11 +62,20 @@ bool CustomString_isalpha_or_colon(CustomString *target) {
       break;
     }
   }
-  /* check if : is only once in the string */
-  if (strchr(target->string, ':') != strrchr(target->string, ':'))
-    isalphaorcolon = false;
 
   return isalphaorcolon;
+}
+
+bool CustomString_isalpha_or_hyphen(CustomString *target) {
+  bool isalphaorhyphen = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i]) && !(target->string[i] == '-')) {
+      isalphaorhyphen = false;
+      break;
+    }
+  }
+
+  return isalphaorhyphen;
 }
 
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
@@ -78,12 +102,26 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
         if (!checkstring)
           printf("Invalid character found, valid is a-z,A-Z,0-9\n >> ");
         break;
-      case ISALPHAORCOLON:
-        checkstring = CustomString_isalpha_or_colon(new);
+      case ISALPHA_AND_COLON:
+        checkstring = CustomString_isalpha_and_one_colon(new);
         if (!checkstring)
           printf(
               "Invalid character found, valid is a-z,A-Z,0-9 and mandatory one "
               "colon : \n >> ");
+        break;
+      case ISAPLHA_OR_COLON:
+        checkstring = CustomString_isalpha_or_colon(new);
+        if (!checkstring)
+          printf(
+              "Invalid character found, valid is a-z,A-Z,0-9 and colon : \n "
+              ">> ");
+        break;
+      case ISALPHA_OR_HYPHEN:
+        checkstring = CustomString_isalpha_or_hyphen(new);
+        if (!checkstring)
+          printf(
+              "Invalid character found, valid is a-z,A-Z,0-9 and hyphen - \n "
+              ">> ");
         break;
       default:
         printf("Invalid character found. >> ");

@@ -11,7 +11,8 @@
 #define MAX_ENVIRONMENTS 10
 #define MAX_HOST_EACH_HANASYSTEM 13
 #define MAX_SID_PER_ENVIRONMENT 6
-#define SIDLENGTH 3  // SID Length
+#define SIDLENGTH 3   // SID Length
+#define MACLENGTH 17  // MAC Length incl. colon
 #define OK 0
 #define ERROR 1
 
@@ -22,6 +23,10 @@ typedef struct {
   char *string;
   size_t buffer_size;
 } CustomString;
+
+/*
+  SID Informationen
+*/
 
 typedef struct sidtype {
   char sid[SIDLENGTH + 1];
@@ -44,18 +49,42 @@ typedef struct sidtype {
 } SIDTYPE;
 
 /*
-typedef struct hanasidtype {
-  SIDTYPE hanasid[MAX_SID_PER_ENVIRONMENT];
-} HANASIDTYPE;
+ Netwerkinformationen
+ */
+typedef struct networktype {
+  char network_name[7];
+  char network_host_ip[15];
+  char network_ip[15];
+  char network_gw[15];
+  u_int8_t network_netmask;
+  u_int16_t network_vlanid;
+  u_int16_t network_mtu;
+} NETWORKTYPE;
+
+/*
+HOST Informationen
 */
 typedef struct hanasystemtype {
-  char *physical_hostname[HOSTNAME_LENGTH];
-  char *virtual_hostname[HOSTNAME_LENGTH];
-  char *mac_address[17];
+  char physical_hostname[HOSTNAME_LENGTH + 1];
+  char virtual_hostname[HOSTNAME_LENGTH + 1];
+  char mac_address1[17];
+  char mac_address2[17];
+  NETWORKTYPE *network_ips;
+  NETWORKTYPE *network_adm;
+  NETWORKTYPE *network_client;
+  NETWORKTYPE *network_st;
+  NETWORKTYPE *network_cr1;
+  NETWORKTYPE *network_cr2;
+  NETWORKTYPE *network_pcm;
+  NETWORKTYPE *network_bak;
+  NETWORKTYPE *network_se;
+  NETWORKTYPE *network_hnr;
+  NETWORKTYPE *network_hni;
 } HANASYSTEMTYPE;
 
 /* interactive.c */
 void get_sid_list(void);
+void get_system_data(void);
 int get_systemtype_choice(void);
 int interactive(void);
 #endif
