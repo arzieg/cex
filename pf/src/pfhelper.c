@@ -78,6 +78,18 @@ bool CustomString_isalpha_or_hyphen(CustomString *target) {
   return isalphaorhyphen;
 }
 
+bool CustomString_isalpha_or_dot(CustomString *target) {
+  bool isalphaordot = true;
+  for (int i = 0; i < target->length - 1; i++) {
+    if (!isalnum(target->string[i]) && !(target->string[i] == '.')) {
+      isalphaordot = false;
+      break;
+    }
+  }
+
+  return isalphaordot;
+}
+
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              int stringfunction) {
   do {
@@ -121,6 +133,13 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
         if (!checkstring)
           printf(
               "Invalid character found, valid is a-z,A-Z,0-9 and hyphen - \n "
+              ">> ");
+        break;
+      case ISALPHA_OR_DOT:
+        checkstring = CustomString_isalpha_or_dot(new);
+        if (!checkstring)
+          printf(
+              "Invalid character found, valid is a-z,A-Z,0-9 and dot . \n "
               ">> ");
         break;
       default:

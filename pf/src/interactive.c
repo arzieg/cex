@@ -77,6 +77,53 @@ int get_systemtype_choice(void) {
   return selection;
 }
 
+/*
+  get_network_name(network)
+    get information from network environment
+*/
+NETWORKTYPE get_network_name(char *network_name, char *hostname) {
+  NETWORKTYPE nw;
+
+  printf("\nInformation for Network %s for Host %s ", network_name, hostname);
+  printf("\n-------------------------------------------------");
+  printf("\nNetwork IP:");
+
+  strcpy(nw.network_name, network_name);
+
+  CustomString *line = custom_getline(stdin, IP_MIN_LENGTH + 1,
+                                      IP_MAX_LENGTH + 1, ISALPHA_OR_DOT);
+  strncpy(nw.network_ip, line->string, line->length);
+  nw.network_ip[line->length - 1] = '\0';
+  free(line);
+
+  printf("\nGateway IP:");
+  line = custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1,
+                        ISALPHA_OR_DOT);
+  strncpy(nw.network_gw, line->string, line->length);
+  nw.network_gw[line->length - 1] = '\0';
+  free(line);
+
+  printf("\nIP of Host in this subnet:");
+  line = custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1,
+                        ISALPHA_OR_DOT);
+  strncpy(nw.network_host_ip, line->string, line->length);
+  nw.network_host_ip[line->length - 1] = '\0';
+  free(line);
+
+  printf("\nNetwork Mask: ");
+  scanf(" %hhd", &nw.network_netmask);
+
+  printf("\nNetwork VLAN-ID: ");
+  scanf(" %hd", &nw.network_vlanid);
+
+  printf("\nNetwork MTU Size: ");
+  scanf(" %hd", &nw.network_mtu);
+
+  clear_stdin();
+
+  return nw;
+}
+
 /* --------------------------------------------------------------
  Enter the SID list. Each SID could be part of a systemReplication.
  If more then one System is entered, the system is per definition part of a mcos
@@ -198,6 +245,7 @@ void get_sid_list(void) {
 
 void get_system_data(void) {
   int n = 0;
+  NETWORKTYPE nwtmp;
 
   system("clear");
   printf("\nInteractive Mode");
@@ -255,67 +303,105 @@ void get_system_data(void) {
     debug_print("Line convert:%s\n", hanasystem[0][n].mac_address2);
     free(line);
 
-    /*
-      export PF4SH_SO_01_NET_MACS1_DC1=(AB:68:62:2B:68:4A AB:68:62:2B:67:66
-    AB:68:62:2B:67:68) export PF4SH_SO_01_NET_MACS1_DC2=(AB:68:62:2B:68:6C
-    AB:68:62:2B:67:58 AB:68:62:2B:66:98) export
-    PF4SH_SO_01_NET_MACS2_DC1=(98:45:AB:6A:FB:74 98:45:AB:6A:FB:78
-    98:45:AB:6A:FB:58) export PF4SH_SO_01_NET_MACS2_DC2=(98:45:AB:28:31:FC
-    98:45:AB:28:32:08 98:45:AB:28:31:D8) export
-    PF4SH_SO_01_NET_HOSTS_DC1=(hdb10s04-0001 hdb10s04-0002 hdb10s04-0003) export
-    PF4SH_SO_01_NET_HOSTS_DC2=(hdb10s04-1001 hdb10s04-1002 hdb10s04-1003) export
-    PF4SH_SO_01_NET_HANA_01_HOSTS_DC1=(lavdb10s04001 lavdb10s04002
-    lavdb10s04003) export PF4SH_SO_01_NET_HANA_01_HOSTS_DC2=(lavdb10s04101
-    lavdb10s04102 lavdb10s04103) export
-    PF4SH_SO_01_NET_HANA_01_IPS_DC1=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.201 10.2.65.202 10.2.65.203) export
-    PF4SH_SO_01_NET_HANA_01_IPS_DC2=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.204 10.2.65.205 10.2.65.206) export
-    PF4SH_SO_01_NET_ADM_DC1=(10.2.15.0 10.2.15.1 24 615
-    1500 10.2.15.101 10.2.15.102 10.2.15.103) export
-    PF4SH_SO_01_NET_ADM_DC2=(10.2.15.0 10.2.15.1 24 615
-    1500 10.2.15.104 10.2.15.105 10.2.15.106) export
-    PF4SH_SO_01_NET_CLIENT_DC1=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.101 10.2.65.102 10.2.65.103) export
-    PF4SH_SO_01_NET_CLIENT_DC2=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.104 10.2.65.105 10.2.65.106) export
-    PF4SH_SO_01_NET_ST_DC1=(10.2.14.0 10.2.14.1 24 614
-    9000 10.2.14.141 10.2.14.142 10.2.14.143) export
-    PF4SH_SO_01_NET_ST_DC2=(10.2.14.0 10.2.14.1 24 614
-    9000 10.2.14.144 10.2.14.145 10.2.14.146) export
-    PF4SH_SO_01_NET_CR1_DC1=(10.2.60.0 10.2.60.1 24 660
-    1500 10.2.60.101 10.2.60.102 10.2.60.103) export
-    PF4SH_SO_01_NET_CR1_DC2=(10.2.60.0 10.2.60.1 24 660
-    1500 10.2.60.104 10.2.60.105 10.2.60.106) export
-    PF4SH_SO_01_NET_CR2_DC1=(10.2.61.0 10.2.61.1 24 661
-    1500 10.2.61.101 10.2.61.102 10.2.61.103) export
-    PF4SH_SO_01_NET_CR2_DC2=(10.2.61.0 10.2.61.1 24 661
-    1500 10.2.61.104 10.2.61.105 10.2.61.106) export
-    PF4SH_SO_01_NET_PCM_DC1=(10.2.63.0 10.2.63.1 24 663
-    1500 10.2.63.101 10.2.63.102 10.2.63.103) export
-    PF4SH_SO_01_NET_PCM_DC2=(10.2.63.0 10.2.63.1 24 663
-    1500 10.2.63.104 10.2.63.105 10.2.63.106) export
-    PF4SH_SO_01_NET_BAK_DC1=(10.2.4.0 10.2.4.1 24 400
-    1500 10.2.4.101 10.2.4.102 10.2.4.103) export
-    PF4SH_SO_01_NET_BAK_DC2=(10.2.4.0 10.2.4.1 24 400
-    1500 10.2.4.104 10.2.4.105 10.2.4.106) # first HANA Installation on these
-    hosts export PF4SH_SO_01_NET_HANA_01_SE_DC1=(10.2.64.0 10.2.64.1 24 664
-    1500 10.2.64.101 10.2.64.102 10.2.64.103) export
-    PF4SH_SO_01_NET_HANA_01_SE_DC2=(10.2.64.0 10.2.64.1 24 664
-    1500 10.2.64.104 10.2.64.105 10.2.64.106) export
-    PF4SH_SO_01_NET_HANA_01_CLIENT_DC1=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.101 10.2.65.102 10.2.65.103) export
-    PF4SH_SO_01_NET_HANA_01_CLIENT_DC2=(10.2.65.0 10.2.65.1 24 665
-    1500 10.2.65.104 10.2.65.105 10.2.65.106) # ScaleOut Intercommunication #
-    TAKE CARE!!! MTU should be 9000 für HNR!!!!!!!! export
-    PF4SH_SO_01_NET_HANA_01_HNR_DC1=(10.2.62.0 10.2.62.1 24 662
-    1500 10.2.62.101 10.2.62.102 10.2.62.103) export
-    PF4SH_SO_01_NET_HANA_01_HNR_DC2=(10.2.62.0 10.2.62.1 24 662
-    1500 10.2.62.104 10.2.62.105 10.2.62.106) export
-    PF4SH_SO_01_NET_HANA_01_HNI_DC1=(10.2.66.0 10.2.66.1 24 666
-    9000 10.2.66.101 10.2.66.102 10.2.66.103) export
-    PF4SH_SO_01_NET_HANA_01_HNI_DC2=(10.2.66.0 10.2.66.1 24 666
-    9000 10.2.66.104 10.2.66.105 10.2.66.106)
-    */
-  } while (true);
+    nwtmp = get_network_name("IPS", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_ips.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_ips.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_ips.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_ips.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_ips.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_ips.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_ips.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("ADM", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_adm.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_adm.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_adm.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_adm.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_adm.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_adm.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_adm.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("CLIENT", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_client.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_client.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_client.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_client.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_client.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_client.network_host_ip,
+           nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_client.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("ST", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_st.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_st.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_st.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_st.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_st.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_st.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_st.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("CR1", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_cr1.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_cr1.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_cr1.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_cr1.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_cr1.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_cr1.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_cr1.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("CR2", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_cr2.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_cr2.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_cr2.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_cr2.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_cr2.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_cr2.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_cr2.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("PCM", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_pcm.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_pcm.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_pcm.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_pcm.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_pcm.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_pcm.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_pcm.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("BAK", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_bak.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_bak.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_bak.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_bak.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_bak.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_bak.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_bak.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("SE", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_se.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_se.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_se.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_se.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_se.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_se.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_se.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("HNR", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_hnr.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_hnr.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_hnr.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_hnr.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_hnr.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_hnr.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_hnr.network_ip, nwtmp.network_ip);
+
+    nwtmp = get_network_name("HNI", hanasystem[0][n].physical_hostname);
+    hanasystem[0][n].network_hni.network_mtu = nwtmp.network_mtu;
+    hanasystem[0][n].network_hni.network_netmask = nwtmp.network_netmask;
+    hanasystem[0][n].network_hni.network_vlanid = nwtmp.network_vlanid;
+    strcpy(hanasystem[0][n].network_hni.network_name, nwtmp.network_name);
+    strcpy(hanasystem[0][n].network_hni.network_gw, nwtmp.network_gw);
+    strcpy(hanasystem[0][n].network_hni.network_host_ip, nwtmp.network_host_ip);
+    strcpy(hanasystem[0][n].network_hni.network_ip, nwtmp.network_ip);
+
+   } while (true);
 }
