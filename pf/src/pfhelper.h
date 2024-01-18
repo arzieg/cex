@@ -11,7 +11,8 @@ enum stringfunction {
   ISALPHANUMERIC,
   ISALPHA_AND_COLON,
   ISAPLHA_OR_COLON,
-  ISALPHA_OR_HYPHEN
+  ISALPHA_OR_HYPHEN,
+  ISALPHA_OR_DOT,
 };
 
 void CustomString_free(CustomString *target);

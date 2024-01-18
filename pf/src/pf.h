@@ -15,6 +15,8 @@
 #define MACLENGTH 17  // MAC Length incl. colon
 #define OK 0
 #define ERROR 1
+#define IP_MIN_LENGTH 7
+#define IP_MAX_LENGTH 15
 
 /* get custom string
    https://suchprogramming.com/c-strings-and-standard-input/ */
@@ -69,17 +71,17 @@ typedef struct hanasystemtype {
   char virtual_hostname[HOSTNAME_LENGTH + 1];
   char mac_address1[17];
   char mac_address2[17];
-  NETWORKTYPE *network_ips;
-  NETWORKTYPE *network_adm;
-  NETWORKTYPE *network_client;
-  NETWORKTYPE *network_st;
-  NETWORKTYPE *network_cr1;
-  NETWORKTYPE *network_cr2;
-  NETWORKTYPE *network_pcm;
-  NETWORKTYPE *network_bak;
-  NETWORKTYPE *network_se;
-  NETWORKTYPE *network_hnr;
-  NETWORKTYPE *network_hni;
+  NETWORKTYPE network_ips;
+  NETWORKTYPE network_adm;
+  NETWORKTYPE network_client;
+  NETWORKTYPE network_st;
+  NETWORKTYPE network_cr1;
+  NETWORKTYPE network_cr2;
+  NETWORKTYPE network_pcm;
+  NETWORKTYPE network_bak;
+  NETWORKTYPE network_se;
+  NETWORKTYPE network_hnr;
+  NETWORKTYPE network_hni;
 } HANASYSTEMTYPE;
 
 /* interactive.c */
