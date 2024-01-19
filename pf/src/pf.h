@@ -9,7 +9,7 @@
 
 #define HOSTNAME_LENGTH 13
 #define MAX_ENVIRONMENTS 10
-#define MAX_HOST_EACH_HANASYSTEM 13
+#define MAX_HOST_EACH_HANASYSTEM 12
 #define MAX_SID_PER_ENVIRONMENT 6
 #define SIDLENGTH 3   // SID Length
 #define MACLENGTH 17  // MAC Length incl. colon
@@ -86,7 +86,9 @@ typedef struct hanasystemtype {
 
 /* interactive.c */
 void get_sid_list(void);
-void get_system_data(void);
-int get_systemtype_choice(void);
+void get_system_data(int max_hana_systems);
+void get_systemtype_choice(void);
+int get_number_systems(void);
+int get_number_sids(void);
 int interactive(void);
 #endif

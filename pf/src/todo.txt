@@ -36,6 +36,11 @@ building blocks:
 6. allg. pf pflege
 
 
+#
+check mac-address auf Richtigkeit
+bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
+
+
 
 
 
