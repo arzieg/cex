@@ -9,15 +9,6 @@
 #include "pf.h"
 #include "pfhelper.h"
 
-#define DEBUG 1
-
-#define debug_print(fmt, ...)                                           \
-  do {                                                                  \
-    if (DEBUG)                                                          \
-      fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, \
-              __VA_ARGS__);                                             \
-  } while (0)
-
 /* global variables */
 /* each hanasystemenvironment has 1 to n servers */
 HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
@@ -85,8 +76,14 @@ int interactive(void) {
   // get_sid_list();
   // get_system_data();
 
-  get_systemtype_choice();
-  // printf("\nYou entered %d\n", selection);
+  // get_systemtype_choice();
+  //  printf("\nYou entered %d\n", selection);
+  static char testchar[] = "1234567890.";
+
+  printf("\nTestfunction: \n, Enter IP: ");
+  CustomString *testline =
+      test_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, testchar);
+  CustomString_free(testline);
 
   return OK;
 }

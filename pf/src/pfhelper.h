@@ -23,6 +23,11 @@ bool CustomString_isalpha_or_hyphen(CustomString *target);
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              int stringfunction);
 bool get_yesno_status(char *text, FILE *stream);
+
 void to_upper_case(char *line, int n);
+void to_lower_case(char *line, int n);
 void clear_stdin(void);
+
+CustomString *test_getline(FILE *stream, int minchars, int maxchars,
+                           char *stringfunction);
 #endif

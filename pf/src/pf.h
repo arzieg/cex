@@ -18,6 +18,15 @@
 #define IP_MIN_LENGTH 7
 #define IP_MAX_LENGTH 15
 
+#define DEBUG 1
+
+#define debug_print(fmt, ...)                                           \
+  do {                                                                  \
+    if (DEBUG)                                                          \
+      fprintf(stderr, "%s:%d:%s(): " fmt, __FILE__, __LINE__, __func__, \
+              __VA_ARGS__);                                             \
+  } while (0)
+
 /* get custom string
    https://suchprogramming.com/c-strings-and-standard-input/ */
 typedef struct {
