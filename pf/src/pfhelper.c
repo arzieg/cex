@@ -6,6 +6,7 @@
 
 #include <ctype.h>
 #include <errno.h>
+#include <regex.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -41,24 +42,52 @@ bool CustomString_check_custom_char(CustomString *target, char *customchar) {
   bool alphanum = true;
   bool flag = true;
 
-  do {
-    for (size_t i = 0; i < target->length - 1; i++) {
-      flag = false;
-      size_t n = sizeof(customchar) / sizeof(customchar[0]);
-      for (size_t j = 0; j < n - 1; j++) {
-        if (target->string[i] == customchar[j]) {
-          flag = true;
-          break;
-        }
-      }
-      if (flag == false) {
-        alphanum = false;
+  for (size_t i = 0; i < target->length - 1; i++) {
+    flag = false;
+    size_t n = sizeof(customchar) / sizeof(customchar[0]);
+    for (size_t j = 0; j < n - 1; j++) {
+      if (target->string[i] == customchar[j]) {
+        flag = true;
         break;
       }
     }
-  } while (alphanum == true);
+    if (flag == false) {
+      alphanum = false;
+      break;
+    }
+  }
 
   return alphanum;
+}
+
+bool CustomString_check_regex(CustomString *target, char *customregex) {
+  regex_t regex;
+  int reti;
+  char msgbuf[100];
+
+  /* Kompilieren des Regex-Musters */
+  reti = regcomp(&regex, customregex, REG_EXTENDED);
+  if (reti) {
+    fprintf(stderr, "Konnte Regex-Muster nicht kompilieren\n");
+    return ERROR;
+  }
+
+  /* Ausführen des Regex-Musters */
+  reti = regexec(&regex, target->string, 0, NULL, 0);
+  if (!reti) {
+    printf("Regex-Muster gefunden\n");
+  } else if (reti == REG_NOMATCH) {
+    printf("Regex-Muster nicht gefunden\n");
+  } else {
+    regerror(reti, &regex, msgbuf, sizeof(msgbuf));
+    fprintf(stderr, "Regex-Fehler: %s\n", msgbuf);
+    return ERROR;
+  }
+
+  /* Freigeben des Regex-Musters */
+  regfree(&regex);
+
+  return OK;
 }
 
 /* check if string is alphanumeric or has a punctuation*/
@@ -253,8 +282,10 @@ CustomString *test_getline(FILE *stream, int minchars, int maxchars,
              maxchars - 1);
       checklength = false;
     }
+    new->string[new->length - 1] = '\0';
 
-    checkstring = CustomString_check_custom_char(new, stringfunction);
+    // checkstring = CustomString_check_custom_char(new, stringfunction);
+    checkstring = CustomString_check_regex(new, stringfunction);
     debug_print("Checkstring %d ", checkstring);
 
     if (checklength && checkstring) {
