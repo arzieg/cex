@@ -78,7 +78,9 @@ int interactive(void) {
 
   // get_systemtype_choice();
   //  printf("\nYou entered %d\n", selection);
-  static char testchar[] = "1234567890.";
+  static char testchar[] =
+      "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|"
+      "[01]?[0-9][0-9]?)){3}";
 
   printf("\nTestfunction: \n, Enter IP: ");
   CustomString *testline =
