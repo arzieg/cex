@@ -74,19 +74,22 @@ int interactive(void) {
   // int selection;
 
   // get_sid_list();
-  // get_system_data();
+  get_system_data(1);
 
   // get_systemtype_choice();
   //  printf("\nYou entered %d\n", selection);
+
+  /*
   static char testchar[] =
       "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|"
       "[01]?[0-9][0-9]?)){3}";
 
-  printf("\nTestfunction: \n, Enter IP: ");
+  printf("\nTestfunction, Enter IP: ");
   CustomString *testline =
-      test_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, testchar);
+      custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, testchar);
   CustomString_free(testline);
 
+  */
   return OK;
 }
 
@@ -134,28 +137,32 @@ void get_systemtype_choice(void) {
 NETWORKTYPE get_network_name(char *network_name, char *hostname) {
   NETWORKTYPE nw;
 
+  static char regexstring[] =
+      "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|"
+      "[01]?[0-9][0-9]?)){3}";
+
   printf("\nInformation for Network %s for Host %s ", network_name, hostname);
   printf("\n-------------------------------------------------");
   printf("\nNetwork IP:");
 
   strcpy(nw.network_name, network_name);
 
-  CustomString *line = custom_getline(stdin, IP_MIN_LENGTH + 1,
-                                      IP_MAX_LENGTH + 1, ISALPHA_OR_DOT);
+  CustomString *line =
+      custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, regexstring);
   strncpy(nw.network_ip, line->string, line->length);
   nw.network_ip[line->length - 1] = '\0';
   free(line);
 
   printf("\nGateway IP:");
-  line = custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1,
-                        ISALPHA_OR_DOT);
+  line =
+      custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, regexstring);
   strncpy(nw.network_gw, line->string, line->length);
   nw.network_gw[line->length - 1] = '\0';
   free(line);
 
   printf("\nIP of Host in this subnet:");
-  line = custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1,
-                        ISALPHA_OR_DOT);
+  line =
+      custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, regexstring);
   strncpy(nw.network_host_ip, line->string, line->length);
   nw.network_host_ip[line->length - 1] = '\0';
   free(line);

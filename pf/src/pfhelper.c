@@ -60,34 +60,37 @@ bool CustomString_check_custom_char(CustomString *target, char *customchar) {
   return alphanum;
 }
 
-bool CustomString_check_regex(CustomString *target, char *customregex) {
+bool CustomString_check_regex(CustomString *target, char *customregex,
+                              size_t length) {
   regex_t regex;
+  regmatch_t pmatch[1];
+  regoff_t off, len;
   int reti;
   char msgbuf[100];
 
   /* Kompilieren des Regex-Musters */
   reti = regcomp(&regex, customregex, REG_EXTENDED);
-  if (reti) {
+  if (reti != 0) {
     fprintf(stderr, "Konnte Regex-Muster nicht kompilieren\n");
     return ERROR;
   }
 
   /* Ausführen des Regex-Musters */
-  reti = regexec(&regex, target->string, 0, NULL, 0);
-  if (!reti) {
+  reti = regexec(&regex, target->string, 1, pmatch, 0);
+  if (reti == 0) {
     printf("Regex-Muster gefunden\n");
   } else if (reti == REG_NOMATCH) {
     printf("Regex-Muster nicht gefunden\n");
   } else {
     regerror(reti, &regex, msgbuf, sizeof(msgbuf));
     fprintf(stderr, "Regex-Fehler: %s\n", msgbuf);
-    return ERROR;
+    return false;
   }
 
   /* Freigeben des Regex-Musters */
   regfree(&regex);
 
-  return OK;
+  return (reti == 0) ? true : false;
 }
 
 /* check if string is alphanumeric or has a punctuation*/
@@ -143,6 +146,7 @@ bool CustomString_isalpha_or_dot(CustomString *target) {
   return isalphaordot;
 }
 
+/*
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              int stringfunction) {
   do {
@@ -205,6 +209,7 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
     }
   } while (true);
 }
+*/
 
 bool get_yesno_status(char *text, FILE *stream) {
   bool answer = false;
@@ -265,11 +270,13 @@ void clear_stdin(void) {
   }
 }
 
-CustomString *test_getline(FILE *stream, int minchars, int maxchars,
-                           char *stringfunction) {
+CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
+                             char *stringfunction) {
   do {
     bool checklength = true;
     bool checkstring = false;
+    debug_print("Checkstring %d \n", checkstring);
+    debug_print("Checklength %d \n", checklength);
     CustomString *new = malloc(sizeof(*new));
     new->string = NULL;
     new->buffer_size = 0;
@@ -281,12 +288,13 @@ CustomString *test_getline(FILE *stream, int minchars, int maxchars,
       printf("\nExpect characters between %d-%d, try again >> ", minchars - 1,
              maxchars - 1);
       checklength = false;
+    } else {
+      /* change \n to \0 */
+      new->string[new->length - 1] = '\0';
+      checkstring = CustomString_check_regex(new, stringfunction, new->length);
+      debug_print("\nCheckstring %d \n", checkstring);
+      debug_print("\nChecklength %d \n", checklength);
     }
-    new->string[new->length - 1] = '\0';
-
-    // checkstring = CustomString_check_custom_char(new, stringfunction);
-    checkstring = CustomString_check_regex(new, stringfunction);
-    debug_print("Checkstring %d ", checkstring);
 
     if (checklength && checkstring) {
       return new;
