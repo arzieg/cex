@@ -38,12 +38,8 @@ building blocks:
 
 #
 check mac-address auf Richtigkeit
-    CustomString *custom_getline(FILE *stream, int minchars, int maxchars,char *stringfunction) 
-      Hier wäre der Check von CustomString_check_regex(new, stringfunction) zu erweitern.
-      Regex alleine Reicht nicht, es kann ja auch sein, dass nur ein Teil gefunden wird. Bsp. 
-       Hostname = abcdefg-000*1, wenn regex nun Buchstaben, Nummern, Hyphen erlaubt, dann ist 1 ein Ergebnis
-       In diesem Fall unterscheidet sich die Anzahl der Zeichen der Eingabe mit der Anzahl der Zeichen des 
-       Suchergebnis uns sollte ein Fehler zurückgeben. 
+    get_sid_list 
+      pattern erarbeiten.
 
 bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
 

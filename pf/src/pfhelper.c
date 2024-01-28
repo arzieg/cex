@@ -60,31 +60,40 @@ bool CustomString_check_custom_char(CustomString *target, char *customchar) {
   return alphanum;
 }
 
-bool CustomString_check_regex(CustomString *target, char *customregex,
-                              size_t length) {
+bool CustomString_check_regex(CustomString *target, char *customregex) {
   regex_t regex;
   regmatch_t pmatch[1];
-  regoff_t off, len;
+  regoff_t len;
   int reti;
   char msgbuf[100];
 
   /* Kompilieren des Regex-Musters */
   reti = regcomp(&regex, customregex, REG_EXTENDED);
   if (reti != 0) {
-    fprintf(stderr, "Konnte Regex-Muster nicht kompilieren\n");
+    fprintf(stderr, "Could not compile regex.\n");
     return ERROR;
   }
 
   /* Ausführen des Regex-Musters */
   reti = regexec(&regex, target->string, 1, pmatch, 0);
   if (reti == 0) {
-    printf("Regex-Muster gefunden\n");
+    debug_print("found regex reti=%d\n", reti);
   } else if (reti == REG_NOMATCH) {
-    printf("Regex-Muster nicht gefunden\n");
+    debug_print("regex not found reti = %d\n", reti);
   } else {
     regerror(reti, &regex, msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex-Fehler: %s\n", msgbuf);
+    fprintf(stderr, "regex-error: %s\n", msgbuf);
     return false;
+  }
+
+  /* Pruefung der Laenge des gefundenen Strings und vgl. mit Laenge des  */
+  len = pmatch[0].rm_eo - pmatch[0].rm_so;
+  debug_print("len pmatch[0] = %d,  target->length = %d\n", len,
+              target->length);
+  if (target->length - 1 - len != 0) {
+    reti = 1;
+    fprintf(stderr,
+            "\nFound illegal character in the input string, please try again.");
   }
 
   /* Freigeben des Regex-Musters */
@@ -275,8 +284,8 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
   do {
     bool checklength = true;
     bool checkstring = false;
-    debug_print("Checkstring %d \n", checkstring);
-    debug_print("Checklength %d \n", checklength);
+    debug_print("Checkstring %d\n", checkstring);
+    debug_print("Checklength %d\n", checklength);
     CustomString *new = malloc(sizeof(*new));
     new->string = NULL;
     new->buffer_size = 0;
@@ -291,9 +300,9 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
     } else {
       /* change \n to \0 */
       new->string[new->length - 1] = '\0';
-      checkstring = CustomString_check_regex(new, stringfunction, new->length);
-      debug_print("\nCheckstring %d \n", checkstring);
-      debug_print("\nChecklength %d \n", checklength);
+      checkstring = CustomString_check_regex(new, stringfunction);
+      debug_print("Checkstring %d\n", checkstring);
+      debug_print("Checklength %d\n", checklength);
     }
 
     if (checklength && checkstring) {

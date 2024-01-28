@@ -73,8 +73,8 @@ int get_number_sids(void) {
 int interactive(void) {
   // int selection;
 
-  // get_sid_list();
-  get_system_data(1);
+  get_sid_list();
+  // get_system_data(1);
 
   // get_systemtype_choice();
   //  printf("\nYou entered %d\n", selection);
@@ -304,6 +304,7 @@ void get_system_data(int max_hana_systems) {
   int n = 0;
   NETWORKTYPE nwtmp;
   char dc[4] = "DC1";
+  char pattern[120] = "[a-z0-9-]+$";
 
   system("clear");
   printf("\nInteractive Mode");
@@ -315,8 +316,7 @@ void get_system_data(int max_hana_systems) {
     }
 
     printf("\nEnter physical Hostname in %s, SystemID %d: ", dc, n);
-    CustomString *line =
-        custom_getline(stdin, 8, HOSTNAME_LENGTH + 1, ISALPHA_OR_HYPHEN);
+    CustomString *line = custom_getline(stdin, 8, HOSTNAME_LENGTH + 1, pattern);
     strncpy(hanasystem[0][n].physical_hostname, line->string, line->length);
     hanasystem[0][n].physical_hostname[line->length - 1] =
         '\0';  // add \0 Terminator at end
@@ -327,7 +327,7 @@ void get_system_data(int max_hana_systems) {
 
     printf("\nEnter virtual Hostname in %s, SystemID %s: ", dc,
            hanasystem[0][n].physical_hostname);
-    line = custom_getline(stdin, 8, HOSTNAME_LENGTH + 1, ISALPHA_OR_HYPHEN);
+    line = custom_getline(stdin, 8, HOSTNAME_LENGTH + 1, pattern);
     strncpy(hanasystem[0][n].virtual_hostname, line->string, line->length);
     hanasystem[0][n].virtual_hostname[line->length - 1] =
         '\0';  // add \0 Terminator at end
@@ -336,10 +336,12 @@ void get_system_data(int max_hana_systems) {
     debug_print("Line convert:%s\n", hanasystem[0][n].virtual_hostname);
     free(line);
 
+    strcpy(pattern,
+           "^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})|([0-9a-fA-F]{4}\\.[0-9a-"
+           "fA-F]{4}\\.[0-9a-fA-F]{4})$\0");
     printf("\nEnter 1. MAC Adress for System %s: ",
            hanasystem[0][n].physical_hostname);
-    line =
-        custom_getline(stdin, MACLENGTH + 1, MACLENGTH + 1, ISAPLHA_OR_COLON);
+    line = custom_getline(stdin, MACLENGTH + 1, MACLENGTH + 1, pattern);
     strncpy(hanasystem[0][n].mac_address1, line->string, line->length);
     hanasystem[0][n].mac_address1[line->length - 1] =
         '\0';  // add \0 Terminator at end of SID
@@ -352,8 +354,7 @@ void get_system_data(int max_hana_systems) {
 
     printf("\nEnter 2. MAC Adress for System %s: ",
            hanasystem[0][n].physical_hostname);
-    line =
-        custom_getline(stdin, MACLENGTH + 1, MACLENGTH + 1, ISAPLHA_OR_COLON);
+    line = custom_getline(stdin, MACLENGTH + 1, MACLENGTH + 1, pattern);
 
     strncpy(hanasystem[0][n].mac_address2, line->string, line->length);
     hanasystem[0][n].mac_address2[line->length - 1] =
