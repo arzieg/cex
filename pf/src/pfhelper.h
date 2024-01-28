@@ -30,6 +30,5 @@ void clear_stdin(void);
 
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              char *stringfunction);
-bool CustomString_check_regex(CustomString *target, char *customregex,
-                              size_t length);
+bool CustomString_check_regex(CustomString *target, char *customregex);
 #endif
