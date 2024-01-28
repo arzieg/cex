@@ -1,36 +1,35 @@
 #include <regex.h>
+#include <stdint.h>
 #include <stdio.h>
+#include <stdlib.h>
 
-int main() {
+#define ARRAY_SIZE(arr) (sizeof((arr)) / sizeof((arr)[0]))
+
+static const char *const str =
+    "1) John Driverhacker;\n2) John Doe;\n3) John Foo;\n";
+static const char *const re = "John.*o";
+
+int main(void) {
+  static const char *s = str;
   regex_t regex;
-  int reti;
-  char msgbuf[100];
+  regmatch_t pmatch[1];
+  regoff_t off, len;
 
-  static const char *const string = "123pol45rttts7";
-  static const char *const pattern = "[0-9]{3}";
+  if (regcomp(&regex, re, REG_NEWLINE)) exit(EXIT_FAILURE);
 
-  printf("\n %s", pattern);
-  /* Kompilieren des Regex-Musters */
-  reti = regcomp(&regex, pattern, REG_EXTENDED);
-  if (reti) {
-    fprintf(stderr, "Konnte Regex-Muster nicht kompilieren\n");
-    return 1;
+  printf("String = \"%s\"\n", str);
+  printf("Matches:\n");
+
+  for (int i = 0;; i++) {
+    if (regexec(&regex, s, ARRAY_SIZE(pmatch), pmatch, 0)) break;
+
+    off = pmatch[0].rm_so + (s - str);
+    len = pmatch[0].rm_eo - pmatch[0].rm_so;
+    printf("#%d:\n", i);
+    printf("offset = %jd; length = %jd\n", (intmax_t)off, (intmax_t)len);
+    printf("substring = \"%.*s\"\n", len, s + pmatch[0].rm_so);
+
+    s += pmatch[0].rm_eo;
   }
-
-  /* Ausführen des Regex-Musters */
-  reti = regexec(&regex, string, 0, NULL, 0);
-  if (!reti) {
-    printf("Regex-Muster gefunden\n");
-  } else if (reti == REG_NOMATCH) {
-    printf("Regex-Muster nicht gefunden\n");
-  } else {
-    regerror(reti, &regex, msgbuf, sizeof(msgbuf));
-    fprintf(stderr, "Regex-Fehler: %s\n", msgbuf);
-    return 1;
-  }
-
-  /* Freigeben des Regex-Musters */
-  regfree(&regex);
-
-  return 0;
+  exit(EXIT_SUCCESS);
 }
