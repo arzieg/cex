@@ -15,6 +15,8 @@ HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 /* each hanasystemenvironment could have 1 to n SIDs */
 SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 
+enum serverrole {MASTER, WORKER, STANDBY};
+
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
    type=so,su,toolserver,iscsi
@@ -78,18 +80,6 @@ int interactive(void) {
 
   // get_systemtype_choice();
   //  printf("\nYou entered %d\n", selection);
-
-  /*
-  static char testchar[] =
-      "(\\b25[0-5]|\\b2[0-4][0-9]|\\b[01]?[0-9][0-9]?)(\\.(25[0-5]|2[0-4][0-9]|"
-      "[01]?[0-9][0-9]?)){3}";
-
-  printf("\nTestfunction, Enter IP: ");
-  CustomString *testline =
-      custom_getline(stdin, IP_MIN_LENGTH + 1, IP_MAX_LENGTH + 1, testchar);
-  CustomString_free(testline);
-
-  */
   return OK;
 }
 
@@ -193,6 +183,7 @@ void get_sid_list(void) {
   char msg[255];
   int n = 0;
   int number_of_hosts = 6;
+  char regexstring[120];
 
   system("clear");
   printf("\nInteractive Mode");
@@ -203,9 +194,10 @@ void get_sid_list(void) {
     printf("\nNumber of HANA Hosts in DC1: ");
     scanf(" %d", &number_of_hosts);
     clear_stdin();
+    strcpy(regexstring, "[a-zA-Z0-9]{3}\0");
     printf("\nPlease enter SID: ");
     CustomString *line =
-        custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1, ISALPHANUMERIC);
+        custom_getline(stdin, SIDLENGTH + 1, SIDLENGTH + 1, regexstring);
     strncpy(hanasid[0][n].sid, line->string, line->length);
     hanasid[0][n].sid[line->length - 1] =
         '\0';  // add \0 Terminator at end of SID
@@ -220,51 +212,62 @@ void get_sid_list(void) {
     debug_print("... SR = %d\n", systemreplication);
     hanasid[0][n].systemReplication = systemreplication;
 
-    printf("\nInstallationnumber: ");
-    scanf("%d", &hanasid[0][n].installation_number);
-    printf("\nUID of SIDADM: ");
-    scanf("%d", &hanasid[0][n].uid_sidadm);
-    printf("\nUID of SAPADM: ");
-    scanf("%d", &hanasid[0][n].uid_sapadm);
-    printf("\nGID of SIDSHM: ");
-    scanf("%d", &hanasid[0][n].gid_sidshm);
-    printf("\nGID of SAPSYS: ");
-    scanf("%d", &hanasid[0][n].gid_sapsys);
-    clear_stdin();
-
     // todo: change here code to use number of hosts
-    printf("\n------------ DC 1 ------------");
-    for (int i = 0; i < number_of_hosts; i++) {
-      printf("\nRule for each HANA System in DC1: ");
-      CustomString *line = custom_getline(stdin, 10, 21, ISALPHA_AND_COLON);
-      strncpy(hanasid[0][n].nodes_dc1[i], line->string, line->length);
-      hanasid[0][n].nodes_dc1[i][line->length - 1] =
-          '\0';  // add \0 Terminator at end of SID
-      debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
-                  line->buffer_size);
-      debug_print("Line read:%s\n", line->string);
-      free(line);
-    };
+    // ===================================================
+    // printf("\n------------ DC 1 ------------");
+    // printf("\nRule for each HANA System in DC1: ");
+    // for (int i = 0; i < number_of_hosts; i++) {
+    //   printf("\n Host %s:", hanasid[0])
+    //   CustomString *line = custom_getline(stdin, 10, 21, ISALPHA_AND_COLON);
+    //   strncpy(hanasid[0][n].nodes_dc1[i], line->string, line->length);
+    //   hanasid[0][n].nodes_dc1[i][line->length - 1] =
+    //       '\0';  // add \0 Terminator at end of SID
+    //   debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
+    //               line->buffer_size);
+    //   debug_print("Line read:%s\n", line->string);
+    //   free(line);
+    // };
 
-    printf("\n------------ DC 2 ------------");
-    for (int i = 0; i < number_of_hosts; i++) {
-      printf("\nRule for each HANA System in DC2: ");
-      CustomString *line = custom_getline(stdin, 10, 21, ISALPHA_AND_COLON);
-      strncpy(hanasid[0][n].nodes_dc2[i], line->string, line->length);
-      hanasid[0][n].nodes_dc2[i][line->length - 1] =
-          '\0';  // add \0 Terminator at end of SID
-      debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
-                  line->buffer_size);
-      debug_print("Line read:%s\n", line->string);
-      free(line);
-    };
+    // printf("\n------------ DC 2 ------------");
+    // for (int i = 0; i < number_of_hosts; i++) {
+    //   printf("\nRule for each HANA System in DC2: ");
+    //   CustomString *line = custom_getline(stdin, 10, 21, ISALPHA_AND_COLON);
+    //   strncpy(hanasid[0][n].nodes_dc2[i], line->string, line->length);
+    //   hanasid[0][n].nodes_dc2[i][line->length - 1] =
+    //       '\0';  // add \0 Terminator at end of SID
+    //   debug_print("Read %zd bytes, buffer is %zd bytes\n", line->length,
+    //               line->buffer_size);
+    //   debug_print("Line read:%s\n", line->string);
+    //   free(line);
+    // };
 
-    printf("\nNumber of storage partitions (data+log volumes): ");
-    scanf("%d", &hanasid[0][n].num_numsp);
+    strcpy(msg, "Installationnumber\0");
+    hanasid[0][n].installation_number = get_systeminformation_int(msg, 0, 95);
+    debug_print("\ninstallation_number %d",hanasid[0][n].installation_number );
+   
+    strcpy(msg, "UID of SIDADM\0");
+    hanasid[0][n].uid_sidadm = get_systeminformation_int(msg, 1000,60000);
+    debug_print("\nuid of sidadm %d",hanasid[0][n].uid_sidadm );
 
+    strcpy(msg, "UID of SAPADM\0");
+    hanasid[0][n].uid_sapadm = get_systeminformation_int(msg, 100,60000);
+    debug_print("\nuid of sapadm %d",hanasid[0][n].uid_sapadm );
+
+    strcpy(msg, "GID of SIDSHM\0");
+    hanasid[0][n].gid_sidshm = get_systeminformation_int(msg, 1000,60000);
+    debug_print("\ngid of sidshm %d",hanasid[0][n].gid_sidshm );
+     
+    strcpy(msg, "GID of SAPSYS\0");
+    hanasid[0][n].gid_sapsys = get_systeminformation_int(msg, 1000,60000);
+    debug_print("\ngid of sapsys %d",hanasid[0][n].gid_sapsys );
+    
+    strcpy(msg, "Number of storage partitions (data+log volumes)\0");
+    hanasid[0][n].num_numsp = get_systeminformation_int(msg, 2,8);
+    debug_print("\nnumber of storage partitions %d",hanasid[0][n].num_numsp );
+    
     n++;
 
-    strncpy(msg, "Enter an additional SAP SID (Y/N)?", 255);
+    strncpy(msg, "\nEnter an additional SAP SID (Y/N)?", 255);
     get_next_sid = get_yesno_status(msg, stdin);
     debug_print("... GET_NEXT_SID = %d\n", get_next_sid);
 
