@@ -1,0 +1,5 @@
+Die ist eine Testdatei. 
+Hier stehen verschiedene Zeilen drin. 
+Mal liest man Zeile 3, mal kann man auch Zeile 2 oder 1 lesen. 
+
+Ender der Datei

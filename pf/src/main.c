@@ -20,21 +20,22 @@ const char *argp_program_bug_address = "<bug@to.me>";
 static char doc[] = "pf -- ein Programm zur Pflege der pf-Datei";
 
 /* A description of the arguments we accept. */
-static char args_doc[] = "PFFILE";
+static char args_doc[] = "CONFDIR";
 
 /* The options we understand. */
 static struct argp_option options[] = {
     {"verbose", 'v', 0, 0, "Produce verbose output"},
     {"interactive", 'i', 0, 0, "Interactive Mode"},
+    {"confdir", 'd', "CONFDIR", 0, "Directory with config files"},
     {"output", 'o', "OUTFILE", 0, "Save File to <Outfile>"},
     {"check", 'c', "SID", 0, "Check Configuration of SID"},
     {0}};
 
 /* Used by main to communicate with parse_opt. */
 struct arguments {
-  char *args[1]; /* PFILE */
+  char *args[1]; /* CONFDIR */
+  char *confdir;
   char *output_file;
-  char *sid;
   bool pinteractive, verbose;
 };
 
@@ -51,11 +52,11 @@ static error_t parse_opt(int key, char *arg, struct argp_state *state) {
     case 'v':
       arguments->verbose = true;
       break;
+    case 'd':
+      arguments->confdir = arg;
+      break;
     case 'o':
       arguments->output_file = arg;
-      break;
-    case 'c':
-      arguments->sid = arg;
       break;
 
     case ARGP_KEY_ARG:
@@ -88,10 +89,10 @@ int main(int argc, char **argv) {
   FILE *outstream;
 
   /* Default values. */
-  arguments.sid = "";
   arguments.pinteractive = false;
   arguments.verbose = false;
   arguments.output_file = NULL;
+  arguments.confdir = NULL;
 
   /* Parse our arguments; every option seen by parse_opt will
      be reflected in arguments. */
@@ -103,11 +104,11 @@ int main(int argc, char **argv) {
   else
     outstream = stdout;
 
-  fprintf(outstream, "PFFILE = %s\n", arguments.args[0]);
-  fprintf(outstream, "SID = %s\n", arguments.sid);
+  fprintf(outstream, "CONFDIR = %s\n", arguments.args[0]);
   fprintf(outstream, "interactive = %d\n", arguments.pinteractive);
   fprintf(outstream, "verbose = %d\n", arguments.verbose);
   fprintf(outstream, "OUTPUT_FILE = %s\n", arguments.output_file);
+  fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   if (arguments.pinteractive) interactive();
   exit(0);

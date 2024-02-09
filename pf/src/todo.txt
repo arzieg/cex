@@ -2,7 +2,18 @@ Erzeuge die PF4SH neu
 
 Abfragen der notwendigen Informationen
 
-JSON Library: https://github.com/json-c/json-c
+in <dir> stehen die einzelnen Konfigurationsdateien je SID
+als Output wird eine Datei erzeugt. 
+
+es sind zwei zwingende Argumente zu übergeben 
+ - INDIR
+ - OUTFILE
+
+Optional kann noch -i für Interaktiv angegeben werden. 
+
+
+
+
 
 Funktionen:
     add host | sid |  (tag, clustername, role, hostname, ...)
@@ -37,9 +48,6 @@ building blocks:
 
 
 #
-check mac-address auf Richtigkeit
-    get_sid_list 
-      pattern erarbeiten.
 
 bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
 
