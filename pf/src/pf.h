@@ -100,5 +100,5 @@ void get_systemtype_choice(void);
 int get_number_systems(void);
 int get_number_sids(void);
 int interactive(void);
-int readconf(void);
+int readconf(char *directory);
 #endif

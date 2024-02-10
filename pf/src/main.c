@@ -20,7 +20,7 @@ const char *argp_program_bug_address = "<bug@to.me>";
 static char doc[] = "pf -- ein Programm zur Pflege der pf-Datei";
 
 /* A description of the arguments we accept. */
-static char args_doc[] = "CONFDIR";
+static char args_doc[] = "ARG0";
 
 /* The options we understand. */
 static struct argp_option options[] = {
@@ -28,7 +28,6 @@ static struct argp_option options[] = {
     {"interactive", 'i', 0, 0, "Interactive Mode"},
     {"confdir", 'd', "CONFDIR", 0, "Directory with config files"},
     {"output", 'o', "OUTFILE", 0, "Save File to <Outfile>"},
-    {"check", 'c', "SID", 0, "Check Configuration of SID"},
     {0}};
 
 /* Used by main to communicate with parse_opt. */
@@ -104,12 +103,13 @@ int main(int argc, char **argv) {
   else
     outstream = stdout;
 
-  fprintf(outstream, "CONFDIR = %s\n", arguments.args[0]);
+  fprintf(outstream, "ARG0 = %s\n", arguments.args[0]);
   fprintf(outstream, "interactive = %d\n", arguments.pinteractive);
   fprintf(outstream, "verbose = %d\n", arguments.verbose);
   fprintf(outstream, "OUTPUT_FILE = %s\n", arguments.output_file);
   fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   if (arguments.pinteractive) interactive();
+  if (arguments.confdir) readconf(arguments.confdir);
   exit(0);
 }
