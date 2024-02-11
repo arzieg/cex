@@ -1,41 +1,47 @@
+// implicit declaration of function getline
+#define _GNU_SOURCE
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
-// Funktion, die alle Übereinstimmungen mit einem regulären Ausdruck zurückgibt
-void find_matches(const char *pattern, const char *text) {
-  regex_t regex;
-  int reti;
-  regmatch_t pmatch[2];  // Array für Übereinstimmungen
+#include "pf.h"
 
-  // Kompiliere den regulären Ausdruck
-  reti = regcomp(&regex, pattern, 0);
-  if (reti) {
-    fprintf(stderr, "Could not compile regulare pattern\n");
-    exit(1);
-  }
+/*
+  ----------------------------------------
+  search pattern in text and return result
+  -----------------------------------------
+*/
+char *find_matches(const char *pattern, const char *text) {
+  // https://gist.github.com/ianmackinnon/3294587
 
-  // Suche nach Übereinstimmungen im Text
-  reti = regexec(&regex, text, 2, pmatch, 0) == 0;
-  if (reti) {
-    char *tmp;
-    int n;
-    printf("text = %s\n", text);
-    // printf("pmatch[0] = %s\n", pmatch[0]);
-    printf("Found: %.*s\n", (int)(pmatch[1].rm_eo - pmatch[1].rm_so),
-           &text[pmatch[1].rm_so]);
-    n = pmatch[1].rm_eo - pmatch[1].rm_so;
-    tmp = (char *)malloc(n * sizeof(char));
-    strcpy(tmp, &text[pmatch[1].rm_so]);
-    printf("tmp = %s", tmp);
-    printf("strlen = %ld", strlen(tmp));
-    // printf("Found: %s\n", &text[pmatch[1].rm_so]);
-    // text += pmatch[2].rm_eo;  // Gehe zum nächsten Teil des Texts
-  }
+  size_t maxGroups = 3;
+  size_t reti;
 
-  // Gib den Speicher frei
-  regfree(&regex);
+  regex_t regexCompiled;
+  regmatch_t groupArray[maxGroups];
+  char *cursor = NULL;
+
+  if (regcomp(&regexCompiled, pattern, REG_EXTENDED)) {
+    printf("Could not compile regular expression.\n");
+    return NULL;
+  };
+
+  reti = regexec(&regexCompiled, text, maxGroups, groupArray, 0);
+
+  if (!reti) {
+    regoff_t off, len;
+    off = groupArray[1].rm_so;
+    len = groupArray[1].rm_eo - groupArray[1].rm_so;
+    cursor = malloc((len + 1) * sizeof(char));
+    strncpy(cursor, text + off, len);
+    cursor[len + 1] = '\0';
+    debug_print("\n found = %s\n", cursor);
+    }
+
+  regfree(&regexCompiled);
+
+  return (cursor != NULL) ? cursor : NULL;
 }
 
 int readconf(char *filename) {
@@ -45,9 +51,6 @@ int readconf(char *filename) {
   char **gptr = malloc(sizeof(char *));
   *gptr = NULL;
   char pattern[120] = "\\bSU_NET_MACS1_DC2=\\((.*)\\)";
-  // char pattern[120] = "\\bSU_NET_MACS1_DC2=\\(([^)]+)";
-
-  // CustomString_check_regex(CustomString *target, char *customregex)
 
   if ((fd = fopen(filename, "r")) == NULL) {
     fprintf(stderr, "Could not open %s!\n", filename);
@@ -55,8 +58,10 @@ int readconf(char *filename) {
   }
 
   while ((nRet = getline(gptr, t, fd)) > 0) {
-    find_matches(pattern, *gptr);
-    // fputs(*gptr, stdout);
+    char *result = find_matches(pattern, *gptr);
+    if (result != NULL) {
+      printf("\nGot from function = %s \n", result);
+    }
   }
 
   return EXIT_SUCCESS;

@@ -1,35 +1,46 @@
 #include <regex.h>
-#include <stdint.h>
 #include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
-#define ARRAY_SIZE(arr) (sizeof((arr)) / sizeof((arr)[0]))
+int main() {
+  char* source = "SU_NET_MACS1_DC2=(4C:52:62:2B:66:98)";
+  char* regexString = "\\bSU_NET_MACS1_DC2=\\((.*)\\)";
+  size_t maxMatches = 2;
+  size_t maxGroups = 3;
 
-static const char *const str =
-    "1) John Driverhacker;\n2) John Doe;\n3) John Foo;\n";
-static const char *const re = "John.*o";
+  regex_t regexCompiled;
+  regmatch_t groupArray[maxGroups];
+  unsigned int m;
+  char* cursor;
 
-int main(void) {
-  static const char *s = str;
-  regex_t regex;
-  regmatch_t pmatch[1];
-  regoff_t off, len;
+  if (regcomp(&regexCompiled, regexString, REG_EXTENDED)) {
+    printf("Could not compile regular expression.\n");
+    return 1;
+  };
 
-  if (regcomp(&regex, re, REG_NEWLINE)) exit(EXIT_FAILURE);
+  m = 0;
+  cursor = source;
+  for (m = 0; m < maxMatches; m++) {
+    if (regexec(&regexCompiled, cursor, maxGroups, groupArray, 0))
+      break;  // No more matches
 
-  printf("String = \"%s\"\n", str);
-  printf("Matches:\n");
+    unsigned int g = 0;
+    unsigned int offset = 0;
+    for (g = 0; g < maxGroups; g++) {
+      if (groupArray[g].rm_so == (size_t)-1) break;  // No more groups
 
-  for (int i = 0;; i++) {
-    if (regexec(&regex, s, ARRAY_SIZE(pmatch), pmatch, 0)) break;
+      if (g == 0) offset = groupArray[g].rm_eo;
 
-    off = pmatch[0].rm_so + (s - str);
-    len = pmatch[0].rm_eo - pmatch[0].rm_so;
-    printf("#%d:\n", i);
-    printf("offset = %jd; length = %jd\n", (intmax_t)off, (intmax_t)len);
-    printf("substring = \"%.*s\"\n", len, s + pmatch[0].rm_so);
-
-    s += pmatch[0].rm_eo;
+      char cursorCopy[strlen(cursor) + 1];
+      strcpy(cursorCopy, cursor);
+      cursorCopy[groupArray[g].rm_eo] = 0;
+      printf("Match %u, Group %u: [%2u-%2u]: %s\n", m, g, groupArray[g].rm_so,
+             groupArray[g].rm_eo, cursorCopy + groupArray[g].rm_so);
+    }
+    cursor += offset;
   }
-  exit(EXIT_SUCCESS);
+
+  regfree(&regexCompiled);
+
+  return 0;
 }
