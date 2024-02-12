@@ -15,10 +15,18 @@ enum stringfunction {
   ISALPHA_OR_DOT,
 };
 
+/*
+ for readconf.c. Idea is to setup a table with parametername, regexec-code and
+ result of regexec.
+*/
+// Parameter | regexec | result
+struct ConfigTableArray {
+  char *parametername;
+  char *regexeccode;
+  char *result;
+};
+
 void CustomString_free(CustomString *target);
-// bool CustomString_isalpha_and_one_colon(CustomString *target);
-// bool CustomString_isalpha_or_colon(CustomString *target);
-// bool CustomString_isalpha_or_hyphen(CustomString *target);
 
 // CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
 //                              int stringfunction);

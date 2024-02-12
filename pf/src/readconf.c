@@ -6,6 +6,14 @@
 #include <string.h>
 
 #include "pf.h"
+#include "pfhelper.h"
+
+struct ConfigTableArray ConfigTable[] = {
+    {.parametername = "SU_NET_MACS1_DC2",
+     .regexeccode = "\\bSU_NET_MACS1_DC2=\\((.*)\\)"},
+    {.parametername = "SU_NET_MACS1_DC1",
+     .regexeccode = "\\bSU_NET_MACS1_DC1=\\((.*)\\)"},
+};
 
 /*
   ----------------------------------------
@@ -37,7 +45,7 @@ char *find_matches(const char *pattern, const char *text) {
     strncpy(cursor, text + off, len);
     cursor[len + 1] = '\0';
     debug_print("\n found = %s\n", cursor);
-    }
+  }
 
   regfree(&regexCompiled);
 
@@ -45,24 +53,64 @@ char *find_matches(const char *pattern, const char *text) {
 }
 
 int readconf(char *filename) {
+  // FILE *fd;
+  // int nRet;
+  // size_t *t = malloc(0);
+  // char **gptr = malloc(sizeof(char *));
+  // *gptr = NULL;
+  // char pattern[120] = "\\bSU_NET_MACS1_DC2=\\((.*)\\)";
+
+  // if ((fd = fopen(filename, "r")) == NULL) {
+  //   fprintf(stderr, "Could not open %s!\n", filename);
+  //   return EXIT_FAILURE;
+  // }
+
+  // while ((nRet = getline(gptr, t, fd)) > 0) {
+  //   char *result = find_matches(pattern, *gptr);
+  //   if (result != NULL) {
+  //     printf("\nGot from function = %s \n", result);
+  //   }
+  // }
+
+  // return EXIT_SUCCESS;
   FILE *fd;
-  int nRet;
-  size_t *t = malloc(0);
-  char **gptr = malloc(sizeof(char *));
-  *gptr = NULL;
-  char pattern[120] = "\\bSU_NET_MACS1_DC2=\\((.*)\\)";
+  char *filecontent;
+  size_t filesize;
 
-  if ((fd = fopen(filename, "r")) == NULL) {
-    fprintf(stderr, "Could not open %s!\n", filename);
-    return EXIT_FAILURE;
+  fd = fopen(filename, "rb");
+  if (fd == NULL) {
+    fprintf(stderr, "Could not open %s\n", filename);
+    return ERROR;
   }
 
-  while ((nRet = getline(gptr, t, fd)) > 0) {
-    char *result = find_matches(pattern, *gptr);
-    if (result != NULL) {
-      printf("\nGot from function = %s \n", result);
-    }
+  // get filesize
+  fseek(fd, 0, SEEK_END);
+  filesize = ftell(fd);
+  fseek(fd, 0, SEEK_SET);
+
+  // reserve memory
+  filecontent = (char *)malloc(filesize * sizeof(char));
+  if (filecontent == NULL) {
+    fprintf(stderr, "Could not allocate %ld Bytes.\n", filesize * sizeof(char));
+    fclose(fd);
   }
+
+  fread(filecontent, 1, filesize, fd);
+  fclose(fd);
+
+  debug_print("Dateiinhalt:\n%s\n", filecontent);
+
+  // ConfigTable[0].result = (char *)malloc(50 * sizeof(char));
+  // ConfigTable[1].result = (char *)malloc(100 * sizeof(char));
+
+  for (size_t i = 0; i < 2; i++) {
+    printf("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
+           ConfigTable[i].regexeccode);
+    find_matches(ConfigTable[i].regexeccode, filecontent);
+  }
+
+  // Speicher freigeben
+  free(filecontent);
 
   return EXIT_SUCCESS;
 }
