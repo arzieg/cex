@@ -13,6 +13,7 @@ struct ConfigTableArray ConfigTable[] = {
      .regexeccode = "\\bSU_NET_MACS1_DC2=\\((.*)\\)"},
     {.parametername = "SU_NET_MACS1_DC1",
      .regexeccode = "\\bSU_NET_MACS1_DC1=\\((.*)\\)"},
+
 };
 
 /*
@@ -44,7 +45,7 @@ char *find_matches(const char *pattern, const char *text) {
     cursor = malloc((len + 1) * sizeof(char));
     strncpy(cursor, text + off, len);
     cursor[len + 1] = '\0';
-    debug_print("\n found = %s\n", cursor);
+    // debug_print("\n found = %s\n", cursor);
   }
 
   regfree(&regexCompiled);
@@ -53,28 +54,9 @@ char *find_matches(const char *pattern, const char *text) {
 }
 
 int readconf(char *filename) {
-  // FILE *fd;
-  // int nRet;
-  // size_t *t = malloc(0);
-  // char **gptr = malloc(sizeof(char *));
-  // *gptr = NULL;
-  // char pattern[120] = "\\bSU_NET_MACS1_DC2=\\((.*)\\)";
-
-  // if ((fd = fopen(filename, "r")) == NULL) {
-  //   fprintf(stderr, "Could not open %s!\n", filename);
-  //   return EXIT_FAILURE;
-  // }
-
-  // while ((nRet = getline(gptr, t, fd)) > 0) {
-  //   char *result = find_matches(pattern, *gptr);
-  //   if (result != NULL) {
-  //     printf("\nGot from function = %s \n", result);
-  //   }
-  // }
-
-  // return EXIT_SUCCESS;
   FILE *fd;
   char *filecontent;
+  char *cursor;
   size_t filesize;
 
   fd = fopen(filename, "rb");
@@ -98,15 +80,17 @@ int readconf(char *filename) {
   fread(filecontent, 1, filesize, fd);
   fclose(fd);
 
-  debug_print("Dateiinhalt:\n%s\n", filecontent);
+  // debug_print("Dateiinhalt:\n%s\n", filecontent);
 
-  // ConfigTable[0].result = (char *)malloc(50 * sizeof(char));
-  // ConfigTable[1].result = (char *)malloc(100 * sizeof(char));
+  ConfigTable[0].result = (char *)malloc(50 * sizeof(char));
+  ConfigTable[1].result = (char *)malloc(100 * sizeof(char));
 
   for (size_t i = 0; i < 2; i++) {
-    printf("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
-           ConfigTable[i].regexeccode);
-    find_matches(ConfigTable[i].regexeccode, filecontent);
+    debug_print("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
+                ConfigTable[i].regexeccode);
+    ConfigTable[i].result =
+        find_matches(ConfigTable[i].regexeccode, filecontent);
+    debug_print("ConfigTable[i].result = %s", ConfigTable[i].result);
   }
 
   // Speicher freigeben
