@@ -10,9 +10,11 @@
 
 struct ConfigTableArray ConfigTable[] = {
     {.parametername = "SU_NET_MACS1_DC2",
-     .regexeccode = "\\bSU_NET_MACS1_DC2=\\((.*)\\)"},
+     .regexeccode =
+         "SU_NET_MACS1_DC2=\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"},
     {.parametername = "SU_NET_MACS1_DC1",
-     .regexeccode = "\\bSU_NET_MACS1_DC1=\\((.*)\\)"},
+     .regexeccode =
+         "SU_NET_MACS1_DC1=\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"},
 
 };
 
@@ -56,7 +58,6 @@ char *find_matches(const char *pattern, const char *text) {
 int readconf(char *filename) {
   FILE *fd;
   char *filecontent;
-  char *cursor;
   size_t filesize;
 
   fd = fopen(filename, "rb");
@@ -90,7 +91,7 @@ int readconf(char *filename) {
                 ConfigTable[i].regexeccode);
     ConfigTable[i].result =
         find_matches(ConfigTable[i].regexeccode, filecontent);
-    debug_print("ConfigTable[i].result = %s", ConfigTable[i].result);
+    debug_print("ConfigTable[%d].result = %s\n", i, ConfigTable[i].result);
   }
 
   // Speicher freigeben
