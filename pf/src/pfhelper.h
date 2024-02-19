@@ -23,6 +23,7 @@ enum stringfunction {
 struct ConfigTableArray {
   char *parametername;
   char *regexeccode;
+  size_t maxlength;  // max length of string
   char *result;
 };
 
