@@ -17,6 +17,8 @@
 #define ERROR 1
 #define IP_MIN_LENGTH 7
 #define IP_MAX_LENGTH 15
+#define NET_INFOMATION 61  // used in readconf
+#define TEXTLENGTH 20      // used in readconf
 
 #define DEBUG 1
 
