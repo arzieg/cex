@@ -10,7 +10,7 @@
 
 #define REGEXMAC "\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
-#define REGEXSTR "\"\([^\"].?\)\""
+#define REGEXSTR "\"(.*)\""
 
 struct ConfigTableArray ConfigTable[] = {
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC1",
