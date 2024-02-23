@@ -13,12 +13,7 @@
 #define REGEXSTR "\"([^\"]*)\""
 
 struct ConfigTableArray ConfigTable[] = {
-    {.parametername = "SU_XHANA2_RELEASE",
-     .regexeccode = "SU_XHANA2_RELEASE=" REGEXSTR "",
-     .maxlength = TEXTLENGTH},
-    {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC1",
-     .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC1=" REGEXSTR "",
-     .maxlength = TEXTLENGTH},
+
     {.parametername = "SU_NET_MACS1_DC2",
      .regexeccode = "SU_NET_MACS1_DC2=" REGEXBRACKETSTR "",
      .maxlength = MACLENGTH},
@@ -201,7 +196,12 @@ struct ConfigTableArray ConfigTable[] = {
     {.parametername = "SU_HANA_02_DC2_NAME",
      .regexeccode = "SU_HANA_02_DC2_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4},
-
+    {.parametername = "SU_XHANA2_RELEASE",
+     .regexeccode = "SU_XHANA2_RELEASE=" REGEXSTR "",
+     .maxlength = TEXTLENGTH},
+    {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC1",
+     .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC1=" REGEXSTR "",
+     .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC2",
      .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
@@ -267,7 +267,9 @@ char *find_matches(const char *pattern, const char *text) {
     regoff_t off, len;
     off = groupArray[1].rm_so;
     len = groupArray[1].rm_eo - groupArray[1].rm_so;
-    cursor = malloc((len + 1) * sizeof(char));
+    cursor = (char *)calloc((len + 1), sizeof(char));
+    // cursor = (char *)malloc((len+1) * sizeof(char));   # hier wird bei
+    // kleinen Speicher ein Byte mehr allokiert als angefordert
     strncpy(cursor, text + off, len);
     cursor[len + 1] = '\0';
     // debug_print("\n found = %s\n", cursor);
