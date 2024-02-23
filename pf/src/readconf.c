@@ -10,9 +10,12 @@
 
 #define REGEXMAC "\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
-#define REGEXSTR "\"(.*)\""
+#define REGEXSTR "\"([^\"]*)\""
 
 struct ConfigTableArray ConfigTable[] = {
+    {.parametername = "SU_XHANA2_RELEASE",
+     .regexeccode = "SU_XHANA2_RELEASE=" REGEXSTR "",
+     .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC1",
      .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
@@ -198,18 +201,15 @@ struct ConfigTableArray ConfigTable[] = {
     {.parametername = "SU_HANA_02_DC2_NAME",
      .regexeccode = "SU_HANA_02_DC2_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4},
-    {.parametername = "SU_XHANA2_RELEASE",
-     .regexeccode = "SU_XHANA2_RELEASE=" REGEXBRACKETSTR "",
-     .maxlength = TEXTLENGTH},
 
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC2",
-     .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC2=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_02_SAPREPO_VERSION_DC1",
-     .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC1=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_02_SAPREPO_VERSION_DC2",
-     .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC2=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_01_NAS_SVMS",
      .regexeccode = "SU_HANA_01_NAS_SVMS=" REGEXBRACKETSTR "",
@@ -230,13 +230,13 @@ struct ConfigTableArray ConfigTable[] = {
      .regexeccode = "SU_HANA_02_NAS_NUMSP=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_HANA_01_NAS_COMMENT",
-     .regexeccode = "SU_HANA_01_NAS_COMMENT=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_01_NAS_COMMENT=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_NAS_DC1",
-     .regexeccode = "SU_NAS_DC1=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_NAS_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
     {.parametername = "SU_NAS_DC2",
-     .regexeccode = "SU_NAS_DC2=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_NAS_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH},
 
 };
