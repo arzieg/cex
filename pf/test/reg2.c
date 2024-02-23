@@ -5,7 +5,7 @@
 
 // Definiere das Muster für Werte zwischen doppelten Anführungszeichen
 // #define PATTERN "(?<=\")(.*)(?=\")"
-#define PATTERN "\"(.*?)\"\1"
+#define PATTERN "\"([^\"]*)\""
 char *search = "SU_HANA_01_SAPREPO_VERSION_DC1=" PATTERN "";
 
 int main() {
@@ -22,8 +22,8 @@ int main() {
 
   regmatch_t matches[3];
   if (regexec(&regex, input, 3, matches, 0) == 0) {
-    size_t start = matches[2].rm_so;
-    size_t end = matches[2].rm_eo;
+    size_t start = matches[1].rm_so;
+    size_t end = matches[1].rm_eo;
     char *extracted_value = strndup(input + start, end - start);
     printf("search: %s\n", search);
     printf("Extrahierter Wert: %s\n", extracted_value);
