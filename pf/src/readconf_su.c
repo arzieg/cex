@@ -12,6 +12,9 @@
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
 #define REGEXSTR "\"([^\"]*)\""
 
+extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
+
 struct ConfigTableArray ConfigTable[] = {
 
     {.parametername = "SU_NET_MACS1_DC2",
@@ -280,7 +283,7 @@ char *find_matches(const char *pattern, const char *text) {
   return (cursor != NULL) ? cursor : NULL;
 }
 
-int readconf(char *filename) {
+int readconf_su(char *filename) {
   FILE *fd;
   char *filecontent;
   size_t filesize;
@@ -312,15 +315,20 @@ int readconf(char *filename) {
   for (size_t i = 0; i < n; i++) {
     ConfigTable[i].result =
         (char *)malloc((ConfigTable[i].maxlength + 1) * sizeof(char));
-    debug_print("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
+    /* debug_print("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
                 ConfigTable[i].regexeccode);
+    */
     ConfigTable[i].result =
         find_matches(ConfigTable[i].regexeccode, filecontent);
-    debug_print("ConfigTable[%d].result = %s\n", i, ConfigTable[i].result);
+    // debug_print("ConfigTable[%d].result = %s\n", i, ConfigTable[i].result);
   }
-
-  // Speicher freigeben
   free(filecontent);
+
+  // debug
+  for (size_t i = 0; i < n; i++) {
+    debug_print("%s  --  %s\n", ConfigTable[i].parametername,
+                ConfigTable[i].result);
+  }
 
   return EXIT_SUCCESS;
 }

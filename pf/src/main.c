@@ -8,6 +8,15 @@
 #include <unistd.h>
 
 #include "pf.h"
+#include "pfhelper.h"
+
+/* global variables */
+/* each hanasystemenvironment has 1 to n servers */
+HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+/* each hanasystemenvironment could have 1 to n SIDs */
+SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
+
+enum serverrole { MASTER, WORKER, STANDBY };
 
 /* -------------------------------------------
    Arg Parse
@@ -110,6 +119,6 @@ int main(int argc, char **argv) {
   fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   if (arguments.pinteractive) interactive();
-  if (arguments.confdir) readconf(arguments.confdir);
+  if (arguments.confdir) readconf_su(arguments.confdir);
   exit(0);
 }

@@ -9,13 +9,9 @@
 #include "pf.h"
 #include "pfhelper.h"
 
-/* global variables */
-/* each hanasystemenvironment has 1 to n servers */
-HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
-/* each hanasystemenvironment could have 1 to n SIDs */
-SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
-
-enum serverrole {MASTER, WORKER, STANDBY};
+extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
+// extern enum serverrole;
 
 /*
 1. ScaleOut oder ScaleUp oder Managementserver (Toolserver, iSCSI Server)
@@ -243,28 +239,28 @@ void get_sid_list(void) {
 
     strcpy(msg, "Installationnumber\0");
     hanasid[0][n].installation_number = get_systeminformation_int(msg, 0, 95);
-    debug_print("\ninstallation_number %d",hanasid[0][n].installation_number );
-   
+    debug_print("\ninstallation_number %d", hanasid[0][n].installation_number);
+
     strcpy(msg, "UID of SIDADM\0");
-    hanasid[0][n].uid_sidadm = get_systeminformation_int(msg, 1000,60000);
-    debug_print("\nuid of sidadm %d",hanasid[0][n].uid_sidadm );
+    hanasid[0][n].uid_sidadm = get_systeminformation_int(msg, 1000, 60000);
+    debug_print("\nuid of sidadm %d", hanasid[0][n].uid_sidadm);
 
     strcpy(msg, "UID of SAPADM\0");
-    hanasid[0][n].uid_sapadm = get_systeminformation_int(msg, 100,60000);
-    debug_print("\nuid of sapadm %d",hanasid[0][n].uid_sapadm );
+    hanasid[0][n].uid_sapadm = get_systeminformation_int(msg, 100, 60000);
+    debug_print("\nuid of sapadm %d", hanasid[0][n].uid_sapadm);
 
     strcpy(msg, "GID of SIDSHM\0");
-    hanasid[0][n].gid_sidshm = get_systeminformation_int(msg, 1000,60000);
-    debug_print("\ngid of sidshm %d",hanasid[0][n].gid_sidshm );
-     
+    hanasid[0][n].gid_sidshm = get_systeminformation_int(msg, 1000, 60000);
+    debug_print("\ngid of sidshm %d", hanasid[0][n].gid_sidshm);
+
     strcpy(msg, "GID of SAPSYS\0");
-    hanasid[0][n].gid_sapsys = get_systeminformation_int(msg, 1000,60000);
-    debug_print("\ngid of sapsys %d",hanasid[0][n].gid_sapsys );
-    
+    hanasid[0][n].gid_sapsys = get_systeminformation_int(msg, 1000, 60000);
+    debug_print("\ngid of sapsys %d", hanasid[0][n].gid_sapsys);
+
     strcpy(msg, "Number of storage partitions (data+log volumes)\0");
-    hanasid[0][n].num_numsp = get_systeminformation_int(msg, 2,8);
-    debug_print("\nnumber of storage partitions %d",hanasid[0][n].num_numsp );
-    
+    hanasid[0][n].num_numsp = get_systeminformation_int(msg, 2, 8);
+    debug_print("\nnumber of storage partitions %d", hanasid[0][n].num_numsp);
+
     n++;
 
     strncpy(msg, "\nEnter an additional SAP SID (Y/N)?", 255);

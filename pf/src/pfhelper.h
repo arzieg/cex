@@ -7,13 +7,13 @@
 
 #include "pf.h"
 
-enum stringfunction {
-  ISALPHANUMERIC,
-  ISALPHA_AND_COLON,
-  ISAPLHA_OR_COLON,
-  ISALPHA_OR_HYPHEN,
-  ISALPHA_OR_DOT,
-};
+// enum stringfunction {
+//   ISALPHANUMERIC,
+//   ISALPHA_AND_COLON,
+//   ISAPLHA_OR_COLON,
+//   ISALPHA_OR_HYPHEN,
+//   ISALPHA_OR_DOT,
+// };
 
 /*
  for readconf.c. Idea is to setup a table with parametername, regexec-code and
@@ -41,4 +41,8 @@ size_t get_systeminformation_int(char *text, size_t min, size_t max);
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              char *stringfunction);
 bool CustomString_check_regex(CustomString *target, char *customregex);
+
+// readconf_su
+char *find_matches(const char *pattern, const char *text);
+
 #endif
