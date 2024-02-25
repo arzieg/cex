@@ -9,12 +9,16 @@ es sind zwei zwingende Argumente zu übergeben
  - INDIR
  - OUTFILE
 
+readconf_su liest SU ein
+    globale Parameter werden in dieser Datei gesetzt
+
+Aufruf readconf_su ( 
+        char *filename  - SU filename,
+        int arrayindex  - Index des Array)
+        
+
+
 Optional kann noch -i für Interaktiv angegeben werden. 
-
-
-
-
-
 Funktionen:
     add host | sid |  (tag, clustername, role, hostname, ...)
     delete  (tag, clustername,role, hostname, ...)
@@ -47,9 +51,7 @@ building blocks:
 6. allg. pf pflege
 
 
-#
-
-bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
+# bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
 
 
 
