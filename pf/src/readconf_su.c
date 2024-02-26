@@ -283,7 +283,26 @@ char *find_matches(const char *pattern, const char *text) {
   return (cursor != NULL) ? cursor : NULL;
 }
 
-int readconf_su(char *filename) {
+int get_values(int configtablecount, int environmentindex, int maxhost) {
+  /*
+  Durchlaufe eine Schleife 0-n von ConfigTable[i].parametername
+  case
+    xxx setze wert
+      wenn wert noch eine zusammenhängende Zeile, dann aufteilen
+  */
+  for (size_t i = 0; i < configtablecount; i++) {
+    switch (ConfigTable[i].parametername) {
+      case 'SU_NET_MACS1_DC2':
+        debug_print("Found %s", ConfigTable[i].result);
+        break;
+
+      default:
+        break;
+    }
+  }
+}
+
+int readconf_su(char *filename, int environmentindex) {
   FILE *fd;
   char *filecontent;
   size_t filesize;
@@ -329,6 +348,8 @@ int readconf_su(char *filename) {
     debug_print("%s  --  %s\n", ConfigTable[i].parametername,
                 ConfigTable[i].result);
   }
+
+  get_values(n, environmentindex, 2);
 
   return EXIT_SUCCESS;
 }

@@ -15,7 +15,10 @@ readconf_su liest SU ein
 Aufruf readconf_su ( 
         char *filename  - SU filename,
         int arrayindex  - Index des Array)
-        
+
+Switch Problem: 
+ https://stackoverflow.com/questions/4014827/how-can-i-compare-strings-in-c-using-a-switch-statement
+ 
 
 
 Optional kann noch -i für Interaktiv angegeben werden. 

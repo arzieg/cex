@@ -119,6 +119,6 @@ int main(int argc, char **argv) {
   fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   if (arguments.pinteractive) interactive();
-  if (arguments.confdir) readconf_su(arguments.confdir);
+  if (arguments.confdir) readconf_su(arguments.confdir, 0);
   exit(0);
 }
