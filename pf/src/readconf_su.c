@@ -406,6 +406,95 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         strncpy(hanasystem[environmentindex][1].vhostname[1].virtual_hostname,
                 ConfigTable[i].result, HOSTNAME_LENGTH + 1);
         break;
+      case 11:  // SU_NET_HANA_01_IPS_DC1
+        char **token_array = split_string(ConfigTable[i].result, ' ');
+
+        if (token_array) {
+          for (int i = 0; token_array[i] != NULL; i++) {
+            debug_print("Wort %d: [%s]\n", i, token_array[i]);
+            switch (i) {
+              case 0:
+                strncpy(hanasystem[environmentindex][0]
+                            .vhostname[0]
+                            .network_ips.network_name,
+                        "IPS", 4);
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_name,
+                        "IPS", 4);
+                strncpy(hanasystem[environmentindex][0]
+                            .vhostname[0]
+                            .network_ips.network_ip,
+                        token_array[i], 15);
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_ip,
+                        token_array[i], 15);
+                break;
+              case 1:
+                strncpy(hanasystem[environmentindex][0]
+                            .vhostname[0]
+                            .network_ips.network_gw,
+                        token_array[i], 15);
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_gw,
+                        token_array[i], 15);
+                break;
+              case 2:
+                hanasystem[environmentindex][0]
+                    .vhostname[0]
+                    .network_ips.network_netmask = (u_int8_t)*token_array[i];
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_netmask = (u_int8_t)*token_array[i];
+                break;
+              case 3:
+                // TODO: Fehler beim komplieren, hier wird noch der falsche Wert
+                // übergeben
+                hanasystem[environmentindex][0]
+                    .vhostname[0]
+                    .network_ips.network_vlanid = (u_int16_t)token_array[i];
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_vlanid = (u_int16_t)token_array[i];
+                debug_print("\nvlanid = %d\n", hanasystem[environmentindex][1]
+                                                   .vhostname[0]
+                                                   .network_ips.network_vlanid);
+                break;
+
+              case 4:
+                hanasystem[environmentindex][0]
+                    .vhostname[0]
+                    .network_ips.network_mtu = (u_int16_t)*token_array[i];
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_mtu = (u_int16_t)*token_array[i];
+                debug_print("\nnetwork_mtu = %d\n",
+                            hanasystem[environmentindex][1]
+                                .vhostname[0]
+                                .network_ips.network_mtu);
+                break;
+
+              case 5:
+                strncpy(hanasystem[environmentindex][0]
+                            .vhostname[0]
+                            .network_ips.network_host_ip,
+                        token_array[i], 15);
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_host_ip,
+                        token_array[i], 15);
+
+                break;
+            }
+            free(token_array[i]);
+          }
+          free(token_array);
+        }
+        // strncpy(hanasystem[environmentindex][1].vhostname[1].virtual_hostname,
+        //         ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+        break;
 
       default:
         break;
@@ -413,6 +502,19 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   }
   return 0;
 }
+
+/*
+{.parametername = "SU_NET_HANA_01_IPS_DC1",
+     .regexeccode = "SU_NET_HANA_01_IPS_DC1=" REGEXBRACKETSTR "",
+     .maxlength = NET_INFOMATION,
+     .index = 11},
+    {.parametername = "SU_NET_HANA_01_IPS_DC2",
+     .regexeccode = "SU_NET_HANA_01_IPS_DC2=" REGEXBRACKETSTR "",
+     .maxlength = NET_INFOMATION,
+     .index = 12},
+
+
+*/
 
 int readconf_su(char *filename, int environmentindex) {
   FILE *fd;
@@ -446,8 +548,8 @@ int readconf_su(char *filename, int environmentindex) {
   for (size_t i = 0; i < n; i++) {
     ConfigTable[i].result =
         (char *)malloc((ConfigTable[i].maxlength + 1) * sizeof(char));
-    /* debug_print("Parameter: %s    Regex: %s\n", ConfigTable[i].parametername,
-                ConfigTable[i].regexeccode);
+    /* debug_print("Parameter: %s    Regex: %s\n",
+       ConfigTable[i].parametername, ConfigTable[i].regexeccode);
     */
     ConfigTable[i].result =
         find_matches(ConfigTable[i].regexeccode, filecontent);

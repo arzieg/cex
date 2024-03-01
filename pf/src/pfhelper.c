@@ -159,18 +159,50 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
   } while (true);
 }
 
-size_t get_systeminformation_int(char *text, size_t min, size_t max){
+size_t get_systeminformation_int(char *text, size_t min, size_t max) {
   size_t tmp;
 
-printf("\n%s, expected value between %ld and %ld: ", text, min, max);
-do{
-  scanf("%ld",&tmp);
-  if (tmp >= min && tmp <=max)
-  break;
-  printf("\nValue must between %ld and %ld, try again: ", min, max);
-} while (true);
+  printf("\n%s, expected value between %ld and %ld: ", text, min, max);
+  do {
+    scanf("%ld", &tmp);
+    if (tmp >= min && tmp <= max) break;
+    printf("\nValue must between %ld and %ld, try again: ", min, max);
+  } while (true);
 
-return tmp;
+  return tmp;
+}
 
+/*
+  Split String in Single Token
+  Used in readconf_su.c
+*/
+char **split_string(char *input, char delimiter) {
+  char **tokens = NULL;
+  char *token;
+  char *rest = strdup(input);
+  int count = 0;
 
+  // Zähle die Anzahl der Tokens
+  while ((token = strsep(&rest, &delimiter)) != NULL) {
+    count++;
+  }
+
+  // Alloziere Speicher für das Token-Array
+  tokens = (char **)malloc(sizeof(char *) * count);
+  if (!tokens) {
+    perror("Fehler bei der Speicherzuweisung");
+    exit(EXIT_FAILURE);
+  }
+
+  // Setze den Rest-Pointer zurück
+  rest = input;
+  int i = 0;
+
+  // Fülle das Token-Array
+  while ((token = strsep(&rest, &delimiter)) != NULL) {
+    tokens[i] = strdup(token);
+    i++;
+  }
+
+  return tokens;
 }
