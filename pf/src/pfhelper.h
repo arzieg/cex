@@ -42,6 +42,7 @@ size_t get_systeminformation_int(char *text, size_t min, size_t max);
 CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
                              char *stringfunction);
 bool CustomString_check_regex(CustomString *target, char *customregex);
+char **split_string(char *input, char delimiter);
 
 // readconf_su
 char *find_matches(const char *pattern, const char *text);
