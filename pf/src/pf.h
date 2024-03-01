@@ -74,15 +74,21 @@ typedef struct networktype {
   u_int16_t network_mtu;
 } NETWORKTYPE;
 
+typedef struct virthanasystemtype {
+  char virtual_hostname[HOSTNAME_LENGTH + 1];
+  NETWORKTYPE network_ips;
+} VIRTHANASYSTEMTYPE;
+
 /*
 HOST Informationen
 */
 typedef struct hanasystemtype {
   char physical_hostname[HOSTNAME_LENGTH + 1];
-  char virtual_hostname[HOSTNAME_LENGTH + 1];
+  // char virtual_hostname[HOSTNAME_LENGTH + 1];
+  VIRTHANASYSTEMTYPE vhostname[MAX_SID_PER_ENVIRONMENT];
   char mac_address1[17];
   char mac_address2[17];
-  NETWORKTYPE network_ips;
+  // NETWORKTYPE network_ips;
   NETWORKTYPE network_adm;
   NETWORKTYPE network_client;
   NETWORKTYPE network_st;

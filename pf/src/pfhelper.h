@@ -24,6 +24,7 @@ struct ConfigTableArray {
   char *parametername;
   char *regexeccode;
   size_t maxlength;  // max length of string
+  size_t index;
   char *result;
 };
 
