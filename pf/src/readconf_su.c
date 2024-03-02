@@ -418,15 +418,7 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
                             .vhostname[0]
                             .network_ips.network_name,
                         "IPS", 4);
-                strncpy(hanasystem[environmentindex][1]
-                            .vhostname[0]
-                            .network_ips.network_name,
-                        "IPS", 4);
                 strncpy(hanasystem[environmentindex][0]
-                            .vhostname[0]
-                            .network_ips.network_ip,
-                        token_array[i], 15);
-                strncpy(hanasystem[environmentindex][1]
                             .vhostname[0]
                             .network_ips.network_ip,
                         token_array[i], 15);
@@ -436,42 +428,39 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
                             .vhostname[0]
                             .network_ips.network_gw,
                         token_array[i], 15);
-                strncpy(hanasystem[environmentindex][1]
-                            .vhostname[0]
-                            .network_ips.network_gw,
-                        token_array[i], 15);
                 break;
               case 2:
                 hanasystem[environmentindex][0]
                     .vhostname[0]
-                    .network_ips.network_netmask = (u_int8_t)*token_array[i];
-                hanasystem[environmentindex][1]
-                    .vhostname[0]
-                    .network_ips.network_netmask = (u_int8_t)*token_array[i];
+                    .network_ips.network_netmask =
+                    (uint8_t)atoi(token_array[i]);
+                debug_print("\ntoken-array SU_NET_HANA_01_IPS_DC1 = %s\n",
+                            token_array[i]);
+                debug_print("\nhanasystem SU_NET_HANA_01_IPS_DC1 = %hhu\n",
+                            hanasystem[environmentindex][0]
+                                .vhostname[0]
+                                .network_ips.network_netmask);
                 break;
               case 3:
-                // TODO: Fehler beim komplieren, hier wird noch der falsche Wert
-                // übergeben
                 hanasystem[environmentindex][0]
                     .vhostname[0]
-                    .network_ips.network_vlanid = (u_int16_t)token_array[i];
-                hanasystem[environmentindex][1]
-                    .vhostname[0]
-                    .network_ips.network_vlanid = (u_int16_t)token_array[i];
-                debug_print("\nvlanid = %d\n", hanasystem[environmentindex][1]
-                                                   .vhostname[0]
-                                                   .network_ips.network_vlanid);
+                    .network_ips.network_vlanid =
+                    (uint16_t)atoi(token_array[i]);
+                debug_print("\nvlanid SU_NET_HANA_01_IPS_DC1 = %s\n",
+                            token_array[i]);
+                debug_print("\nvlanid SU_NET_HANA_01_IPS_DC1 = %hu\n",
+                            hanasystem[environmentindex][0]
+                                .vhostname[0]
+                                .network_ips.network_vlanid);
                 break;
-
               case 4:
                 hanasystem[environmentindex][0]
                     .vhostname[0]
-                    .network_ips.network_mtu = (u_int16_t)*token_array[i];
-                hanasystem[environmentindex][1]
-                    .vhostname[0]
-                    .network_ips.network_mtu = (u_int16_t)*token_array[i];
-                debug_print("\nnetwork_mtu = %d\n",
-                            hanasystem[environmentindex][1]
+                    .network_ips.network_mtu = (uint16_t)atoi(token_array[i]);
+                debug_print("\nnetwork_mtu SU_NET_HANA_01_IPS_DC1 = %s\n",
+                            token_array[i]);
+                debug_print("\nnetwork_mtu SU_NET_HANA_01_IPS_DC1 = %hu\n",
+                            hanasystem[environmentindex][0]
                                 .vhostname[0]
                                 .network_ips.network_mtu);
                 break;
@@ -481,6 +470,75 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
                             .vhostname[0]
                             .network_ips.network_host_ip,
                         token_array[i], 15);
+                break;
+            }
+            free(token_array[i]);
+          }
+          free(token_array);
+        }
+        // strncpy(hanasystem[environmentindex][1].vhostname[1].virtual_hostname,
+        //         ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+        break;
+      case 12:  // SU_NET_HANA_01_IPS_DC2
+        token_array = split_string(ConfigTable[i].result, ' ');
+
+        if (token_array) {
+          for (int i = 0; token_array[i] != NULL; i++) {
+            debug_print("Wort %d: [%s]\n", i, token_array[i]);
+            switch (i) {
+              case 0:
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_name,
+                        "IPS", 4);
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[0]
+                            .network_ips.network_ip,
+                        token_array[i], 15);
+                break;
+              case 1:
+                strncpy(hanasystem[environmentindex][1]
+                            .vhostname[1]
+                            .network_ips.network_gw,
+                        token_array[i], 15);
+                break;
+              case 2:
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_netmask =
+                    (uint8_t)atoi(token_array[i]);
+                debug_print(
+                    "\nnetwork_netmask token SU_NET_HANA_01_IPS_DC2 = %s\n",
+                    token_array[i]);
+                debug_print(
+                    "\nnetwork_netmask zuweisung SU_NET_HANA_01_IPS_DC2 = "
+                    "%hhu\n",
+                    hanasystem[environmentindex][1]
+                        .vhostname[0]
+                        .network_ips.network_netmask);
+                break;
+              case 3:
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_vlanid =
+                    (uint16_t)atoi(token_array[i]);
+                debug_print("\nvlanid SU_NET_HANA_01_IPS_DC2 = %d\n",
+                            hanasystem[environmentindex][1]
+                                .vhostname[0]
+                                .network_ips.network_vlanid);
+                break;
+
+              case 4:
+                hanasystem[environmentindex][1]
+                    .vhostname[0]
+                    .network_ips.network_mtu = (uint16_t)atoi(token_array[i]);
+                debug_print("\nnetwork_mtu SU_NET_HANA_01_IPS_DC2 = %d\n",
+                            hanasystem[environmentindex][1]
+                                .vhostname[0]
+                                .network_ips.network_mtu);
+                break;
+
+              case 5:
                 strncpy(hanasystem[environmentindex][1]
                             .vhostname[0]
                             .network_ips.network_host_ip,
