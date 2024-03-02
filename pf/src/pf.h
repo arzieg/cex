@@ -2,7 +2,8 @@
 #define PF_H_
 
 #include <stdbool.h>
-#include <sys/types.h>
+// #include <sys/types.h>
+#include <stdint.h>
 
 // 1. Abfrage Szenario Single DC oder Replikation ? SO oder SU wenn SU,
 //     dann Single SID oder MCOS Toolserver ISCSI Server
@@ -69,9 +70,9 @@ typedef struct networktype {
   char network_host_ip[15];
   char network_ip[15];
   char network_gw[15];
-  u_int8_t network_netmask;
-  u_int16_t network_vlanid;
-  u_int16_t network_mtu;
+  uint8_t network_netmask;
+  uint16_t network_vlanid;
+  uint16_t network_mtu;
 } NETWORKTYPE;
 
 typedef struct virthanasystemtype {
