@@ -89,7 +89,7 @@ typedef struct hanasystemtype {
   VIRTHANASYSTEMTYPE vhostname[MAX_SID_PER_ENVIRONMENT];
   char mac_address1[17];
   char mac_address2[17];
-  // NETWORKTYPE network_ips;
+  NETWORKTYPE network_ips;
   NETWORKTYPE network_adm;
   NETWORKTYPE network_client;
   NETWORKTYPE network_st;
