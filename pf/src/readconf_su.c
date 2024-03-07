@@ -15,7 +15,7 @@
 extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 
-HANASYSTEMTYPE *phanasystem;
+NETWORKTYPE *phanasystem;
 
 struct ConfigTableArray ConfigTable[] = {
 
@@ -360,8 +360,7 @@ char *find_matches(const char *pattern, const char *text) {
 /*
   split line and assign to variable
 */
-void split_line_and_assign_to_variable(char *line,
-                                       HANASYSTEMTYPE *phanasystem) {
+void split_line_and_assign_to_variable(char *line, NETWORKTYPE *phanasystem) {
   char **token_array = split_string(line, ' ');
 
   if (token_array) {
@@ -370,10 +369,10 @@ void split_line_and_assign_to_variable(char *line,
       switch (i) {
         case 0:
 
-          strncpy(phanasystem->network_ips.network_ip, token_array[i], 15);
+          strncpy(phanasystem->network_ip, token_array[i], 15);
           debug_print("\ntoken_array = %s", token_array[i]);
           debug_print("\nphanasystem->network_ips.network_ip = %s",
-                      phanasystem->network_ips.network_ip);
+                      phanasystem->network_ip);
           break;
           /*
                   case 1:
