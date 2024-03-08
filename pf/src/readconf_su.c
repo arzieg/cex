@@ -18,7 +18,6 @@ extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
 NETWORKTYPE *phanasystem;
 
 struct ConfigTableArray ConfigTable[] = {
-
     {.parametername = "SU_NET_MACS1_DC2",
      .regexeccode = "SU_NET_MACS1_DC2=" REGEXBRACKETSTR "",
      .maxlength = MACLENGTH,
@@ -371,12 +370,11 @@ void split_line_and_assign_to_variable(char *line, NETWORKTYPE *phanasystem) {
       cnt++;
     }
   }
-  debug_print("\n count=%d", cnt);
+  debug_print("\nCount=%d\n", cnt);
 
   if (token_array) {
     for (int i = 0; token_array[i] != NULL; i++) {
-      debug_print("Token %d: ", i);
-      debug_print("[%s]\n", token_array[i]);
+      debug_print("Token %d: [%s]\n", i, token_array[i]);
       switch (i) {
         case 0:
           strncpy(phanasystem->network_ip, token_array[i], 15);
@@ -413,6 +411,8 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
   */
   for (size_t i = 0; i < configtablecount; i++) {
+    debug_print("\nConfigTable[i].result = %s  length=%d\n",
+                ConfigTable[i].result, strlen(ConfigTable[i].result));
     switch (ConfigTable[i].index) {
       case 1:  // SU_NET_MACS1_DC2
         strncpy(hanasystem[environmentindex][1].mac_address1,

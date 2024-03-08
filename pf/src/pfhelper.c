@@ -199,17 +199,18 @@ char **split_string(char *input, char delimiter) {
   int i = 0;
 
   // Fülle das Token-Array
-  /*
+
   while ((token = strsep(&rest, &delimiter)) != NULL) {
     tokens[i] = strdup(token);
     i++;
   }
-  */
+  /*
   while ((token = strtok_r(rest, &delimiter, &rest))) {
     printf("Token: %s\n", token);
     tokens[i] = strdup(token);
     i++;
-  }
-
+    }
+    */
+  tokens[i] = '\0';
   return tokens;
 }

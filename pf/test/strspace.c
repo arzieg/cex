@@ -8,7 +8,11 @@ char** split_string(char* input, char delimiter) {
   char** tokens = NULL;
   char* token;
   char* rest = strdup(input);
-  int count = 0;
+  char mystring[20];
+  int count;
+  int i = 0;
+  int n = 0;
+  size_t maxlength = strlen(input);
 
   // Zähle die Anzahl der Tokens
   while ((token = strsep(&rest, &delimiter)) != NULL) {
@@ -22,14 +26,15 @@ char** split_string(char* input, char delimiter) {
     exit(EXIT_FAILURE);
   }
 
-  // Setze den Rest-Pointer zurück
-  rest = input;
-  int i = 0;
-
-  // Fülle das Token-Array
-  while ((token = strsep(&rest, &delimiter)) != NULL) {
-    tokens[i] = strdup(token);
-    i++;
+  for (int j = 0; j < maxlength; j++) {
+    if ((input[j] == delimiter) || (j == maxlength - 1)) {
+      memcpy(mystring, input + n, j - n);
+      mystring[j - n] = '\0';
+      tokens[i] = strdup(mystring);
+      printf("\nToken = %s\n", tokens[i]);
+      n = j + 1;
+      i++;
+    }
   }
 
   return tokens;
