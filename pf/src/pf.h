@@ -78,6 +78,9 @@ typedef struct networktype {
 typedef struct virthanasystemtype {
   char virtual_hostname[HOSTNAME_LENGTH + 1];
   NETWORKTYPE network_ips;
+  NETWORKTYPE network_se;
+  NETWORKTYPE network_hnr;
+  NETWORKTYPE network_client_sid;
 } VIRTHANASYSTEMTYPE;
 
 /*
@@ -96,8 +99,6 @@ typedef struct hanasystemtype {
   NETWORKTYPE network_cr2;
   NETWORKTYPE network_pcm;
   NETWORKTYPE network_bak;
-  NETWORKTYPE network_se;
-  NETWORKTYPE network_hnr;
   NETWORKTYPE network_hni;
 } HANASYSTEMTYPE;
 

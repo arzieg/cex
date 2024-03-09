@@ -178,142 +178,134 @@ struct ConfigTableArray ConfigTable[] = {
      .regexeccode = "SU_NET_HANA_02_HNR_DC2=" REGEXBRACKETSTR "",
      .maxlength = NET_INFOMATION,
      .index = 40},
-    {.parametername = "SU_NET_HANA_02_HNR_DC1",
-     .regexeccode = "SU_NET_HANA_02_HNR_DC1=" REGEXBRACKETSTR "",
-     .maxlength = NET_INFOMATION,
-     .index = 41},
-    {.parametername = "SU_NET_HANA_02_HNR_DC2",
-     .regexeccode = "SU_NET_HANA_02_HNR_DC2=" REGEXBRACKETSTR "",
-     .maxlength = NET_INFOMATION,
-     .index = 42},
     {.parametername = "SU_VIRTUAL",
      .regexeccode = "SU_VIRTUAL=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 43},
+     .index = 41},
     {.parametername = "SU_HANA_SID",
      .regexeccode = "SU_HANA_SID=" REGEXBRACKETSTR "",
      .maxlength = SIDLENGTH * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 44},
+     .index = 42},
     {.parametername = "SU_HANA_INR",
      .regexeccode = "SU_HANA_INR=" REGEXBRACKETSTR "",
      .maxlength = SIDLENGTH * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 45},
+     .index = 43},
     {.parametername = "SU_HANA_ALLOC_LIMIT_GB",
      .regexeccode = "SU_HANA_ALLOC_LIMIT_GB=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 46},
+     .index = 44},
     {.parametername = "SU_HANA_PRELOAD_TABLES",
      .regexeccode = "SU_HANA_PRELOAD_TABLES=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 47},
+     .index = 45},
     {.parametername = "SU_UID_SIDADM",
      .regexeccode = "SU_UID_SIDADM=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 48},
+     .index = 46},
     {.parametername = "SU_UID_SAPADM",
      .regexeccode = "SU_UID_SAPADM=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 49},
+     .index = 47},
     {.parametername = "SU_GID_SIDSHM",
      .regexeccode = "SU_GID_SIDSHM=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 50},
+     .index = 48},
     {.parametername = "SU_GID_SAPSYS",
      .regexeccode = "SU_GID_SAPSYS=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 51},
+     .index = 49},
     {.parametername = "SU_UID_SAPROUTER",
      .regexeccode = "SU_UID_SAPROUTER=" REGEXBRACKETSTR "",
      .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
-     .index = 52},
+     .index = 50},
     {.parametername = "SU_HANA_01_NODES_DC1",
      .regexeccode = "SU_HANA_01_NODES_DC1=" REGEXBRACKETSTR "",
      .maxlength = HOSTNAME_LENGTH + 8,
-     .index = 53},
+     .index = 51},
     {.parametername = "SU_HANA_01_NODES_DC2",
      .regexeccode = "SU_HANA_01_NODES_DC1=" REGEXBRACKETSTR "",
      .maxlength = HOSTNAME_LENGTH + 8,
-     .index = 54},
+     .index = 52},
     {.parametername = "SU_HANA_02_NODES_DC1",
      .regexeccode = "SU_HANA_02_NODES_DC1=" REGEXBRACKETSTR "",
      .maxlength = HOSTNAME_LENGTH + 8,
-     .index = 55},
+     .index = 53},
     {.parametername = "SU_HANA_02_NODES_DC2",
      .regexeccode = "SU_HANA_02_NODES_DC2=" REGEXBRACKETSTR "",
      .maxlength = HOSTNAME_LENGTH + 8,
-     .index = 56},
+     .index = 54},
     {.parametername = "SU_HANA_01_DC1_NAME",
      .regexeccode = "SU_HANA_01_DC1_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4,
-     .index = 57},
+     .index = 55},
     {.parametername = "SU_HANA_01_DC2_NAME",
      .regexeccode = "SU_HANA_01_DC2_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4,
-     .index = 58},
+     .index = 56},
     {.parametername = "SU_HANA_02_DC1_NAME",
      .regexeccode = "SU_HANA_02_DC1_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4,
-     .index = 59},
+     .index = 57},
     {.parametername = "SU_HANA_02_DC2_NAME",
      .regexeccode = "SU_HANA_02_DC2_NAME=" REGEXBRACKETSTR "",
      .maxlength = 4,
-     .index = 60},
+     .index = 58},
     {.parametername = "SU_XHANA2_RELEASE",
      .regexeccode = "SU_XHANA2_RELEASE=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 61},
+     .index = 59},
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC1",
      .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 62},
+     .index = 60},
     {.parametername = "SU_HANA_01_SAPREPO_VERSION_DC2",
      .regexeccode = "SU_HANA_01_SAPREPO_VERSION_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 63},
+     .index = 61},
     {.parametername = "SU_HANA_02_SAPREPO_VERSION_DC1",
      .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 64},
+     .index = 62},
     {.parametername = "SU_HANA_02_SAPREPO_VERSION_DC2",
      .regexeccode = "SU_HANA_02_SAPREPO_VERSION_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 65},
+     .index = 63},
     {.parametername = "SU_HANA_01_NAS_SVMS",
      .regexeccode = "SU_HANA_01_NAS_SVMS=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 66},
+     .index = 64},
     {.parametername = "SU_HANA_02_NAS_SVMS",
      .regexeccode = "SU_HANA_02_NAS_SVMS=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 67},
+     .index = 65},
     {.parametername = "SU_HANA_01_NAS_PORTS",
      .regexeccode = "SU_HANA_01_NAS_PORTS=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 68},
+     .index = 66},
     {.parametername = "SU_HANA_02_NAS_PORTS",
      .regexeccode = "SU_HANA_02_NAS_PORTS=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 69},
+     .index = 67},
     {.parametername = "SU_HANA_01_NAS_NUMSP",
      .regexeccode = "SU_HANA_01_NAS_NUMSP=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 70},
+     .index = 68},
     {.parametername = "SU_HANA_02_NAS_NUMSP",
      .regexeccode = "SU_HANA_02_NAS_NUMSP=" REGEXBRACKETSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 71},
+     .index = 69},
     {.parametername = "SU_HANA_01_NAS_COMMENT",
      .regexeccode = "SU_HANA_01_NAS_COMMENT=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 72},
+     .index = 70},
     {.parametername = "SU_NAS_DC1",
      .regexeccode = "SU_NAS_DC1=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 73},
+     .index = 71},
     {.parametername = "SU_NAS_DC2",
      .regexeccode = "SU_NAS_DC2=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
-     .index = 74},
+     .index = 72},
 
 };
 
@@ -357,9 +349,10 @@ char *find_matches(const char *pattern, const char *text) {
 }
 
 /*
-  split line and assign to variable
+  split line and assign to networktype
 */
-void split_line_and_assign_to_variable(char *line, NETWORKTYPE *phanasystem) {
+void split_line_and_assign_to_networktype(char *line,
+                                          NETWORKTYPE *phanasystem) {
   char **token_array = split_string(line, ' ');
 
   int cnt = 0;
@@ -401,6 +394,28 @@ void split_line_and_assign_to_variable(char *line, NETWORKTYPE *phanasystem) {
   }
 }
 
+void split_line_and_return_tokens(char *line, SIDTYPE *psid) {
+  char **token_array = split_string(line, ' ');
+
+  int cnt = 0;
+
+  if (token_array) {
+    for (int i = 0; token_array[i] != NULL; i++) {
+      debug_print("\n Address = %p", token_array[i]);
+      cnt++;
+    }
+  }
+  debug_print("\nCount=%d\n", cnt);
+
+  if (token_array) {
+    for (int i = 0; token_array[i] != NULL; i++) {
+      debug_print("Token %d: [%s]\n", i, token_array[i]);
+    }
+    free(token_array[i]);
+  }
+  free(token_array);
+}
+
 int get_values(int configtablecount, int environmentindex, int maxhost) {
   /*
   Durchlaufe eine Schleife 0-n von ConfigTable[i].parametername
@@ -411,8 +426,9 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
   */
   for (size_t i = 0; i < configtablecount; i++) {
-    debug_print("\nConfigTable[i].result = %s  length=%d\n",
-                ConfigTable[i].result, strlen(ConfigTable[i].result));
+    if (ConfigTable[i].result != NULL)
+      debug_print("\nConfigTable[%d].result = %s  length=%d\n", i,
+                  ConfigTable[i].result, strlen(ConfigTable[i].result));
     switch (ConfigTable[i].index) {
       case 1:  // SU_NET_MACS1_DC2
         strncpy(hanasystem[environmentindex][1].mac_address1,
@@ -456,75 +472,157 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         break;
       case 11:  // SU_NET_HANA_01_IPS_DC1
         phanasystem = &hanasystem[environmentindex][0].vhostname[0].network_ips;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 12:  // SU_NET_HANA_01_IPS_DC2
         phanasystem = &hanasystem[environmentindex][1].vhostname[0].network_ips;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 13:  // SU_NET_HANA_02_IPS_DC1
         phanasystem = &hanasystem[environmentindex][0].vhostname[1].network_ips;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 14:  // SU_NET_HANA_02_IPS_DC2
         phanasystem = &hanasystem[environmentindex][1].vhostname[1].network_ips;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 15:  // SU_NET_ADM_DC1
         phanasystem = &hanasystem[environmentindex][0].network_adm;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 16:  // SU_NET_ADM_DC2
         phanasystem = &hanasystem[environmentindex][1].network_adm;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 17:  // SU_NET_CLIENT_DC1
         phanasystem = &hanasystem[environmentindex][0].network_client;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 18:  // SU_NET_CLIENT_DC2
         phanasystem = &hanasystem[environmentindex][1].network_client;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 19:  // SU_NET_ST_DC1
         phanasystem = &hanasystem[environmentindex][0].network_st;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 20:  // SU_NET_ST_DC2
         phanasystem = &hanasystem[environmentindex][1].network_st;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 21:  // SU_NET_CR1_DC1
         phanasystem = &hanasystem[environmentindex][0].network_cr1;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 22:  // SU_NET_CR1_DC2
         phanasystem = &hanasystem[environmentindex][1].network_cr1;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 23:  // SU_NET_CR2_DC1
         phanasystem = &hanasystem[environmentindex][0].network_cr2;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 24:  // SU_NET_CR2_DC2
         phanasystem = &hanasystem[environmentindex][1].network_cr2;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 25:  // SU_NET_PCM_DC1
         phanasystem = &hanasystem[environmentindex][0].network_pcm;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 26:  // SU_NET_PCM_DC2
         phanasystem = &hanasystem[environmentindex][1].network_pcm;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 27:  // SU_NET_BAK_DC1
         phanasystem = &hanasystem[environmentindex][0].network_bak;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
       case 28:  // SU_NET_BAK_DC2
         phanasystem = &hanasystem[environmentindex][1].network_bak;
-        split_line_and_assign_to_variable(ConfigTable[i].result, phanasystem);
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 29:  // SU_NET_HANA_01_SE_DC1
+        phanasystem = &hanasystem[environmentindex][0].vhostname[0].network_se;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 30:  // SU_NET_HANA_01_SE_DC2
+        phanasystem = &hanasystem[environmentindex][1].vhostname[0].network_se;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 31:  // SU_NET_HANA_01_CLIENT_DC1
+        phanasystem =
+            &hanasystem[environmentindex][0].vhostname[0].network_client_sid;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 32:  // SU_NET_HANA_01_CLIENT_DC2
+        phanasystem =
+            &hanasystem[environmentindex][1].vhostname[0].network_client_sid;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 33:  // SU_NET_HANA_02_SE_DC1
+        phanasystem = &hanasystem[environmentindex][0].vhostname[1].network_se;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 34:  // SU_NET_HANA_02_SE_DC2
+        phanasystem = &hanasystem[environmentindex][1].vhostname[1].network_se;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 35:  // SU_NET_HANA_02_CLIENT_DC1
+        phanasystem =
+            &hanasystem[environmentindex][0].vhostname[1].network_client_sid;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 36:  // SU_NET_HANA_02_CLIENT_DC2
+        phanasystem =
+            &hanasystem[environmentindex][1].vhostname[1].network_client_sid;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 37:  // SU_NET_HANA_01_HNR_DC1
+        phanasystem = &hanasystem[environmentindex][0].vhostname[0].network_hnr;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 38:  // SU_NET_HANA_01_HNR_DC2
+        phanasystem = &hanasystem[environmentindex][1].vhostname[0].network_hnr;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 39:  // SU_NET_HANA_02_HNR_DC1
+        phanasystem = &hanasystem[environmentindex][0].vhostname[1].network_hnr;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
+        break;
+      case 40:  // SU_NET_HANA_02_HNR_DC2
+        phanasystem = &hanasystem[environmentindex][1].vhostname[1].network_hnr;
+        split_line_and_assign_to_networktype(ConfigTable[i].result,
+                                             phanasystem);
         break;
     }
   }
@@ -532,6 +630,7 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
 }
 
 /*
+
 
 
 
