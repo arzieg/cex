@@ -394,26 +394,15 @@ void split_line_and_assign_to_networktype(char *line,
   }
 }
 
-void split_line_and_return_tokens(char *line, SIDTYPE *psid) {
+void *split_line_and_set_value(char *line, size_t index) {
   char **token_array = split_string(line, ' ');
 
-  int cnt = 0;
-
-  if (token_array) {
-    for (int i = 0; token_array[i] != NULL; i++) {
-      debug_print("\n Address = %p", token_array[i]);
-      cnt++;
-    }
+  if (token_array[index] == NULL) {
+    return EXIT_FAILURE;
   }
-  debug_print("\nCount=%d\n", cnt);
 
-  if (token_array) {
-    for (int i = 0; token_array[i] != NULL; i++) {
-      debug_print("Token %d: [%s]\n", i, token_array[i]);
-    }
-    free(token_array[i]);
-  }
-  free(token_array);
+  void *address = &token_array[index];
+  return address;
 }
 
 int get_values(int configtablecount, int environmentindex, int maxhost) {
@@ -422,8 +411,9 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   case
     xxx setze wert
       wenn wert noch eine zusammenhängende Zeile, dann aufteilen
-  extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
-  extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
+  extern HANASYSTEMTYPE
+  hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM]; extern SIDTYPE
+  hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
   */
   for (size_t i = 0; i < configtablecount; i++) {
     if (ConfigTable[i].result != NULL)
@@ -624,6 +614,14 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         split_line_and_assign_to_networktype(ConfigTable[i].result,
                                              phanasystem);
         break;
+        /*
+          case 41
+        */
+      case 42:  // SU_HANA_SID
+        char mysid[4];
+        char (*test)(char *, size_t) = &split_line_and_set_value;
+        *mysid = test(ConfigTable[i].result, 0);
+        debug_print("\nSID with Index %d = %s\n", 0, *mysid);
     }
   }
   return 0;
