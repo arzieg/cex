@@ -11,6 +11,11 @@
 #define REGEXMAC "\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
 #define REGEXSTR "\"([^\"]*)\""
+#define FREE(ptr) \
+  do {            \
+    free(ptr);    \
+    ptr = NULL;   \
+  } while (0)
 
 extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
@@ -394,17 +399,6 @@ void split_line_and_assign_to_networktype(char *line,
   }
 }
 
-void *split_line_and_set_value(char *line, size_t index) {
-  char **token_array = split_string(line, ' ');
-
-  if (token_array[index] == NULL) {
-    return EXIT_FAILURE;
-  }
-
-  void *address = &token_array[index];
-  return address;
-}
-
 int get_values(int configtablecount, int environmentindex, int maxhost) {
   /*
   Durchlaufe eine Schleife 0-n von ConfigTable[i].parametername
@@ -416,6 +410,7 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
   */
   for (size_t i = 0; i < configtablecount; i++) {
+    char **line;
     if (ConfigTable[i].result != NULL)
       debug_print("\nConfigTable[%d].result = %s  length=%d\n", i,
                   ConfigTable[i].result, strlen(ConfigTable[i].result));
@@ -618,10 +613,97 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
           case 41
         */
       case 42:  // SU_HANA_SID
-        char mysid[4];
-        char (*test)(char *, size_t) = &split_line_and_set_value;
-        *mysid = test(ConfigTable[i].result, 0);
-        debug_print("\nSID with Index %d = %s\n", 0, *mysid);
+        line = split_string(ConfigTable[i].result, ' ');
+
+        (line[0] != NULL)
+            ? strncpy(hanasid[environmentindex][0].sid, line[0], 4)
+            : NULL;
+
+        (line[1] != NULL)
+            ? strncpy(hanasid[environmentindex][1].sid, line[1], 4)
+            : NULL;
+
+        debug_print("\nToken %d = %s\n", 0, hanasid[environmentindex][0].sid);
+        debug_print("\nToken %d = %s\n", 1, hanasid[environmentindex][1].sid);
+
+        FREE(line);
+        break;
+      case 43:  // SU_HANA_INR
+        line = split_string(ConfigTable[i].result, ' ');
+
+        if (line[0] != NULL) {
+          int tmp = atoi(line[0]);
+          if (tmp > 0 && tmp < 99) {
+            hanasid[environmentindex][0].installation_number = tmp;
+          } else {
+            hanasid[environmentindex][0].installation_number = -1;
+          }
+        }
+        if (line[1] != NULL) {
+          int tmp = atoi(line[1]);
+          if (tmp > 0 && tmp < 99) {
+            hanasid[environmentindex][1].installation_number = tmp;
+          } else {
+            hanasid[environmentindex][1].installation_number = -1;
+          }
+        }
+
+        debug_print("\nToken null = %d\n",
+                    hanasid[environmentindex][0].installation_number);
+        debug_print("\nToken eins = %d\n",
+                    hanasid[environmentindex][1].installation_number);
+
+        FREE(line);
+        break;
+      case 44:  // SU_HANA_ALLOC_LIMIT_GB
+        line = split_string(ConfigTable[i].result, ' ');
+
+        if (line[0] != NULL) {
+          int tmp = atoi(line[0]);
+          if (tmp > 0) {
+            hanasid[environmentindex][0].allocation_limit = tmp;
+          } else {
+            hanasid[environmentindex][0].allocation_limit = -1;
+          }
+        }
+        if (line[1] != NULL) {
+          int tmp = atoi(line[1]);
+          if (tmp > 0 && tmp < 99) {
+            hanasid[environmentindex][1].allocation_limit = tmp;
+          } else {
+            hanasid[environmentindex][1].allocation_limit = -1;
+          }
+        }
+
+        debug_print("\nToken null = %d\n",
+                    hanasid[environmentindex][0].allocation_limit);
+        debug_print("\nToken eins = %d\n",
+                    hanasid[environmentindex][1].allocation_limit);
+
+        FREE(line);
+        break;
+      case 45:  // SU_HANA_PRELOAD_TABLES
+        line = split_string(ConfigTable[i].result, ' ');
+
+        if (line[0] != NULL && strcmp(line[0], "true")) {
+          hanasid[environmentindex][0].preload = true;
+        } else {
+          hanasid[environmentindex][0].preload = false;
+        }
+
+        if (line[1] != NULL && strcmp(line[1], "true")) {
+          hanasid[environmentindex][1].preload = true;
+        } else {
+          hanasid[environmentindex][1].preload = false;
+        }
+
+        debug_print("\nToken null = %d\n",
+                    hanasid[environmentindex][0].preload);
+        debug_print("\nToken eins = %d\n",
+                    hanasid[environmentindex][1].preload);
+
+        FREE(line);
+        break;
     }
   }
   return 0;
@@ -629,6 +711,30 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
 
 /*
 
+    {.parametername = "SU_HANA_PRELOAD_TABLES",
+     .regexeccode = "SU_HANA_PRELOAD_TABLES=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 45},
+    {.parametername = "SU_UID_SIDADM",
+     .regexeccode = "SU_UID_SIDADM=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 46},
+    {.parametername = "SU_UID_SAPADM",
+     .regexeccode = "SU_UID_SAPADM=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 47},
+    {.parametername = "SU_GID_SIDSHM",
+     .regexeccode = "SU_GID_SIDSHM=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 48},
+    {.parametername = "SU_GID_SAPSYS",
+     .regexeccode = "SU_GID_SAPSYS=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 49},
+    {.parametername = "SU_UID_SAPROUTER",
+     .regexeccode = "SU_UID_SAPROUTER=" REGEXBRACKETSTR "",
+     .maxlength = 5 * MAX_SID_PER_ENVIRONMENT + MAX_SID_PER_ENVIRONMENT,
+     .index = 50},
 
 
 

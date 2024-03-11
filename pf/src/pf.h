@@ -45,6 +45,8 @@ typedef struct {
 typedef struct sidtype {
   char sid[SIDLENGTH + 1];
   int installation_number;
+  int allocation_limit;
+  bool preload;
   int uid_sidadm;
   int uid_sapadm;
   int gid_sidshm;
