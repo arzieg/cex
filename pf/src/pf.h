@@ -52,16 +52,17 @@ typedef struct sidtype {
   int gid_sidshm;
   int gid_sapsys;
   int uid_saprouter;
-  char nodes_dc1[MAX_HOST_EACH_HANASYSTEM][21];
-  char nodes_dc2[MAX_HOST_EACH_HANASYSTEM][21];
-  char nas_ports[4];
+  char nodes_dc1[MAX_SID_PER_ENVIRONMENT][21];
+  char nodes_dc2[MAX_SID_PER_ENVIRONMENT][21];
+  char nas_svms[MAX_SID_PER_ENVIRONMENT][13];
+  char nas_ports[MAX_SID_PER_ENVIRONMENT][2];
   int num_numsp;
   char nas_comment;
-  char dc1_name[MAX_HOST_EACH_HANASYSTEM][3];
-  char dc2_name[MAX_HOST_EACH_HANASYSTEM][3];
-  char xhana2_release[3];
-  char saprepo_version_dc1[24];
-  char saprepo_version_dc2[24];
+  char dc1_name[MAX_SID_PER_ENVIRONMENT][4];
+  char dc2_name[MAX_SID_PER_ENVIRONMENT][4];
+  char xhana2_release[4];
+  char saprepo_version_dc1[MAX_SID_PER_ENVIRONMENT][24];
+  char saprepo_version_dc2[MAX_SID_PER_ENVIRONMENT][24];
   bool systemReplication;
 } SIDTYPE;
 
