@@ -925,8 +925,86 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         debug_print("\nSU_XHANA2_RELEASE = %s\n",
                     hanasid[environmentindex][0].xhana2_release);
         break;
-    }
-  }
+      case 60:  // SU_HANA_01_SAPREPO_VERSION_DC1
+        strncpy(hanasid[environmentindex][0].saprepo_version_dc1[0],
+                ConfigTable[i].result, 24);
+        debug_print("\nSU_HANA_01_SAPREPO_VERSION_DC1 = %s\n",
+                    hanasid[environmentindex][0].saprepo_version_dc1[0]);
+        break;
+      case 61:  // SU_HANA_01_SAPREPO_VERSION_DC2
+        strncpy(hanasid[environmentindex][1].saprepo_version_dc2[0],
+                ConfigTable[i].result, 24);
+        debug_print("\nSU_HANA_01_SAPREPO_VERSION_DC2 = %s\n",
+                    hanasid[environmentindex][1].saprepo_version_dc2[0]);
+        break;
+      case 62:  // SU_HANA_02_SAPREPO_VERSION_DC1
+        strncpy(hanasid[environmentindex][0].saprepo_version_dc1[1],
+                ConfigTable[i].result, 24);
+        debug_print("\nSU_HANA_02_SAPREPO_VERSION_DC1 = %s\n",
+                    hanasid[environmentindex][0].saprepo_version_dc1[1]);
+        break;
+      case 63:  // SU_HANA_02_SAPREPO_VERSION_DC2
+        strncpy(hanasid[environmentindex][1].saprepo_version_dc2[1],
+                ConfigTable[i].result, 24);
+        debug_print("\nSU_HANA_02_SAPREPO_VERSION_DC2 = %s\n",
+                    hanasid[environmentindex][1].saprepo_version_dc2[1]);
+        break;
+      case 64:  // SU_HANA_01_NAS_SVMS
+        line = split_string(ConfigTable[i].result, ' ');
+
+        for (int i = 0; i < 2; i++) {
+          if (strlen(line[i]) > 2 && strlen(line[i]) <= 13) {
+            char *tmp = line[i] + 1;
+            tmp[strlen(tmp) - 1] = '\0';
+            strncpy(hanasid[environmentindex][i].nas_svms[0], tmp, strlen(tmp));
+          }
+        }
+        debug_print("\nSU_HANA_01_NAS_SVMS DC1= %s   DC2=%s\n",
+                    hanasid[environmentindex][0].nas_svms[0],
+                    hanasid[environmentindex][1].nas_svms[0]);
+        break;
+      case 65:  // SU_HANA_02_NAS_SVMS
+        line = split_string(ConfigTable[i].result, ' ');
+
+        for (int i = 0; i < 2; i++) {
+          if (strlen(line[i]) > 2 && strlen(line[i]) <= 13) {
+            char *tmp = line[i] + 1;
+            tmp[strlen(tmp) - 1] = '\0';
+            strncpy(hanasid[environmentindex][i].nas_svms[1], tmp, strlen(tmp));
+          }
+        }
+        debug_print("\nSU_HANA_02_NAS_SVMS DC1= %s   DC2=%s\n",
+                    hanasid[environmentindex][0].nas_svms[1],
+                    hanasid[environmentindex][1].nas_svms[1]);
+        break;
+      case 66:  // SU_HANA_01_NAS_PORTS
+        line = split_string(ConfigTable[i].result, ' ');
+
+        for (int i = 0; i < 2; i++) {
+          if (strlen(line[i]) == 1) {
+            strncpy(hanasid[environmentindex][i].nas_ports[0], line[i],
+                    strlen(line[i]));
+          }
+        }
+        debug_print("\nSU_HANA_01_NAS_PORTS DC1=%s   DC2=%s\n",
+                    hanasid[environmentindex][0].nas_ports[0],
+                    hanasid[environmentindex][1].nas_ports[0]);
+        break;
+      case 67:  // SU_HANA_02_NAS_PORTS
+        line = split_string(ConfigTable[i].result, ' ');
+
+        for (int i = 0; i < 2; i++) {
+          if (strlen(line[i]) == 1) {
+            strncpy(hanasid[environmentindex][i].nas_ports[1], line[i],
+                    strlen(line[i]));
+          }
+        }
+        debug_print("\nSU_HANA_02_NAS_PORTS DC1=%s   DC2=%s\n",
+                    hanasid[environmentindex][0].nas_ports[1],
+                    hanasid[environmentindex][1].nas_ports[1]);
+        break;
+    }  // end of switch
+  }    // end of for
   return 0;
 }
 
