@@ -204,13 +204,6 @@ char **split_string(char *input, char delimiter) {
     tokens[i] = strdup(token);
     i++;
   }
-  /*
-  while ((token = strtok_r(rest, &delimiter, &rest))) {
-    printf("Token: %s\n", token);
-    tokens[i] = strdup(token);
-    i++;
-    }
-    */
   tokens[i] = '\0';
   return tokens;
 }

@@ -11,6 +11,7 @@
 #define REGEXMAC "\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
 #define REGEXSTR "\"([^\"]*)\""
+#define REGEXNUM "(\\b[1-9]\\b)"
 #define FREE(ptr) \
   do {            \
     free(ptr);    \
@@ -18,7 +19,8 @@
   } while (0)
 
 extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
-extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
+extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+extern PMKHANATYPE pmkhana[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 
 NETWORKTYPE *phanasystem;
 
@@ -292,25 +294,21 @@ struct ConfigTableArray ConfigTable[] = {
      .maxlength = TEXTLENGTH,
      .index = 67},
     {.parametername = "SU_HANA_01_NAS_NUMSP",
-     .regexeccode = "SU_HANA_01_NAS_NUMSP=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_01_NAS_NUMSP=" REGEXNUM "",
      .maxlength = TEXTLENGTH,
      .index = 68},
     {.parametername = "SU_HANA_02_NAS_NUMSP",
-     .regexeccode = "SU_HANA_02_NAS_NUMSP=" REGEXBRACKETSTR "",
+     .regexeccode = "SU_HANA_02_NAS_NUMSP=" REGEXNUM "",
      .maxlength = TEXTLENGTH,
      .index = 69},
     {.parametername = "SU_HANA_01_NAS_COMMENT",
      .regexeccode = "SU_HANA_01_NAS_COMMENT=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
      .index = 70},
-    {.parametername = "SU_NAS_DC1",
-     .regexeccode = "SU_NAS_DC1=" REGEXSTR "",
+    {.parametername = "SU_HANA_02_NAS_COMMENT",
+     .regexeccode = "SU_HANA_02_NAS_COMMENT=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
      .index = 71},
-    {.parametername = "SU_NAS_DC2",
-     .regexeccode = "SU_NAS_DC2=" REGEXSTR "",
-     .maxlength = TEXTLENGTH,
-     .index = 72},
 
 };
 
@@ -364,15 +362,15 @@ void split_line_and_assign_to_networktype(char *line,
 
   if (token_array) {
     for (int i = 0; token_array[i] != NULL; i++) {
-      debug_print("\n Address = %p", token_array[i]);
+      // debug_print("\n Address = %p", token_array[i]);
       cnt++;
     }
   }
-  debug_print("\nCount=%d\n", cnt);
+  // debug_print("\nCount=%d\n", cnt);
 
   if (token_array) {
     for (int i = 0; token_array[i] != NULL; i++) {
-      debug_print("Token %d: [%s]\n", i, token_array[i]);
+      // debug_print("Token %d: [%s]\n", i, token_array[i]);
       switch (i) {
         case 0:
           strncpy(phanasystem->network_ip, token_array[i], 15);
@@ -405,9 +403,6 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   case
     xxx setze wert
       wenn wert noch eine zusammenhängende Zeile, dann aufteilen
-  extern HANASYSTEMTYPE
-  hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM]; extern SIDTYPE
-  hanasid[MAX_ENVIRONMENTS][MAX_SID_PER_ENVIRONMENT];
   */
   for (size_t i = 0; i < configtablecount; i++) {
     char **line;
@@ -417,43 +412,43 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
     switch (ConfigTable[i].index) {
       case 1:  // SU_NET_MACS1_DC2
         strncpy(hanasystem[environmentindex][1].mac_address1,
-                ConfigTable[i].result, 17);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 2:  // SU_NET_MACS1_DC1
         strncpy(hanasystem[environmentindex][0].mac_address1,
-                ConfigTable[i].result, 17);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 3:  // SU_NET_MACS2_DC2
         strncpy(hanasystem[environmentindex][1].mac_address2,
-                ConfigTable[i].result, 17);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 4:  // SU_NET_MACS2_DC1
         strncpy(hanasystem[environmentindex][0].mac_address2,
-                ConfigTable[i].result, 17);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 5:  // SU_NET_HOSTS_DC1
         strncpy(hanasystem[environmentindex][0].physical_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 6:  // SU_NET_HOSTS_DC2
         strncpy(hanasystem[environmentindex][1].physical_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 7:  // SU_NET_HANA_01_HOSTS_DC1
         strncpy(hanasystem[environmentindex][0].vhostname[0].virtual_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 8:  // SU_NET_HANA_01_HOSTS_DC2
         strncpy(hanasystem[environmentindex][1].vhostname[0].virtual_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 9:  // SU_NET_HANA_02_HOSTS_DC1
         strncpy(hanasystem[environmentindex][0].vhostname[1].virtual_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 10:  // SU_NET_HANA_02_HOSTS_DC2
         strncpy(hanasystem[environmentindex][1].vhostname[1].virtual_hostname,
-                ConfigTable[i].result, HOSTNAME_LENGTH + 1);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         break;
       case 11:  // SU_NET_HANA_01_IPS_DC1
         phanasystem = &hanasystem[environmentindex][0].vhostname[0].network_ips;
@@ -615,13 +610,13 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
       case 42:  // SU_HANA_SID
         line = split_string(ConfigTable[i].result, ' ');
 
-        (line[0] != NULL)
-            ? strncpy(hanasid[environmentindex][0].sid, line[0], 4)
-            : NULL;
+        (line[0] != NULL) ? strncpy(hanasid[environmentindex][0].sid, line[0],
+                                    ConfigTable[i].maxlength)
+                          : NULL;
 
-        (line[1] != NULL)
-            ? strncpy(hanasid[environmentindex][1].sid, line[1], 4)
-            : NULL;
+        (line[1] != NULL) ? strncpy(hanasid[environmentindex][1].sid, line[1],
+                                    ConfigTable[i].maxlength)
+                          : NULL;
 
         debug_print("\nToken %d = %s\n", 0, hanasid[environmentindex][0].sid);
         debug_print("\nToken %d = %s\n", 1, hanasid[environmentindex][1].sid);
@@ -927,25 +922,25 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         break;
       case 60:  // SU_HANA_01_SAPREPO_VERSION_DC1
         strncpy(hanasid[environmentindex][0].saprepo_version_dc1[0],
-                ConfigTable[i].result, 24);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         debug_print("\nSU_HANA_01_SAPREPO_VERSION_DC1 = %s\n",
                     hanasid[environmentindex][0].saprepo_version_dc1[0]);
         break;
       case 61:  // SU_HANA_01_SAPREPO_VERSION_DC2
         strncpy(hanasid[environmentindex][1].saprepo_version_dc2[0],
-                ConfigTable[i].result, 24);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         debug_print("\nSU_HANA_01_SAPREPO_VERSION_DC2 = %s\n",
                     hanasid[environmentindex][1].saprepo_version_dc2[0]);
         break;
       case 62:  // SU_HANA_02_SAPREPO_VERSION_DC1
         strncpy(hanasid[environmentindex][0].saprepo_version_dc1[1],
-                ConfigTable[i].result, 24);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         debug_print("\nSU_HANA_02_SAPREPO_VERSION_DC1 = %s\n",
                     hanasid[environmentindex][0].saprepo_version_dc1[1]);
         break;
       case 63:  // SU_HANA_02_SAPREPO_VERSION_DC2
         strncpy(hanasid[environmentindex][1].saprepo_version_dc2[1],
-                ConfigTable[i].result, 24);
+                ConfigTable[i].result, ConfigTable[i].maxlength);
         debug_print("\nSU_HANA_02_SAPREPO_VERSION_DC2 = %s\n",
                     hanasid[environmentindex][1].saprepo_version_dc2[1]);
         break;
@@ -953,7 +948,8 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         line = split_string(ConfigTable[i].result, ' ');
 
         for (int i = 0; i < 2; i++) {
-          if (strlen(line[i]) > 2 && strlen(line[i]) <= 13) {
+          if (strlen(line[i]) > 2 &&
+              strlen(line[i]) <= ConfigTable[i].maxlength) {
             char *tmp = line[i] + 1;
             tmp[strlen(tmp) - 1] = '\0';
             strncpy(hanasid[environmentindex][i].nas_svms[0], tmp, strlen(tmp));
@@ -967,7 +963,8 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         line = split_string(ConfigTable[i].result, ' ');
 
         for (int i = 0; i < 2; i++) {
-          if (strlen(line[i]) > 2 && strlen(line[i]) <= 13) {
+          if (strlen(line[i]) > 2 &&
+              strlen(line[i]) <= ConfigTable[i].maxlength) {
             char *tmp = line[i] + 1;
             tmp[strlen(tmp) - 1] = '\0';
             strncpy(hanasid[environmentindex][i].nas_svms[1], tmp, strlen(tmp));
@@ -1003,13 +1000,58 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
                     hanasid[environmentindex][0].nas_ports[1],
                     hanasid[environmentindex][1].nas_ports[1]);
         break;
+      case 68:  // SU_HANA_01_NAS_NUMSP
+        if (ConfigTable[i].result != NULL) {
+          int tmp = atoi(ConfigTable[i].result);
+          if (tmp >= 1 && tmp <= 9) {
+            hanasid[environmentindex][0].num_numsp[0] = tmp;
+          } else {
+            hanasid[environmentindex][0].num_numsp[0] = -1;
+          }
+        } else {
+          hanasid[environmentindex][0].num_numsp[0] = -1;
+        }
+
+        debug_print("\nSU_HANA_01_NAS_NUMSP = %d\n",
+                    hanasid[environmentindex][0].num_numsp[0]);
+
+        FREE(line);
+        break;
+      case 69:  // SU_HANA_02_NAS_NUMSP
+        if (ConfigTable[i].result != NULL) {
+          int tmp = atoi(ConfigTable[i].result);
+          if (tmp >= 1 && tmp <= 9) {
+            hanasid[environmentindex][0].num_numsp[1] = tmp;
+          } else {
+            hanasid[environmentindex][0].num_numsp[1] = -1;
+          }
+        } else {
+          hanasid[environmentindex][0].num_numsp[1] = -1;
+        }
+
+        debug_print("\nSU_HANA_02_NAS_NUMSP = %d\n",
+                    hanasid[environmentindex][0].num_numsp[1]);
+
+        FREE(line);
+        break;
+      case 70:  // SU_HANA_01_NAS_COMMENT
+        strncpy(hanasid[environmentindex][0].nas_comment[0],
+                ConfigTable[i].result, ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_NAS_COMMENT = %s\n",
+                    hanasid[environmentindex][0].nas_comment[0]);
+        break;
+      case 71:  // SU_HANA_02_NAS_COMMENT
+        strncpy(hanasid[environmentindex][0].nas_comment[1],
+                ConfigTable[i].result, ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_02_NAS_COMMENT = %s\n",
+                    hanasid[environmentindex][0].nas_comment[1]);
+        break;
     }  // end of switch
   }    // end of for
   return 0;
 }
 
 /*
-
 
 
 
