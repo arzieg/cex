@@ -8,18 +8,18 @@
 // 1. Abfrage Szenario Single DC oder Replikation ? SO oder SU wenn SU,
 //     dann Single SID oder MCOS Toolserver ISCSI Server
 
-#define HOSTNAME_LENGTH 13
+#define HOSTNAME_LENGTH 14
 #define MAX_ENVIRONMENTS 10
 #define MAX_HOST_EACH_HANASYSTEM 12
 #define MAX_SID_PER_ENVIRONMENT 6
-#define SIDLENGTH 3   // SID Length
+#define SIDLENGTH 4   // SID Length
 #define MACLENGTH 17  // MAC Length incl. colon
 #define OK 0
 #define ERROR 1
 #define IP_MIN_LENGTH 7
 #define IP_MAX_LENGTH 15
 #define NET_INFOMATION 61  // used in readconf
-#define TEXTLENGTH 20      // used in readconf
+#define TEXTLENGTH 24      // used in readconf
 
 #define DEBUG 1
 
@@ -43,7 +43,7 @@ typedef struct {
 */
 
 typedef struct sidtype {
-  char sid[SIDLENGTH + 1];
+  char sid[SIDLENGTH];
   int installation_number;
   int allocation_limit;
   bool preload;
@@ -52,17 +52,17 @@ typedef struct sidtype {
   int gid_sidshm;
   int gid_sapsys;
   int uid_saprouter;
-  char nodes_dc1[MAX_SID_PER_ENVIRONMENT][21];
-  char nodes_dc2[MAX_SID_PER_ENVIRONMENT][21];
-  char nas_svms[MAX_SID_PER_ENVIRONMENT][13];
+  char nodes_dc1[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char nodes_dc2[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char nas_svms[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
   char nas_ports[MAX_SID_PER_ENVIRONMENT][2];
-  int num_numsp;
-  char nas_comment;
-  char dc1_name[MAX_SID_PER_ENVIRONMENT][4];
-  char dc2_name[MAX_SID_PER_ENVIRONMENT][4];
+  int num_numsp[MAX_SID_PER_ENVIRONMENT];
+  char nas_comment[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char dc1_name[MAX_SID_PER_ENVIRONMENT][SIDLENGTH];
+  char dc2_name[MAX_SID_PER_ENVIRONMENT][SIDLENGTH];
   char xhana2_release[4];
-  char saprepo_version_dc1[MAX_SID_PER_ENVIRONMENT][24];
-  char saprepo_version_dc2[MAX_SID_PER_ENVIRONMENT][24];
+  char saprepo_version_dc1[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char saprepo_version_dc2[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
   bool systemReplication;
 } SIDTYPE;
 
@@ -80,7 +80,7 @@ typedef struct networktype {
 } NETWORKTYPE;
 
 typedef struct virthanasystemtype {
-  char virtual_hostname[HOSTNAME_LENGTH + 1];
+  char virtual_hostname[HOSTNAME_LENGTH];
   NETWORKTYPE network_ips;
   NETWORKTYPE network_se;
   NETWORKTYPE network_hnr;
@@ -91,7 +91,7 @@ typedef struct virthanasystemtype {
 HOST Informationen
 */
 typedef struct hanasystemtype {
-  char physical_hostname[HOSTNAME_LENGTH + 1];
+  char physical_hostname[HOSTNAME_LENGTH];
   // char virtual_hostname[HOSTNAME_LENGTH + 1];
   VIRTHANASYSTEMTYPE vhostname[MAX_SID_PER_ENVIRONMENT];
   char mac_address1[17];
@@ -105,6 +105,18 @@ typedef struct hanasystemtype {
   NETWORKTYPE network_bak;
   NETWORKTYPE network_hni;
 } HANASYSTEMTYPE;
+
+typedef struct pmkhanatype {
+  char virtual_hostname[MAX_SID_PER_ENVIRONMENT][HOSTNAME_LENGTH];
+  char virtual_ip[MAX_SID_PER_ENVIRONMENT][IP_MAX_LENGTH];
+  char virtual_gw[MAX_SID_PER_ENVIRONMENT][IP_MAX_LENGTH];
+  int virtual_netmask[MAX_SID_PER_ENVIRONMENT];
+  int virtual_vlan[MAX_SID_PER_ENVIRONMENT];
+  char pace_nodes[MAX_SID_PER_ENVIRONMENT][HOSTNAME_LENGTH];
+  char iscsi_target[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char irmc_user[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char irmc_pwd[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+} PMKHANATYPE;
 
 /* interactive.c */
 void get_sid_list(void);

@@ -57,6 +57,7 @@ building blocks:
 # bei den Netzwerkinformationen nur eine Iteration durchlaufen und bei hostnamen dann die Anzahl nehmen
 
 
+# Pacemakerinformationen verarbeiten
 
 
 
