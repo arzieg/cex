@@ -34,7 +34,6 @@ void split_line_and_assign_to_networktype(char *line) {
       free(token_array[i]);
     }
     free(token_array);
-    token_array = NULL;
   }
 }
 
