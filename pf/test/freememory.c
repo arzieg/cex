@@ -40,7 +40,7 @@ void split_line_and_assign_to_networktype(char *line) {
 
 char **split_string(char *input, char delimiter) {
   char **tokens = NULL;
-  char *token;
+  char *token = NULL;
   char *rest = strdup(input);
   int count = 0;
 
