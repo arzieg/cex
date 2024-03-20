@@ -21,7 +21,7 @@ void split_line_and_assign_to_networktype(char *line) {
 
   if (token_array) {
     for (int i = 0; token_array[i] != NULL; i++) {
-      // debug_print("\n Address = %p", token_array[i]);
+      printf("\n Address = %p\n", token_array[i]);
       cnt++;
     }
   }
@@ -31,9 +31,9 @@ void split_line_and_assign_to_networktype(char *line) {
     for (int i = 0; token_array[i] != NULL; i++) {
       printf("\nToken = %s", token_array[i]);
 
-      free(token_array[i]);
+      FREE(token_array[i]);
     }
-    free(token_array);
+    FREE(token_array);
   }
 }
 
@@ -73,6 +73,7 @@ char **split_string(char *input, char delimiter) {
 
 int main() {
   char *line = "Das ist ein Teststring";
+  printf("\n Address of line %p", line);
   split_line_and_assign_to_networktype(line);
 
   return 0;
