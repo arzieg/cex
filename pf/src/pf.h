@@ -113,9 +113,9 @@ typedef struct pmkhanatype {
   int virtual_netmask[MAX_SID_PER_ENVIRONMENT];
   int virtual_vlan[MAX_SID_PER_ENVIRONMENT];
   char pace_nodes[MAX_SID_PER_ENVIRONMENT][HOSTNAME_LENGTH];
-  char iscsi_target[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
-  char irmc_user[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
-  char irmc_pwd[MAX_SID_PER_ENVIRONMENT][TEXTLENGTH];
+  char iscsi_target[3][TEXTLENGTH];
+  char irmc_user[TEXTLENGTH];
+  char irmc_pwd[TEXTLENGTH];
 } PMKHANATYPE;
 
 /* interactive.c */

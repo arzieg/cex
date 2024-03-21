@@ -11,7 +11,10 @@
 #define REGEXMAC "\\((([a-fA-F0-9]{2}[:-]){5}([a-fA-F0-9]{2}))\\)"
 #define REGEXBRACKETSTR "\\(([^()]*)\\)"
 #define REGEXSTR "\"([^\"]*)\""
-#define REGEXNUM "(\\b[1-9]\\b)"
+#define REGEXMATCHWORD "(\\w+)"
+#define REGEXMATCHIP "(\\w+.\\w+.\\w+.\\w+)"
+#define REGEXNUM "(\\b[1-9]\\b)"        // find Numbers
+#define REGEXMATCHVAR "(\\$\\w+|\\w+)"  // find $VAR
 #define FREE(ptr) \
   do {            \
     free(ptr);    \
@@ -20,7 +23,7 @@
 
 extern HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 extern SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
-extern PMKHANATYPE pmkhana[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+extern PMKHANATYPE pmkhana[MAX_ENVIRONMENTS];
 
 NETWORKTYPE *phanasystem;
 
@@ -309,7 +312,62 @@ struct ConfigTableArray ConfigTable[] = {
      .regexeccode = "SU_HANA_02_NAS_COMMENT=" REGEXSTR "",
      .maxlength = TEXTLENGTH,
      .index = 71},
-
+    {.parametername = "SU_HANA_01_VIRTUAL_HOST_01",
+     .regexeccode = "SU_HANA_01_VIRTUAL_HOST_01=" REGEXMATCHWORD "",
+     .maxlength = HOSTNAME_LENGTH,
+     .index = 72},
+    {.parametername = "SU_HANA_01_VIRTUAL_IP_01",
+     .regexeccode = "SU_HANA_01_VIRTUAL_IP_01=" REGEXMATCHIP "",
+     .maxlength = IP_MAX_LENGTH,
+     .index = 73},
+    {.parametername = "SU_HANA_01_VIRTUAL_GW_01",
+     .regexeccode = "SU_HANA_01_VIRTUAL_GW_01=" REGEXMATCHIP "",
+     .maxlength = IP_MAX_LENGTH,
+     .index = 74},
+    {.parametername = "SU_HANA_01_VIRTUAL_NETMASK_01",
+     .regexeccode = "SU_HANA_01_VIRTUAL_NETMASK_01=" REGEXMATCHWORD "",
+     .maxlength = TEXTLENGTH,
+     .index = 75},
+    {.parametername = "SU_HANA_01_VIRTUAL_VLAN_01",
+     .regexeccode = "SU_HANA_01_VIRTUAL_VLAN_01=" REGEXMATCHWORD "",
+     .maxlength = TEXTLENGTH,
+     .index = 76},
+    {.parametername = "SU_HANA_01_VIRTUAL_HOST_02",
+     .regexeccode = "SU_HANA_01_VIRTUAL_HOST_02=" REGEXMATCHWORD "",
+     .maxlength = HOSTNAME_LENGTH,
+     .index = 77},
+    {.parametername = "SU_HANA_01_VIRTUAL_IP_02",
+     .regexeccode = "SU_HANA_01_VIRTUAL_IP_02=" REGEXMATCHIP "",
+     .maxlength = IP_MAX_LENGTH,
+     .index = 78},
+    {.parametername = "SU_HANA_01_VIRTUAL_GW_02",
+     .regexeccode = "SU_HANA_01_VIRTUAL_GW_02=" REGEXMATCHIP "",
+     .maxlength = IP_MAX_LENGTH,
+     .index = 79},
+    {.parametername = "SU_HANA_01_VIRTUAL_NETMASK_02",
+     .regexeccode = "SU_HANA_01_VIRTUAL_NETMASK_02=" REGEXMATCHWORD "",
+     .maxlength = TEXTLENGTH,
+     .index = 80},
+    {.parametername = "SU_HANA_01_VIRTUAL_VLAN_02",
+     .regexeccode = "SU_HANA_01_VIRTUAL_VLAN_02=" REGEXMATCHWORD "",
+     .maxlength = TEXTLENGTH,
+     .index = 81},
+    {.parametername = "SU_HANA_01_PACE_NODES",
+     .regexeccode = "SU_HANA_01_PACE_NODES=" REGEXBRACKETSTR "",
+     .maxlength = TEXTLENGTH,
+     .index = 82},
+    {.parametername = "SU_HANA_01_PACE_ISCSI_TARGETS",
+     .regexeccode = "SU_HANA_01_PACE_ISCSI_TARGETS=" REGEXBRACKETSTR "",
+     .maxlength = TEXTLENGTH,
+     .index = 83},
+    {.parametername = "SU_HANA_IRMC_USER",
+     .regexeccode = "SU_HANA_IRMC_USER=" REGEXMATCHWORD "",
+     .maxlength = TEXTLENGTH,
+     .index = 84},
+    {.parametername = "SU_HANA_IRMC_PWD",
+     .regexeccode = "SU_HANA_IRMC_PWD=" REGEXMATCHVAR "",
+     .maxlength = TEXTLENGTH,
+     .index = 85},
 };
 
 /*
@@ -1046,12 +1104,115 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
         debug_print("\nSU_HANA_02_NAS_COMMENT = %s\n",
                     hanasid[environmentindex][0].nas_comment[1]);
         break;
+      case 72:  // SU_HANA_01_VIRTUAL_HOST_01
+        strncpy(pmkhana[environmentindex].virtual_hostname[0],
+                ConfigTable[i].result, ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_HOST_01 = %s\n",
+                    pmkhana[environmentindex].virtual_hostname[0]);
+        break;
+      case 73:  // SU_HANA_01_VIRTUAL_IP_01
+        strncpy(pmkhana[environmentindex].virtual_ip[0], ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_IP_01 = %s\n",
+                    pmkhana[environmentindex].virtual_ip[0]);
+        break;
+      case 74:  // SU_HANA_01_VIRTUAL_GW_01
+        strncpy(pmkhana[environmentindex].virtual_gw[0], ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_GW_01 = %s\n",
+                    pmkhana[environmentindex].virtual_gw[0]);
+        break;
+      case 75:  // SU_HANA_01_VIRTUAL_NETMASK_01
+        pmkhana[environmentindex].virtual_netmask[0] =
+            atoi(ConfigTable[i].result);
+        debug_print("\nSU_HANA_01_VIRTUAL_NETMASK_01 = %d\n",
+                    pmkhana[environmentindex].virtual_netmask[0]);
+        break;
+      case 76:  // SU_HANA_01_VIRTUAL_VLAN_01
+        pmkhana[environmentindex].virtual_vlan[0] = atoi(ConfigTable[i].result);
+        debug_print("\nSU_HANA_01_VIRTUAL_VLAN_01 = %d\n",
+                    pmkhana[environmentindex].virtual_vlan[0]);
+        break;
+
+      case 77:  // SU_HANA_01_VIRTUAL_HOST_02
+        strncpy(pmkhana[environmentindex].virtual_hostname[1],
+                ConfigTable[i].result, ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_HOST_02 = %s\n",
+                    pmkhana[environmentindex].virtual_hostname[1]);
+        break;
+      case 78:  // SU_HANA_01_VIRTUAL_IP_02
+        strncpy(pmkhana[environmentindex].virtual_ip[1], ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_IP_02 = %s\n",
+                    pmkhana[environmentindex].virtual_ip[1]);
+        break;
+      case 79:  // SU_HANA_01_VIRTUAL_GW_02
+        strncpy(pmkhana[environmentindex].virtual_gw[1], ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_01_VIRTUAL_GW_02 = %s\n",
+                    pmkhana[environmentindex].virtual_gw[1]);
+        break;
+      case 80:  // SU_HANA_01_VIRTUAL_NETMASK_02
+        pmkhana[environmentindex].virtual_netmask[1] =
+            atoi(ConfigTable[i].result);
+        debug_print("\nSU_HANA_01_VIRTUAL_NETMASK_02 = %d\n",
+                    pmkhana[environmentindex].virtual_netmask[1]);
+        break;
+      case 81:  // SU_HANA_01_VIRTUAL_VLAN_02
+        pmkhana[environmentindex].virtual_vlan[1] = atoi(ConfigTable[i].result);
+        debug_print("\nSU_HANA_01_VIRTUAL_VLAN_02 = %d\n",
+                    pmkhana[environmentindex].virtual_vlan[1]);
+        break;
+      case 82:  // SU_HANA_01_PACE_NODES
+        line = split_string(ConfigTable[i].result, ' ');
+        if (line[0] != NULL) {
+          char *tmp = line[0] + 1;
+          tmp[strlen(tmp)] = '\0';
+          strncpy(pmkhana[environmentindex].pace_nodes[0], tmp, strlen(tmp));
+        }
+        if (line[1] != NULL) {
+          char *tmp = line[1];
+          tmp[strlen(tmp) - 1] = '\0';
+          strncpy(pmkhana[environmentindex].pace_nodes[1], tmp, strlen(tmp));
+        }
+        debug_print("\SU_HANA_01_PACE_NODES DC1=%s   DC2=%s\n",
+                    pmkhana[environmentindex].pace_nodes[0],
+                    pmkhana[environmentindex].pace_nodes[1]);
+        break;
+      case 83:  // SU_HANA_01_PACE_ISCSI_TARGETS
+        line = split_string(ConfigTable[i].result, ' ');
+        for (int i = 0; i < 3; i++) {
+          if (strlen(line[i]) != 0) {
+            strncpy(pmkhana[environmentindex].iscsi_target[i], line[i],
+                    strlen(line[i]));
+          }
+        }
+        debug_print("\nSU_HANA_01_PACE_ISCSI_TARGETS=%s  %s  %s   \n",
+                    pmkhana[environmentindex].iscsi_target[0],
+                    pmkhana[environmentindex].iscsi_target[1],
+                    pmkhana[environmentindex].iscsi_target[2]);
+
+        break;
+      case 84:  // SU_HANA_IRMC_USER
+        strncpy(pmkhana[environmentindex].irmc_user, ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_IRMC_USER = %s\n",
+                    pmkhana[environmentindex].irmc_user);
+        break;
+      case 85:  // SU_HANA_IRMC_PWD
+        strncpy(pmkhana[environmentindex].irmc_pwd, ConfigTable[i].result,
+                ConfigTable[i].maxlength);
+        debug_print("\nSU_HANA_IRMC_PWD = %s\n",
+                    pmkhana[environmentindex].irmc_pwd);
+        break;
     }  // end of switch
   }    // end of for
   return 0;
 }
 
 /*
+SU_HANA_01_PACE_NODES=("pcmc11-0001 pcmc11-1001")
+SU_HANA_01_PACE_ISCSI_TARGETS=(dc1-hana-sbd-pcm dc2-hana-sbd-pcm vsrv159-pcm)
 
 
 
