@@ -16,7 +16,7 @@ HANASYSTEMTYPE hanasystem[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 /* each hanasystemenvironment could have 1 to n SIDs */
 SIDTYPE hanasid[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
 /* hanasystem with systemreplication could have a pacemaker configuration */
-PMKHANATYPE pmkhana[MAX_ENVIRONMENTS][MAX_HOST_EACH_HANASYSTEM];
+PMKHANATYPE pmkhana[MAX_ENVIRONMENTS];
 
 enum serverrole { MASTER, WORKER, STANDBY };
 
