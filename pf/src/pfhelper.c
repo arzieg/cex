@@ -5,6 +5,7 @@
 #include "pfhelper.h"
 
 #include <ctype.h>
+#include <dirent.h>
 #include <errno.h>
 #include <regex.h>
 #include <stdbool.h>
@@ -206,4 +207,40 @@ char **split_string(char *input, char delimiter) {
   }
   tokens[i] = '\0';
   return tokens;
+}
+
+size_t get_files_in_confdir(char *directory) {
+  DIR *dir = opendir(directory);
+
+  // ToDo
+  // Anlegen einer Struktur
+  // char *filename
+  // char type
+  // als dynamische Liste
+  // Rückgabe des Zeigers zur dynamischen Liste
+
+  // als erstes aber erst einmal faken und
+  // C11.conf und B20.conf zurückgeben, um environmentindex zu testen.
+
+  if (dir == NULL) {
+    fprintf(stderr, "error: %s: %s (errno = %d)\n", directory, strerror(errno),
+            errno);
+    exit(EXIT_FAILURE);
+  }
+
+  /* get conf files */
+  struct dirent *file;
+  while ((file = readdir(dir)) != NULL) {
+    // check for *.conf
+    if (strstr(file->d_name, ".conf") != NULL) {
+      // check that is after *.conf nothing
+      size_t len = strlen(file->d_name);
+      if (len > 5 && strcmp(file->d_name + len - 5, ".conf") == 0) {
+        printf("%s\n", file->d_name);
+      }
+    }
+  }
+
+  closedir(dir);
+  return 0;
 }
