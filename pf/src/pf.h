@@ -4,6 +4,7 @@
 #include <stdbool.h>
 // #include <sys/types.h>
 #include <stdint.h>
+#include <sys/types.h>  // ssize_t
 
 // 1. Abfrage Szenario Single DC oder Replikation ? SO oder SU wenn SU,
 //     dann Single SID oder MCOS Toolserver ISCSI Server

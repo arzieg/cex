@@ -20,21 +20,6 @@ struct ConfigTableArray {
   char *result;
 };
 
-/*
- for pfhelper.c
- Types of Installations
-*/
-enum InstallationType { SCALEUP, SCALEOUT, TOOLSERVER, MAJORITYMAKER, ISCSI };
-
-/*
- for pfhelper.c
-*/
-typedef struct ConfigFilesStruct {
-  char *filename;
-  enum InstallationType systemtype;
-  struct ConfigFilesStruct *next;
-} CONFIGFILESSTRUCT;
-
 void CustomString_free(CustomString *target);
 
 // CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
