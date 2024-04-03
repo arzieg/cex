@@ -211,6 +211,7 @@ char **split_string(char *input, char delimiter) {
 
 size_t get_files_in_confdir(char *directory) {
   DIR *dir = opendir(directory);
+  CONFIGFILESSTRUCT ConfigFiles;
 
   // ToDo
   // Anlegen einer Struktur
@@ -228,6 +229,8 @@ size_t get_files_in_confdir(char *directory) {
     exit(EXIT_FAILURE);
   }
 
+  printf("\n GET FILENAMES \n\n");
+
   /* get conf files */
   struct dirent *file;
   while ((file = readdir(dir)) != NULL) {
@@ -240,6 +243,11 @@ size_t get_files_in_confdir(char *directory) {
       }
     }
   }
+
+  /* fake*/
+  char *file1 = "C11.conf";
+  ConfigFiles->filename = (char *)malloc(sizeof(char) * strlen(file1));
+  strncpy(ConfigFiles->filename, file1, strlen(file1));
 
   closedir(dir);
   return 0;
