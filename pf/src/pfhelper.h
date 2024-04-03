@@ -7,14 +7,6 @@
 
 #include "pf.h"
 
-// enum stringfunction {
-//   ISALPHANUMERIC,
-//   ISALPHA_AND_COLON,
-//   ISAPLHA_OR_COLON,
-//   ISALPHA_OR_HYPHEN,
-//   ISALPHA_OR_DOT,
-// };
-
 /*
  for readconf.c. Idea is to setup a table with parametername, regexec-code and
  result of regexec.
@@ -27,6 +19,21 @@ struct ConfigTableArray {
   size_t index;
   char *result;
 };
+
+/*
+ for pfhelper.c
+ Types of Installations
+*/
+enum InstallationType { SCALEUP, SCALEOUT, TOOLSERVER, MAJORITYMAKER, ISCSI };
+
+/*
+ for pfhelper.c
+*/
+typedef struct ConfigFilesStruct {
+  char *filename;
+  enum InstallationType systemtype;
+  struct ConfigFilesStruct *next;
+} CONFIGFILESSTRUCT;
 
 void CustomString_free(CustomString *target);
 
