@@ -122,6 +122,7 @@ int main(int argc, char **argv) {
 
   // if (arguments.pinteractive) interactive();
   // if (arguments.confdir) readconf_su(arguments.confdir, 0);
-  if (arguments.confdir) get_files_in_confdir(arguments.confdir);
+  // if (arguments.confdir) get_files_in_confdir(arguments.confdir);
+  if (arguments.confdir) testmain();
   exit(0);
 }
