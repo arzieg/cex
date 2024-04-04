@@ -9,68 +9,68 @@
 
 #include "pf.h"
 
-/*
- Types of Installations
-*/
-typedef enum {
-  SCALEUP,
-  SCALEOUT,
-  TOOLSERVER,
-  MAJORITYMAKER,
-  ISCSI
-} InstallationType_t;
-
 typedef struct ConfigFilesStruct {
   char *filename;
   InstallationType_t systemtype;
   struct ConfigFilesStruct *next;
-} CONFIGFILESSTRUCT;
+} ConfigFilesStruct_t;
 
-CONFIGFILESSTRUCT *create_fileentry(char *pfilename,
-                                    InstallationType_t psystemtype) {
-  CONFIGFILESSTRUCT *f = (CONFIGFILESSTRUCT *)malloc(sizeof(CONFIGFILESSTRUCT));
-  f->filename = pfilename;
-  f->next = NULL;
-  f->systemtype = psystemtype;
-  return f;
+size_t createFilestack(ConfigFilesStruct_t **stack) {
+  *stack = NULL;
+  return EXIT_SUCCESS;
 }
 
-// check if stack is empty
-size_t isEmpty(CONFIGFILESSTRUCT *top) { return top == NULL; }
+size_t isEmpty(ConfigFilesStruct_t *stack) { return stack == NULL; }
 
 // function to push an elment onto the stack
-void push(CONFIGFILESSTRUCT **top, char *pfilename,
-          InstallationType_t psystemtype) {
-  CONFIGFILESSTRUCT *newFile = create_fileentry(pfilename, psystemtype);
-  newFile->next = *top;
-  *top = newFile;
-  printf("%s pushed to the stack.\n", pfilename);
+size_t pushFileStack(ConfigFilesStruct_t **stack, char *pfilename,
+                     InstallationType_t psystemtype) {
+  ConfigFilesStruct_t *newFile;
+  newFile = (ConfigFilesStruct_t *)malloc(sizeof(ConfigFilesStruct_t *));
+  if (!newFile) return EXIT_FAILURE;
+  newFile->filename = pfilename;
+  newFile->systemtype = psystemtype;
+  newFile->next = *stack;
+  *stack = newFile;
+  printf("%s is a %d pushed to the stack.\n", pfilename, psystemtype);
+  return EXIT_SUCCESS;
 }
 
-// functio to pop an element from the stack
-char *pop(CONFIGFILESSTRUCT **top) {
-  if (isEmpty(*top)) {
+// function to pop an element from the stack
+size_t popFileStack(ConfigFilesStruct_t **stack, char **pfilename,
+                    InstallationType_t *psystemtype) {
+  ConfigFilesStruct_t *temp = *stack;
+  if (isEmpty(*stack)) {
     printf("Stack underflow!\n");
-    return ERROR;
+    return EXIT_FAILURE;
   }
-  CONFIGFILESSTRUCT *temp = *top;
-  char *popped_filename = temp->filename;
-  InstallationType_t popped_type = temp->systemtype;
-  *top = (*top)->next;
+  *stack = temp->next;
+  *pfilename = temp->filename;
+  psystemtype = &temp->systemtype;
   free(temp);
-  return popped_filename;  // zweiter Wert muss auch noch zurückgegeben werden
+  return EXIT_SUCCESS;
+}
+
+size_t deleteFileStack(ConfigFilesStruct_t **stack) {
+  ConfigFilesStruct_t *temp;
+  while (*stack) {
+    temp = (*stack)->next;
+    free(*stack);
+    *stack = temp;
+  }
+  return EXIT_SUCCESS;
 }
 
 // function to display the stack
-void displayStack(CONFIGFILESSTRUCT *top) {
-  if (isEmpty(top)) {
+void displayFileStack(ConfigFilesStruct_t *stack) {
+  if (isEmpty(stack)) {
     printf("Stack is empty!\n");
     return;
   }
-  CONFIGFILESSTRUCT *current = top;
+  ConfigFilesStruct_t *current = stack;
   printf("\nStack: ");
   while (current != NULL) {
-    printf("%s ", current->filename);
+    printf("\n%s is %d ", current->filename, current->systemtype);
     current = current->next;
   }
   printf("\n");
@@ -78,21 +78,24 @@ void displayStack(CONFIGFILESSTRUCT *top) {
 
 /*
 // Main function
-int main() {
-    struct Node* top = NULL;
-    push(&top, 10);
-    push(&top, 20);
-    push(&top, 30);
-    displayStack(top);
-    printf("%d popped from the stack.\n", pop(&top));
-    displayStack(top);
-    return 0;
+*/
+int testmain() {
+  ConfigFilesStruct_t *filestack = NULL;
+  char *pfilename;
+  InstallationType_t *psystemtype;
+
+  pushFileStack(&filestack, "C11.conf", SCALEUP);
+  pushFileStack(&filestack, "B10.conf", SCALEOUT);
+  displayFileStack(filestack);
+  popFileStack(&filestack, &pfilename, psystemtype);
+  printf("popped from the stack, got %s and %d.\n\n", pfilename, *psystemtype);
+  displayFileStack(filestack);
+  return 0;
 }
 
-*/
 void get_files_in_confdir(char *directory) {
   DIR *dir = opendir(directory);
-  CONFIGFILESSTRUCT ConfigFiles;
+  ConfigFilesStruct_t ConfigFiles;
 
   // ToDo
   // Anlegen einer Struktur
@@ -128,5 +131,5 @@ void get_files_in_confdir(char *directory) {
   /* fake*/
 
   closedir(dir);
-  return 0;
+  return EXIT_SUCCESS;
 }
