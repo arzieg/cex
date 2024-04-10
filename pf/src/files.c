@@ -37,16 +37,17 @@ size_t pushFileStack(ConfigFilesStruct_t **stack, char *pfilename,
 }
 
 // function to pop an element from the stack
-size_t popFileStack(ConfigFilesStruct_t **stack, char **pfilename,
-                    InstallationType_t *psystemtype) {
-  ConfigFilesStruct_t *temp = *stack;
+ConfigFilesStruct_t *popFileStack(ConfigFilesStruct_t **stack) {
   if (isEmpty(*stack)) {
     printf("Stack underflow!\n");
     return EXIT_FAILURE;
   }
+  ConfigFilesStruct_t *temp = *stack;
+
   *stack = temp->next;
-  *pfilename = temp->filename;
-  psystemtype = &temp->systemtype;
+  char *filename = temp->filename;
+  InstallationType_t systemtype = temp->systemtype;
+
   free(temp);
   return EXIT_SUCCESS;
 }
@@ -87,7 +88,7 @@ int testmain() {
   pushFileStack(&filestack, "C11.conf", SCALEUP);
   pushFileStack(&filestack, "B10.conf", SCALEOUT);
   displayFileStack(filestack);
-  popFileStack(&filestack, &pfilename, psystemtype);
+  popFileStack(&filestack);
   printf("popped from the stack, got %s and %d.\n\n", pfilename, *psystemtype);
   displayFileStack(filestack);
   return 0;
