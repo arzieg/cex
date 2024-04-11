@@ -15,6 +15,14 @@ typedef struct ConfigFilesStruct {
   struct ConfigFilesStruct *next;
 } ConfigFilesStruct_t;
 
+typedef struct LinkedListStruct {
+  ConfigFilesStruct_t *head;
+  ConfigFilesStruct_t *tail;
+  ConfigFilesStruct_t *current;
+} LinkeListStruct_t;
+
+typedef LinkeListStruct_t filestack;
+
 size_t createFilestack(ConfigFilesStruct_t **stack) {
   *stack = NULL;
   return EXIT_SUCCESS;
