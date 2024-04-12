@@ -15,59 +15,51 @@ typedef struct ConfigFilesStruct {
   struct ConfigFilesStruct *next;
 } ConfigFilesStruct_t;
 
-typedef struct LinkedListStruct {
-  ConfigFilesStruct_t *head;
-  ConfigFilesStruct_t *tail;
-  ConfigFilesStruct_t *current;
-} LinkeListStruct_t;
-
-typedef LinkeListStruct_t filestack;
-
-size_t createFilestack(ConfigFilesStruct_t **stack) {
+bool createFilestack(ConfigFilesStruct_t **stack) {
   *stack = NULL;
-  return EXIT_SUCCESS;
+  return true;
 }
 
 size_t isEmpty(ConfigFilesStruct_t *stack) { return stack == NULL; }
 
-// function to push an elment onto the stack
-size_t pushFileStack(ConfigFilesStruct_t **stack, char *pfilename,
-                     InstallationType_t psystemtype) {
+// function to push an element onto the stack
+bool pushFileStack(ConfigFilesStruct_t **stack, char *pfilename,
+                   InstallationType_t psystemtype) {
   ConfigFilesStruct_t *newFile;
   newFile = (ConfigFilesStruct_t *)malloc(sizeof(ConfigFilesStruct_t *));
-  if (!newFile) return EXIT_FAILURE;
+  if (!newFile) return false;
   newFile->filename = pfilename;
   newFile->systemtype = psystemtype;
   newFile->next = *stack;
   *stack = newFile;
   printf("%s is a %d pushed to the stack.\n", pfilename, psystemtype);
-  return EXIT_SUCCESS;
+  return true;
 }
 
 // function to pop an element from the stack
-ConfigFilesStruct_t *popFileStack(ConfigFilesStruct_t **stack) {
+bool popFileStack(ConfigFilesStruct_t **stack, char **pfilename,
+                  InstallationType_t *psystemtype) {
   if (isEmpty(*stack)) {
     printf("Stack underflow!\n");
-    return EXIT_FAILURE;
+    return false;
   }
   ConfigFilesStruct_t *temp = *stack;
-
+  if (!temp) return false;
   *stack = temp->next;
-  char *filename = temp->filename;
-  InstallationType_t systemtype = temp->systemtype;
-
+  *pfilename = temp->filename;
+  *psystemtype = temp->systemtype;
   free(temp);
-  return EXIT_SUCCESS;
+  return true;
 }
 
-size_t deleteFileStack(ConfigFilesStruct_t **stack) {
+bool deleteFileStack(ConfigFilesStruct_t **stack) {
   ConfigFilesStruct_t *temp;
   while (*stack) {
     temp = (*stack)->next;
     free(*stack);
     *stack = temp;
   }
-  return EXIT_SUCCESS;
+  return true;
 }
 
 // function to display the stack
@@ -86,35 +78,32 @@ void displayFileStack(ConfigFilesStruct_t *stack) {
 }
 
 /*
-// Main function
+// Test Main function
 */
 int testmain() {
   ConfigFilesStruct_t *filestack = NULL;
   char *pfilename;
-  InstallationType_t *psystemtype;
+  InstallationType_t psystemtype = SCALEUP;
 
   pushFileStack(&filestack, "C11.conf", SCALEUP);
   pushFileStack(&filestack, "B10.conf", SCALEOUT);
   displayFileStack(filestack);
-  popFileStack(&filestack);
-  printf("popped from the stack, got %s and %d.\n\n", pfilename, *psystemtype);
+  popFileStack(&filestack, &pfilename, &psystemtype);
+  printf("popped from the stack, got %s and %d.\n\n", pfilename, psystemtype);
   displayFileStack(filestack);
+  popFileStack(&filestack, &pfilename, &psystemtype);
+  printf("popped from the stack, got %s and %d.\n\n", pfilename, psystemtype);
+  displayFileStack(filestack);
+  deleteFileStack(&filestack);
+
   return 0;
 }
 
 void get_files_in_confdir(char *directory) {
   DIR *dir = opendir(directory);
-  ConfigFilesStruct_t ConfigFiles;
-
-  // ToDo
-  // Anlegen einer Struktur
-  // char *filename
-  // char type
-  // als dynamische Liste
-  // Rückgabe des Zeigers zur dynamischen Liste
-
-  // als erstes aber erst einmal faken und
-  // C11.conf und B20.conf zurückgeben, um environmentindex zu testen.
+  ConfigFilesStruct_t *ConfigFiles = NULL;
+  char *pfilename;
+  InstallationType_t psystemtype = SCALEUP;
 
   if (dir == NULL) {
     fprintf(stderr, "error: %s: %s (errno = %d)\n", directory, strerror(errno),
@@ -138,7 +127,17 @@ void get_files_in_confdir(char *directory) {
   }
 
   /* fake*/
+  printf("\n FAKE DATA \n");
+  if (!createFilestack(&ConfigFiles)) fprintf(stderr, "Could not create Stack");
+  if (!pushFileStack(&ConfigFiles, "C11.conf", SCALEUP))
+    fprintf(stderr, "Error pushing C11.conf to the stack");
+  if (!pushFileStack(&ConfigFiles, "B10.conf", SCALEOUT))
+    fprintf(stderr, "Error pushing B10.conf to the stack");
 
   closedir(dir);
   return EXIT_SUCCESS;
+
+  // zurückgegeben werden müsste nun der Zeiger auf ConfigFiles,
+  // das geht an main zurück und von da muss dann die nächste Funktion wieder
+  // übergeben werden.
 }
