@@ -1,6 +1,7 @@
 #ifndef FILESLIST
 #define FILESLIST
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef enum {
@@ -11,21 +12,23 @@ typedef enum {
   ISCSI
 } InstallationType_t;
 
+void get_files_in_confdir(char *directory);
 /*
  filename structure
 */
 typedef struct ConfigFilesStruct ConfigFilesStruct_t;
 
-ConfigFilesStruct_t *create_fileentry(char *pfilename, InstallationType_t);
-
-// check if stack is empty
+/*
+ Stack functions
+*/
+bool createFilestack(ConfigFilesStruct_t **stack);
+// stack is empty?
 size_t isEmpty(ConfigFilesStruct_t *stack);
-
-// function to push an elment onto the stack
-void push(ConfigFilesStruct_t **stack, char *pfilename, InstallationType_t);
-// functio to pop an element from the stack
-char *pop(ConfigFilesStruct_t **stack);
-// function to display the stack
-void displayStack(ConfigFilesStruct_t *stack);
+bool pushFileStack(ConfigFilesStruct_t **stack, char *filename,
+                   InstallationType_t);
+bool popFileStack(ConfigFilesStruct_t **stack, char **filename,
+                  InstallationType_t *);
+bool deleteFileStack(ConfigFilesStruct_t **stack);
+void displayFileStack(ConfigFilesStruct_t *stack);
 
 #endif
