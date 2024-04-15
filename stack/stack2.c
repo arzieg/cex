@@ -12,8 +12,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+typedef struct Point {
+  int x;
+  int y;
+} Point_t;
+
 typedef struct Stack {
-  int number;
+  Point_t p;
   struct Stack *next;
 } Stack_t;
 
@@ -22,15 +27,16 @@ bool createStack(Stack_t **s) {
   return true;
 }
 
-bool pushStack(Stack_t **s, int n) {
+bool pushStack(Stack_t **s, int x, int y) {
   Stack_t *elem;
   elem = (Stack_t *)malloc(sizeof(Stack_t *));
   if (!elem) return false;
-  elem->number = n;
+  elem->p.x = x;
+  elem->p.y = y;
   elem->next = *s;
   *s = elem;
-  printf("\nPush %d to Stack on Positon %p, before is %p", elem->number, &elem,
-         elem->next);
+  printf("\nPush x=%d and y=%d to Stack on Positon %p, before address is %p",
+         elem->p.x, elem->p.y, &elem, elem->next);
   return true;
 }
 
@@ -39,12 +45,13 @@ bool isEmpty(Stack_t **s) {
   return false;
 }
 
-bool popStack(Stack_t **s, int *data) {
+bool popStack(Stack_t **s, Point_t *data) {
   Stack_t *elem;
   elem = *s;
   if (isEmpty(&elem)) return false;
   *s = elem->next;
-  *data = elem->number;
+  data->x = elem->p.x;
+  data->y = elem->p.y;
   free(elem);
   return true;
 }
@@ -56,7 +63,9 @@ bool destroyStack(Stack_t **s) {
   *s = NULL;
 }
 
-void displayNode(Stack_t *n) { printf("\tStack value:       %d\n", n->number); }
+void displayNode(Stack_t *n) {
+  printf("\tStack value:       x=%d y=%d\n", n->p.x, n->p.y);
+}
 
 void displayStack(Stack_t **s) {
   for (Stack_t *cur = *s; cur != NULL; cur = cur->next) displayNode(cur);
@@ -70,18 +79,23 @@ size_t main() {
   }
 
   int a = 5;
-  pushStack(&s, a);
+  int b = 6;
+  pushStack(&s, a, b);
   a = 7;
-  pushStack(&s, a);
+  b = 8;
+  pushStack(&s, a, b);
   a = 9;
-  pushStack(&s, a);
+  b = 10;
+  pushStack(&s, a, b);
   printf("\n\n\nStack is\n");
   displayStack(&s);
-  int data;
+
+  Point_t data;
   popStack(&s, &data);
-  printf("\nPOP from Stack, got %d\n", data);
+  printf("\nPOP from Stack, got x=%d y=%d\n", data.x, data.y);
   a = 11;
-  pushStack(&s, a);
+  b = 12;
+  pushStack(&s, a, b);
   printf("\n\n\nStack is\n");
   displayStack(&s);
   destroyStack(&s);
