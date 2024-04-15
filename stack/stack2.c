@@ -39,16 +39,13 @@ bool isEmpty(Stack_t **s) {
   return false;
 }
 
-bool popStack(Stack_t **s, int **data) {
+bool popStack(Stack_t **s, int *data) {
   Stack_t *elem;
   elem = *s;
-  if (!isEmpty(&elem)) {
-    *s = elem->next;
-    *data = elem->number;
-    free(elem);
-  } else {
-    printf("\nStack is empty");
-  }
+  if (isEmpty(&elem)) return false;
+  *s = elem->next;
+  *data = elem->number;
+  free(elem);
   return true;
 }
 
@@ -80,7 +77,7 @@ size_t main() {
   pushStack(&s, a);
   printf("\n\n\nStack is\n");
   displayStack(&s);
-  int *data;
+  int data;
   popStack(&s, &data);
   printf("\nPOP from Stack, got %d\n", data);
   a = 11;
