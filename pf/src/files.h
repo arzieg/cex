@@ -17,18 +17,17 @@ void get_files_in_confdir(char *directory);
  filename structure
 */
 typedef struct ConfigFilesStruct ConfigFilesStruct_t;
+typedef struct Stack Stack_t;
 
 /*
  Stack functions
 */
-bool createFilestack(ConfigFilesStruct_t **stack);
+bool createFilestack(Stack_t **stack);
 // stack is empty?
-size_t isEmpty(ConfigFilesStruct_t *stack);
-bool pushFileStack(ConfigFilesStruct_t **stack, char *filename,
-                   InstallationType_t);
-bool popFileStack(ConfigFilesStruct_t **stack, char **filename,
-                  InstallationType_t *);
-bool deleteFileStack(ConfigFilesStruct_t **stack);
-void displayFileStack(ConfigFilesStruct_t *stack);
+size_t isEmpty(Stack_t *stack);
+bool pushFileStack(Stack_t **stack, ConfigFilesStruct_t *cf);
+bool popFileStack(Stack_t **stack, ConfigFilesStruct_t *cf);
+bool deleteFileStack(Stack_t **stack);
+void displayFileStack(Stack_t *stack);
 
 #endif
