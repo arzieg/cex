@@ -10,50 +10,53 @@
 #include "pf.h"
 
 typedef struct ConfigFilesStruct {
-  char *filename;
+  char filename[256];
   InstallationType_t systemtype;
-  struct ConfigFilesStruct *next;
 } ConfigFilesStruct_t;
 
-bool createFilestack(ConfigFilesStruct_t **stack) {
-  *stack = NULL;
-  return true;
+typedef struct Stack {
+  ConfigFilesStruct_t Configfile;
+  struct Stack *next;
+} Stack_t;
+
+bool createFilestack(Stack_t **stack) {
+  if (*stack == NULL) return true;
+  return false;
 }
 
-size_t isEmpty(ConfigFilesStruct_t *stack) { return stack == NULL; }
+size_t isEmpty(Stack_t *stack) { return stack == NULL; }
 
 // function to push an element onto the stack
-bool pushFileStack(ConfigFilesStruct_t **stack, char *pfilename,
-                   InstallationType_t psystemtype) {
-  ConfigFilesStruct_t *newFile;
-  newFile = (ConfigFilesStruct_t *)malloc(sizeof(ConfigFilesStruct_t *));
-  if (!newFile) return false;
-  newFile->filename = pfilename;
-  newFile->systemtype = psystemtype;
-  newFile->next = *stack;
-  *stack = newFile;
-  printf("%s is a %d pushed to the stack.\n", pfilename, psystemtype);
+bool pushFileStack(Stack_t **stack, ConfigFilesStruct_t *cf) {
+  Stack_t *temp;
+  temp = (Stack_t *)malloc(sizeof(Stack_t *));
+  if (!temp) return false;
+  strncpy(temp->Configfile.filename, cf->filename, strlen(cf->filename));
+  temp->Configfile.systemtype = cf->systemtype;
+  temp->next = *stack;
+  *stack = temp;
+  printf("%s is a %d pushed to the stack.\n", cf->filename, cf->systemtype);
   return true;
 }
 
 // function to pop an element from the stack
-bool popFileStack(ConfigFilesStruct_t **stack, char **pfilename,
-                  InstallationType_t *psystemtype) {
+bool popFileStack(Stack_t **stack, ConfigFilesStruct_t *cf) {
   if (isEmpty(*stack)) {
     printf("Stack underflow!\n");
     return false;
   }
-  ConfigFilesStruct_t *temp = *stack;
-  if (!temp) return false;
+  Stack_t *temp = *stack;
+  if (isEmpty(temp)) return false;
   *stack = temp->next;
-  *pfilename = temp->filename;
-  *psystemtype = temp->systemtype;
+  strncpy(cf->filename, temp->Configfile.filename,
+          strlen(temp->Configfile.filename));
+  cf->systemtype = temp->Configfile.systemtype;
   free(temp);
   return true;
 }
 
-bool deleteFileStack(ConfigFilesStruct_t **stack) {
-  ConfigFilesStruct_t *temp;
+bool deleteFileStack(Stack_t **stack) {
+  Stack_t *temp;
   while (*stack) {
     temp = (*stack)->next;
     free(*stack);
@@ -63,15 +66,16 @@ bool deleteFileStack(ConfigFilesStruct_t **stack) {
 }
 
 // function to display the stack
-void displayFileStack(ConfigFilesStruct_t *stack) {
+void displayFileStack(Stack_t *stack) {
   if (isEmpty(stack)) {
     printf("Stack is empty!\n");
     return;
   }
-  ConfigFilesStruct_t *current = stack;
+  Stack_t *current = stack;
   printf("\nStack: ");
   while (current != NULL) {
-    printf("\n%s is %d ", current->filename, current->systemtype);
+    printf("\n%s is %d ", current->Configfile.filename,
+           current->Configfile.systemtype);
     current = current->next;
   }
   printf("\n");
@@ -81,18 +85,25 @@ void displayFileStack(ConfigFilesStruct_t *stack) {
 // Test Main function
 */
 int testmain() {
-  ConfigFilesStruct_t *filestack = NULL;
-  char *pfilename;
-  InstallationType_t psystemtype = SCALEUP;
+  ConfigFilesStruct_t cf = {.filename = "ABC.conf", .systemtype = SCALEUP};
+  Stack_t *filestack = NULL;
 
-  pushFileStack(&filestack, "C11.conf", SCALEUP);
-  pushFileStack(&filestack, "B10.conf", SCALEOUT);
+  strncpy(cf.filename, "C11.conf", 9);
+  cf.systemtype = SCALEUP;
+  pushFileStack(&filestack, &cf);
+  strncpy(cf.filename, "B10.conf", 9);
+  cf.systemtype = SCALEOUT;
+  pushFileStack(&filestack, &cf);
+
   displayFileStack(filestack);
-  popFileStack(&filestack, &pfilename, &psystemtype);
-  printf("popped from the stack, got %s and %d.\n\n", pfilename, psystemtype);
+
+  popFileStack(&filestack, &cf);
+  printf("popped from the stack, got %s and %d.\n\n", cf.filename,
+         cf.systemtype);
   displayFileStack(filestack);
-  popFileStack(&filestack, &pfilename, &psystemtype);
-  printf("popped from the stack, got %s and %d.\n\n", pfilename, psystemtype);
+  popFileStack(&filestack, &cf);
+  printf("popped from the stack, got %s and %d.\n\n", cf.filename,
+         cf.systemtype);
   displayFileStack(filestack);
   deleteFileStack(&filestack);
 
@@ -101,9 +112,8 @@ int testmain() {
 
 void get_files_in_confdir(char *directory) {
   DIR *dir = opendir(directory);
-  ConfigFilesStruct_t *ConfigFiles = NULL;
-  char *pfilename;
-  InstallationType_t psystemtype = SCALEUP;
+  ConfigFilesStruct_t cf = {.filename = "ABC.conf", .systemtype = SCALEUP};
+  Stack_t *ConfigFiles = NULL;
 
   if (dir == NULL) {
     fprintf(stderr, "error: %s: %s (errno = %d)\n", directory, strerror(errno),
@@ -127,13 +137,17 @@ void get_files_in_confdir(char *directory) {
   }
 
   /* fake*/
+
   printf("\n FAKE DATA \n");
   if (!createFilestack(&ConfigFiles)) fprintf(stderr, "Could not create Stack");
-  if (!pushFileStack(&ConfigFiles, "C11.conf", SCALEUP))
+  strncpy(cf.filename, "C11.conf", 9);
+  cf.systemtype = SCALEUP;
+  if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing C11.conf to the stack");
-  if (!pushFileStack(&ConfigFiles, "B10.conf", SCALEOUT))
+  strncpy(cf.filename, "B10.conf", 9);
+  cf.systemtype = SCALEOUT;
+  if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing B10.conf to the stack");
-
   closedir(dir);
   return EXIT_SUCCESS;
 
