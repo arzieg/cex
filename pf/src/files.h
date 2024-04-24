@@ -12,16 +12,26 @@ typedef enum {
   ISCSI
 } InstallationType_t;
 
-void get_files_in_confdir(char *directory);
+typedef struct ConfigFilesStruct {
+  char filename[256];
+  InstallationType_t systemtype;
+} ConfigFilesStruct_t;
+
+typedef struct Stack {
+  ConfigFilesStruct_t Configfile;
+  struct Stack *next;
+} Stack_t;
+
 /*
  filename structure
-*/
+
 typedef struct ConfigFilesStruct ConfigFilesStruct_t;
 typedef struct Stack Stack_t;
-
+*/
 /*
  Stack functions
 */
+Stack_t *get_files_in_confdir(char *directory);
 bool createFilestack(Stack_t **stack);
 // stack is empty?
 size_t isEmpty(Stack_t *stack);

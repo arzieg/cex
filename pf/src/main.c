@@ -121,8 +121,9 @@ int main(int argc, char **argv) {
   fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   // if (arguments.pinteractive) interactive();
-  // if (arguments.confdir) readconf_su(arguments.confdir, 0);
-  if (arguments.confdir) get_files_in_confdir(arguments.confdir);
-  // if (arguments.confdir) testmain();
+  // if (arguments.confdir) ConfigFiles =
+  // get_files_in_confdir(arguments.confdir); if (arguments.confdir) testmain();
+  if (arguments.confdir) readconf_su(arguments.confdir, 0);
+
   exit(0);
 }

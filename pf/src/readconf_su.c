@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "files.h"
 #include "pf.h"
 #include "pfhelper.h"
 
@@ -1233,7 +1234,11 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
   return 0;
 }
 
-int readconf_su(char *filename, int environmentindex) {
+/*
+ Read single ScaleUp Configuration File
+*/
+
+int read_su_file(char *filename, int environmentindex) {
   FILE *fd;
   char *filecontent;
   size_t filesize;
@@ -1280,7 +1285,39 @@ int readconf_su(char *filename, int environmentindex) {
                 ConfigTable[i].result);
   }
 
-  get_values(n, environmentindex, 2);
+  get_values(n, environmentindex, 2);  // 2 = ScaleUp, max. 2 Hosts
+
+  return EXIT_SUCCESS;
+}
+
+size_t readconf_su(char *filedir) {
+  Stack_t *filestack;
+  int environmentindex = 0;
+
+  filestack = get_files_in_confdir(filedir);
+
+  if (isEmpty(filestack)) {
+    printf("Stack is empty!\n");
+    return;
+  }
+
+  /*
+    todo:
+    filename hat noch nicht den pfad, daher wird das File nicht gelesen. Nun
+    kann man dir mit übergeben, dann müsste man read_su_file anpassen oder aber
+    hier den filename bauen als filedir+current->Configfile.filename oder aber
+    Rückgabe vom Filestack mit Pfad (vlt. die bessere idee)
+  */
+
+  Stack_t *current = filestack;
+  while (current != NULL) {
+    printf("\nRead %s as environmentindex %d", current->Configfile.filename,
+           environmentindex);
+    read_su_file(current->Configfile.filename, environmentindex);
+    current = current->next;
+    environmentindex++;
+  }
+  printf("\n");
 
   return EXIT_SUCCESS;
 }
