@@ -9,6 +9,7 @@
 
 #include "pf.h"
 
+/*
 typedef struct ConfigFilesStruct {
   char filename[256];
   InstallationType_t systemtype;
@@ -18,6 +19,7 @@ typedef struct Stack {
   ConfigFilesStruct_t Configfile;
   struct Stack *next;
 } Stack_t;
+*/
 
 bool createFilestack(Stack_t **stack) {
   if (*stack == NULL) return true;
@@ -83,7 +85,7 @@ void displayFileStack(Stack_t *stack) {
 
 /*
 // Test Main function
-*/
+
 int testmain() {
   ConfigFilesStruct_t cf = {.filename = "ABC.conf", .systemtype = SCALEUP};
   Stack_t *filestack = NULL;
@@ -109,8 +111,9 @@ int testmain() {
 
   return 0;
 }
+*/
 
-void get_files_in_confdir(char *directory) {
+Stack_t *get_files_in_confdir(char *directory) {
   DIR *dir = opendir(directory);
   ConfigFilesStruct_t cf = {.filename = "ABC.conf", .systemtype = SCALEUP};
   Stack_t *ConfigFiles = NULL;
@@ -149,9 +152,6 @@ void get_files_in_confdir(char *directory) {
   if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing B10.conf to the stack");
   closedir(dir);
-  return EXIT_SUCCESS;
-
-  // zurückgegeben werden müsste nun der Zeiger auf ConfigFiles,
-  // das geht an main zurück und von da muss dann die nächste Funktion wieder
-  // übergeben werden.
+  printf("\nIn files.c ConfigFiles = %p", ConfigFiles);
+  return ConfigFiles;
 }

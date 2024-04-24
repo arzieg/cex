@@ -127,6 +127,4 @@ int get_number_systems(void);
 int get_number_sids(void);
 int interactive(void);
 
-// readconf_su
-int readconf_su(char *filename, int environmentindex);
 #endif
