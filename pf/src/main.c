@@ -7,6 +7,9 @@
 #include <string.h>
 #include <unistd.h>
 
+/*
+#include "files.h"
+*/
 #include "pf.h"
 #include "pfhelper.h"
 
@@ -121,9 +124,10 @@ int main(int argc, char **argv) {
   fprintf(outstream, "CONFDIR = %s\n", arguments.confdir);
 
   // if (arguments.pinteractive) interactive();
+  // Stack_t *ConfigFiles;
   // if (arguments.confdir) ConfigFiles =
   // get_files_in_confdir(arguments.confdir); if (arguments.confdir) testmain();
-  if (arguments.confdir) readconf_su(arguments.confdir, 0);
+  if (arguments.confdir) readconf_su(arguments.confdir);
 
   exit(0);
 }

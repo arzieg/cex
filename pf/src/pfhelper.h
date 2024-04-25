@@ -36,6 +36,7 @@ CustomString *custom_getline(FILE *stream, int minchars, int maxchars,
 bool CustomString_check_regex(CustomString *target, char *customregex);
 char **split_string(char *input, char delimiter);
 // readconf_su
+int readconf_su(char *filedir);
 int read_su_file(char *filename, int environmentindex);
 char *find_matches(const char *pattern, const char *text);
 

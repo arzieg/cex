@@ -1231,7 +1231,7 @@ int get_values(int configtablecount, int environmentindex, int maxhost) {
       }  // end of switch
     }    // enf of if check value is not null
   }      // end of for
-  return 0;
+  return EXIT_SUCCESS;
 }
 
 /*
@@ -1280,17 +1280,18 @@ int read_su_file(char *filename, int environmentindex) {
   free(filecontent);
 
   // debug
+  /*
   for (size_t i = 0; i < n; i++) {
     debug_print("%s  --  %s\n", ConfigTable[i].parametername,
                 ConfigTable[i].result);
   }
 
   get_values(n, environmentindex, 2);  // 2 = ScaleUp, max. 2 Hosts
-
+  */
   return EXIT_SUCCESS;
 }
 
-size_t readconf_su(char *filedir) {
+int readconf_su(char *filedir) {
   Stack_t *filestack;
   int environmentindex = 0;
 
@@ -1298,16 +1299,8 @@ size_t readconf_su(char *filedir) {
 
   if (isEmpty(filestack)) {
     printf("Stack is empty!\n");
-    return;
+    return EXIT_FAILURE;
   }
-
-  /*
-    todo:
-    filename hat noch nicht den pfad, daher wird das File nicht gelesen. Nun
-    kann man dir mit übergeben, dann müsste man read_su_file anpassen oder aber
-    hier den filename bauen als filedir+current->Configfile.filename oder aber
-    Rückgabe vom Filestack mit Pfad (vlt. die bessere idee)
-  */
 
   Stack_t *current = filestack;
   while (current != NULL) {

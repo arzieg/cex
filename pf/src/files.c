@@ -38,6 +38,7 @@ bool pushFileStack(Stack_t **stack, ConfigFilesStruct_t *cf) {
   temp->next = *stack;
   *stack = temp;
   printf("%s is a %d pushed to the stack.\n", cf->filename, cf->systemtype);
+  free(temp);
   return true;
 }
 
@@ -143,14 +144,14 @@ Stack_t *get_files_in_confdir(char *directory) {
 
   printf("\n FAKE DATA \n");
   if (!createFilestack(&ConfigFiles)) fprintf(stderr, "Could not create Stack");
-  strncpy(cf.filename, "C11.conf", 9);
+  strncpy(cf.filename, "/home/arne/dev/c/cex/pf/test/C11.conf", 38);
   cf.systemtype = SCALEUP;
   if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing C11.conf to the stack");
-  strncpy(cf.filename, "B10.conf", 9);
+  strncpy(cf.filename, "/home/arne/dev/c/cex/pf/test/B20.conf", 38);
   cf.systemtype = SCALEOUT;
   if (!pushFileStack(&ConfigFiles, &cf))
-    fprintf(stderr, "Error pushing B10.conf to the stack");
+    fprintf(stderr, "Error pushing B20.conf to the stack");
   closedir(dir);
   printf("\nIn files.c ConfigFiles = %p", ConfigFiles);
   return ConfigFiles;
