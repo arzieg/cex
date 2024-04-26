@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define MAXFILENAME 256
+
 typedef enum {
   SCALEUP,
   SCALEOUT,
@@ -13,7 +15,7 @@ typedef enum {
 } InstallationType_t;
 
 typedef struct ConfigFilesStruct {
-  char filename[256];
+  char filename[MAXFILENAME];
   InstallationType_t systemtype;
 } ConfigFilesStruct_t;
 

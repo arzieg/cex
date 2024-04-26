@@ -31,14 +31,13 @@ size_t isEmpty(Stack_t *stack) { return stack == NULL; }
 // function to push an element onto the stack
 bool pushFileStack(Stack_t **stack, ConfigFilesStruct_t *cf) {
   Stack_t *temp;
-  temp = (Stack_t *)malloc(sizeof(Stack_t *));
+  temp = (Stack_t *)malloc(sizeof(Stack_t));
   if (!temp) return false;
-  strncpy(temp->Configfile.filename, cf->filename, strlen(cf->filename));
+  strncpy(temp->Configfile.filename, cf->filename, MAXFILENAME);
   temp->Configfile.systemtype = cf->systemtype;
   temp->next = *stack;
   *stack = temp;
   printf("%s is a %d pushed to the stack.\n", cf->filename, cf->systemtype);
-  free(temp);
   return true;
 }
 
@@ -144,15 +143,16 @@ Stack_t *get_files_in_confdir(char *directory) {
 
   printf("\n FAKE DATA \n");
   if (!createFilestack(&ConfigFiles)) fprintf(stderr, "Could not create Stack");
-  strncpy(cf.filename, "/home/arne/dev/c/cex/pf/test/C11.conf", 38);
+  strncpy(cf.filename, "/home/arzieg/c/cex/pf/test/C11.conf", 256);
+  printf("\nCopied %s with length=%ld\n", cf.filename, strlen(cf.filename));
   cf.systemtype = SCALEUP;
   if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing C11.conf to the stack");
-  strncpy(cf.filename, "/home/arne/dev/c/cex/pf/test/B20.conf", 38);
+  strncpy(cf.filename, "/home/arzieg/c/cex/pf/test/B20.conf", 256);
+  printf("\nCopied %s with length=%ld\n", cf.filename, strlen(cf.filename));
   cf.systemtype = SCALEOUT;
   if (!pushFileStack(&ConfigFiles, &cf))
     fprintf(stderr, "Error pushing B20.conf to the stack");
   closedir(dir);
-  printf("\nIn files.c ConfigFiles = %p", ConfigFiles);
   return ConfigFiles;
 }

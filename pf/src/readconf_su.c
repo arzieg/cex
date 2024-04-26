@@ -1243,6 +1243,10 @@ int read_su_file(char *filename, int environmentindex) {
   char *filecontent;
   size_t filesize;
 
+  printf("\n=========================================================");
+  printf("\nRead file %s", filename);
+  printf("\n=========================================================\n");
+
   fd = fopen(filename, "rb");
   if (fd == NULL) {
     fprintf(stderr, "Could not open %s\n", filename);
@@ -1285,9 +1289,10 @@ int read_su_file(char *filename, int environmentindex) {
     debug_print("%s  --  %s\n", ConfigTable[i].parametername,
                 ConfigTable[i].result);
   }
+  */
 
   get_values(n, environmentindex, 2);  // 2 = ScaleUp, max. 2 Hosts
-  */
+
   return EXIT_SUCCESS;
 }
 
