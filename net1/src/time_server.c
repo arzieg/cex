@@ -34,6 +34,7 @@
 #include <string.h>
 #include <time.h>
 
+
 int main(void) {
 #if defined(_WIN32)
   WSADATA d;
@@ -51,4 +52,20 @@ int main(void) {
 
   struct addrinfo *bind_address;
   getaddrinfo(0, "8080", &hints, &bind_address);
+
+  printf("\ncreate socket ...\n");
+  int socket_listen;
+  socket_listen = socket(bind_address->ai_family, bind_address->ai_socktype, bind_address->ai_protocol);
+  if (!ISVALIDSOCKET(socket_listen)) {
+    fprintf(stderr, "socket() failed. (%d)\n", GETSOCKETERRNO());
+    return 1;
+  }
+
+  printf("Binding socket to local address ...\n");
+  if(bind(socket_listen, bind_address->ai_addr, bind_address->ai_addrlen)) {
+    fprintf(stderr, "bind() failed. (%d)\n", GETSOCKETERRNO());
+    return 1;
+  }
+  freeaddrinfo(bind_address);
+
 }
