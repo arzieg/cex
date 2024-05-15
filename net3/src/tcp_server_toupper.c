@@ -100,10 +100,61 @@ int main(void) {
             fprintf(stderr, "select() failed. (%d)\n", GETSOCKETERRNO());
             return 1;
         }
-    }
 
+        SOCKET i;
+        for(i=1; i<=max_socket; ++i){
+            if(FD_ISSET(i,&reads)){
+                // Handle socket
+                if (i == socket_listen) {
+                    struct sockaddr_storage client_address;
+                    socklen_t client_len = sizeof(client_address);
+                    SOCKET socket_client = accept(socket_listen, (struct sockaddr*) &client_address, &client_len);
+                    if (!ISVALIDSOCKET(socket_client)){
+                        fprintf(stderr, "accept() failed. (%d)\n", GETSOCKETERRNO());
+                        return 1;
+                    }
+                    FD_SET(socket_client, &master);
+                    if(socket_client > max_socket)
+                      max_socket = socket_client;
 
+                    char address_buffer[100];
+                    getnameinfo((struct sockaddr*)&client_address, client_len, address_buffer, sizeof(address_buffer), 0,0, NI_NUMERICHOST);
+                    printf("New connection from %s\n", address_buffer);
+                } else {
+                    char read[1024];
+                    ssize_t bytes_received = recv(i, read, 1024, 0);
+                    if(bytes_received< 1) {
+                        FD_CLR(i, &master);
+                        CLOSESOCKET(i);
+                        continue;
+                    }
+                    SOCKET j;
+                    for (j=1; j<=max_socket; ++j) {
+                        if(FD_ISSET(j, &master)) {
+                            if (j == socket_listen || j==i)
+                              continue;
+                            else
+                              send(j, read, (size_t)bytes_received, 0);
+                        }
+                    }
+                    /* alter code 
+                    int j;
+                    for (j=0; j<bytes_received; ++j)
+                      read[j] = (char)toupper(read[j]);
+                    send(i, read, (size_t)bytes_received,0);
+                    */
+                }
+            } // if FD_ISSET
+        } // for i to max_socket
+    } // while(1)
 
+    printf("Closing listening socket...\n");
+    CLOSESOCKET(socket_listen);
 
+    #if defined(_WIN32)
+      WSACleanup();
+    #endif
 
+      printf("Finished.\n");
+      return 0;
 }
