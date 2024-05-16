@@ -18,16 +18,16 @@ release:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
-client: SRCS=$(SRC)/udp_sendto.c
-client: OBJS=$(OBJ)/udp_sendto.o
-client: BIN=$(BINDIR)/udp_sendto
+client: SRCS=$(SRC)/udp_client.c
+client: OBJS=$(OBJ)/udp_client.o
+client: BIN=$(BINDIR)/udp_client
 client:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
-server: SRCS=$(SRC)/simple_udp_server.c
-server: OBJS=$(OBJ)/simple_udp_server.o
-server: BIN=$(BINDIR)/simple_udp_server
+server: SRCS=$(SRC)/udp_serve_toupper.c
+server: OBJS=$(OBJ)/udp_serve_toupper.o
+server: BIN=$(BINDIR)/udp_serve_toupper
 server:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
