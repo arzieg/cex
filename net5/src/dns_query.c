@@ -81,14 +81,13 @@ void print_dns_message(const char *message, int msg_length)
 
     const unsigned char *msg = (const unsigned char *)message;
 
-    /*
-    int i;
-    for (i = 0; i < msg_length; ++i) {
-        unsigned char r = msg[i];
-        printf("%02d:   %02X  %03d  '%c'\n", i, r, r, r);
+    int q;
+    for (q = 0; q < msg_length; ++q)
+    {
+        unsigned char r = msg[q];
+        printf("%02d:   %02X  %03d  '%c'\n", q, r, r, r);
     }
     printf("\n");
-    */
 
     printf("ID = %0X %0X\n", msg[0], msg[1]);
 
