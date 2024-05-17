@@ -25,10 +25,10 @@ client:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
-server: SRCS=$(SRC)/udp_serve_toupper.c
-server: OBJS=$(OBJ)/udp_serve_toupper.o
-server: BIN=$(BINDIR)/udp_serve_toupper
-server:
+dns_query: SRCS=$(SRC)/dns_query.c
+dns_query: OBJS=$(OBJ)/dns_query.o
+dns_query: BIN=$(BINDIR)/dns_query
+dns_query:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
