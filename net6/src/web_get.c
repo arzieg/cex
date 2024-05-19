@@ -35,14 +35,14 @@ void parse_url(char *url, char **hostname, char **port, char **path)
     printf("URL: %s\n", url);
 
     char *p;
-    p = strstr(url, "://");
+    p = strstr(url, "://"); // findet ://<url>
 
     char *protocol = 0;
     if (p)
     {
         protocol = url;
-        *p = 0;
-        p += 3;
+        *p = 0; // zeiger auf :
+        p += 3; // 3 Zeichen weiter = Start fqdn
     }
     else
     {
