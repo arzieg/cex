@@ -18,10 +18,10 @@ release:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
-web_get: SRCS=$(SRC)/web_get.c
-web_get: OBJS=$(OBJ)/web_get.o
-web_get: BIN=$(BINDIR)/web_get
-web_get:
+web_server: SRCS=$(SRC)/web_server.c
+web_server: OBJS=$(OBJ)/web_server.o
+web_server: BIN=$(BINDIR)/web_server
+web_server:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
