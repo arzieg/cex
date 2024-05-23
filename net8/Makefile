@@ -18,10 +18,10 @@ release:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
-web_server: SRCS=$(SRC)/web_server.c
-web_server: OBJS=$(OBJ)/web_server.o
-web_server: BIN=$(BINDIR)/web_server
-web_server:
+smtp_send: SRCS=$(SRC)/smtp_send.c
+smtp_send: OBJS=$(OBJ)/smtp_send.o
+smtp_send: BIN=$(BINDIR)/smtp_send
+smtp_send:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN)
 
