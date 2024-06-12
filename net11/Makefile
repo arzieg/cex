@@ -26,6 +26,12 @@ ssh_connect:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
+ssh_command: SRCS=$(SRC)/ssh_command.c
+ssh_command: OBJS=$(OBJ)/ssh_command.o
+ssh_command: BIN=$(BINDIR)/ssh_command
+ssh_command:
+	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
 
 .PHONY: clean
