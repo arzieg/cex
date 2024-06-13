@@ -33,6 +33,13 @@ ssh_command:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
+ssh_download: SRCS=$(SRC)/ssh_download.c
+ssh_download: OBJS=$(OBJ)/ssh_download.o
+ssh_download: BIN=$(BINDIR)/ssh_download
+ssh_download:
+	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
+
 
 .PHONY: clean
 clean:
