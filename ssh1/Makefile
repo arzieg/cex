@@ -26,3 +26,9 @@ sshconnect:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
+sshshell: SRCS=$(SRC)/sshshell.c
+sshshell: OBJS=$(OBJ)/sshshell.o
+sshshell: BIN=$(BINDIR)/sshshell
+sshshell:
+	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
+	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
