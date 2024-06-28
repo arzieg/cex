@@ -37,7 +37,7 @@ int establish_shell_session(ssh_session session, ssh_channel *channel) {
   return SSH_OK;
 }
 
-/* int interactive_shell_session(ssh_session session, ssh_channel *channel) {
+int interactive_shell_session(ssh_session session, ssh_channel channel) {
   char buffer[256];
   int nbytes, nwritten;
 
@@ -56,30 +56,33 @@ int establish_shell_session(ssh_session session, ssh_channel *channel) {
     FD_SET(ssh_get_fd(session), &fds);
     maxfd = ssh_get_fd(session) + 1;
 
+    fprintf(stderr, "for ssh_select in_channels[0]=%s, in_channels[1]=%s",
+            in_channels[0], in_channels[1]);
     ssh_select(in_channels, out_channels, maxfd, &fds, &timeout);
+    fprintf(stderr, "after ssh_select in_channels[0]=%p, in_channels[1]=%p",
+            in_channels[0], in_channels[1]);
 
     if (out_channels[0] != NULL) {
       nbytes = ssh_channel_read(channel, buffer, sizeof(buffer), 0);
       if (nbytes < 0) return SSH_ERROR;
       if (nbytes > 0) {
-        nwritten = write(1, buffer, nbytes);
+        nwritten = (int)write(1, buffer, (size_t)nbytes);
         if (nwritten != nbytes) return SSH_ERROR;
       }
     }
 
     if (FD_ISSET(0, &fds)) {
-      nbytes = read(0, buffer, sizeof(buffer));
+      nbytes = (int)read(0, buffer, sizeof(buffer));
       if (nbytes < 0) return SSH_ERROR;
       if (nbytes > 0) {
-        nwritten = ssh_channel_write(channel, buffer, nbytes);
+        nwritten = ssh_channel_write(channel, buffer, (u_int32_t)nbytes);
         if (nbytes != nwritten) return SSH_ERROR;
       }
     }
   }
 
-  return rc;
-} */
-
+  return 0;
+}
 int authenticate_pubkey(ssh_session session) {
   int rc;
   rc = ssh_userauth_publickey_auto(session, NULL, NULL);
@@ -229,12 +232,13 @@ int main(int argc, char *argv[]) {
   rc = verify_knownhost(my_ssh_session);
 
   rc = authenticate_pubkey(my_ssh_session);
-  fprintf(stderr, "authenticate pubkey return %d", rc);
+  fprintf(stderr, "authenticate pubkey return %d\n", rc);
 
   rc = establish_shell_session(my_ssh_session, &my_ssh_channel);
-  /*   if (rc == SSH_OK) {
-      rc = interactive_shell_session(my_ssh_session, &my_ssh_channel);
-    } */
+  fprintf(stderr, "Try to establish session, got rc=%d\n", rc);
+  if (rc == SSH_OK) {
+    rc = interactive_shell_session(my_ssh_session, my_ssh_channel);
+  }
 
   ssh_channel_close(my_ssh_channel);
   ssh_channel_send_eof(my_ssh_channel);
