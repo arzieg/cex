@@ -32,3 +32,4 @@ sshshell: BIN=$(BINDIR)/sshshell
 sshshell:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
+
