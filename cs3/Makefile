@@ -1,6 +1,7 @@
 CC=gcc
 #CFLAGS=-lncurses -ggdb -Wall -ftrapv
-CFLAGS=-Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wmissing-prototypes -Wmisleading-indentation -Wduplicated-cond -Wold-style-definition -Wconversion -Wshadow -Winit-self -Wfloat-equal -Wwrite-strings -Wcast-align=strict -Wformat -O0 -g 
+#CFLAGS=-Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wmissing-prototypes -Wmisleading-indentation -Wduplicated-cond -Wold-style-definition -Wconversion -Wshadow -Winit-self -Wfloat-equal -Wwrite-strings -Wcast-align=strict -Wformat -O0 -g 
+CFLAGS=-Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wmissing-prototypes -Wmisleading-indentation -Wduplicated-cond -Wold-style-definition -Wconversion -Wshadow -Winit-self -Wfloat-equal -Wwrite-strings -Wformat -O0 -g 
 LFLAGS=-lncurses
 SRC=src
 OBJ=obj
@@ -10,11 +11,11 @@ BINDIR=bin
 #BIN=$(BINDIR)/tcp_server_toupper
 
 
-cur1: SRCS=$(SRC)/cur1.c
-cur1: OBJS=$(OBJ)/cur1.o
-cur1: BIN=$(BINDIR)/cur1
-cur1: clean
-cur1:
+syncclient: SRCS=$(SRC)/syncclient.c
+syncclient: OBJS=$(OBJ)/syncclient.o
+syncclient: BIN=$(BINDIR)/syncclient
+syncclient: clean
+syncclient:
 	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
 	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
