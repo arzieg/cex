@@ -1,4 +1,4 @@
-/* web_server.c */
+/* simple server */
 #include "srvprg.h"
 
 /* Store Client information in a structure
@@ -119,7 +119,7 @@ fd_set wait_on_clients(SOCKET server) {
   }
 
   if (select(max_socket + 1, &reads, 0, 0, 0) < 0) {
-    fprintf(stderr, "seleect() failed. (%d)\n", GETSOCKETERRNO());
+    fprintf(stderr, "select() failed. (%d)\n", GETSOCKETERRNO());
     exit(1);
   }
   return reads;
