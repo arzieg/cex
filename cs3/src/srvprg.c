@@ -230,6 +230,27 @@ int main(void) {
         {
           client->received += (int)r;
           client->request[client->received] = 0;
+
+          pid_t pid = fork();
+          if (pid == -1) {
+            perror("Error to fork a shell");
+            return 1;
+          } else if (pid == 0) {
+            char *args[] = {"/bin/bash", NULL};
+            execvp(args[0], args);
+            perror("Error in execvp");
+            return 1;
+          } else {
+            // parent process wait fir the child to finish
+            int status;
+            waitpid(pid, &status, 0);
+            if (WIFEXITED(status)) {
+              printf("\nShell exited with status %d\n", WEXITSTATUS(status));
+            } else {
+              printf("\nShell did not exit normally.\n");
+            }
+          }
+
           // char *q = strstr (client->request, "\r\n\r\n");
           // if (q)
           //   {

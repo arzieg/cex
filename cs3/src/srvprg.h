@@ -35,7 +35,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#endif  // SRVPRG_UTIL
+#include <sys/wait.h>  // for fork
+#endif                 // SRVPRG_UTIL
 
 /* Functions */
 
