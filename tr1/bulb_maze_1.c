@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 /*
 
@@ -47,17 +48,73 @@ void printBits(unsigned int num) {
   }
 }
 
-int main(void) {
-  int j = 133;
-  int x = 128;
-  int y = 0;
+void dezimalZuBinaer(int n) {
+  if (n > 1) {
+    dezimalZuBinaer(n / 2);
+  }
+  printf("%d", n % 2);
+}
 
-  while ((j & 1) == 1) {
-    printBits(j);
-    x = ~j;  // inverse
-    printBits(x);
-    j = x >> 1;  // shift right
+int main(void) {
+  // int j = 133;
+  char *r = "xoxoxxxo";
+  int j = 0;
+  int x = 0;
+  int y = 0;
+  int inv = 0;
+
+  int rooms = 0;
+
+  while (r[rooms] != '\0') {
+    printf("%c", r[rooms]);
+    if (r[rooms] == 'x' || r[rooms] == ' ') j += pow(2, rooms);
+    rooms++;
+  }
+
+  printf("\nroomdec = %d", j);
+  printf("\nrooms = %d", rooms);
+
+  while (((j & 1) == 1) && (rooms > 0)) {
+    printf("\nroom %d", rooms);
+    printf("\nj = ");
+    dezimalZuBinaer(j);
+    inv = ~j;  // inverse
+    printf("\nx= ");
+    dezimalZuBinaer(x);
+    j = inv >> 1;  // shift right
+    y = j & 1;
+    printf("\ny = ");
+    dezimalZuBinaer(y);
+    printf("\n\n\n\n");
+    rooms--;
+  }
+
+  if (rooms == 0) {
+    printf("\nHurra geschafft\n");
+  } else {
+    printf("\ndas war nichts\n");
   }
 
   return 0;
 }
+
+/*
+bool bulb_maze (const char *maze)
+{
+  int j = 0;
+  int inv = 0;
+  int rooms = 0;
+
+  while (maze[rooms] != '\0') {
+    if (maze[rooms] == 'x' || maze[rooms] == ' ') j += pow(2, rooms);
+    rooms++;
+  }
+
+  while (((j & 1) == 1) && (rooms > 0)) {
+    inv = ~j;  // inverse
+    j = inv >> 1;  // shift right
+    rooms--;
+  }
+        return rooms == 0 ? true : false;
+}
+*/
