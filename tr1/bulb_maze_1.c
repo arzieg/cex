@@ -1,7 +1,8 @@
 #include <math.h>
+#include <stdbool.h>
 #include <stdio.h>
-/*
 
+/*
 x=light switch off
 o=light switch on
  = light switch off
@@ -40,10 +41,10 @@ step 4 :  xo  oxox
 
 */
 
-void printBits(unsigned int num) {
-  printf("\n%d:    ", num);
+void printBits(unsigned long int num) {
+  // printf("\n%d:    ", num);
   for (int bit = 0; bit < (sizeof(unsigned int) * 8); bit++) {
-    printf("%i ", num & 0x01);
+    printf("%li", num & 0x01);
     num = num >> 1;
   }
 }
@@ -56,36 +57,49 @@ void dezimalZuBinaer(int n) {
 }
 
 int main(void) {
-  // int j = 133;
-  char *r = "xoxoxxxo";
-  int j = 0;
-  int x = 0;
-  int y = 0;
-  int inv = 0;
+  // int position = 133;
+  char *r = "x  ox x x   xo oxo     o o   o ox xox x";
+
+  long int position = 0;
+  long int y = 0;
+  long int inv = 0;
+  long int alwaysdark = 0;
 
   int rooms = 0;
 
   while (r[rooms] != '\0') {
     printf("%c", r[rooms]);
-    if (r[rooms] == 'x' || r[rooms] == ' ') j += pow(2, rooms);
+    if (r[rooms] == 'x' || r[rooms] == ' ') position += pow(2, rooms);
+    if (r[rooms] == ' ') alwaysdark += pow(2, rooms);
     rooms++;
   }
 
-  printf("\nroomdec = %d", j);
+  printf("\nroomdec = %li", position);
+  printf("\nalways dark = %li", alwaysdark);
   printf("\nrooms = %d", rooms);
 
-  while (((j & 1) == 1) && (rooms > 0)) {
+  while (((position & 1) == 1) && (rooms > 0)) {
     printf("\nroom %d", rooms);
-    printf("\nj = ");
-    dezimalZuBinaer(j);
-    inv = ~j;  // inverse
-    printf("\nx= ");
-    dezimalZuBinaer(x);
-    j = inv >> 1;  // shift right
-    y = j & 1;
-    printf("\ny = ");
-    dezimalZuBinaer(y);
-    printf("\n\n\n\n");
+    printf("\nposition = ");
+    printBits(position);
+    printf("\nalwaysda = ");
+    printBits(alwaysdark);
+    inv = ~position;  // inverse
+    printf("\ninv      = ");
+    printBits(inv);
+    position = inv >> 1;  // shift right
+    alwaysdark >>= 1;     // shift right
+    position |= alwaysdark;
+    printf("\nposition = ");
+    printBits(position);
+    printf("\nalwaysda = ");
+    printBits(alwaysdark);
+
+    y = position & 1;
+    printf("\ny        = ");
+    printBits(y);
+
+    printf("\n\n");
     rooms--;
   }
 
@@ -99,22 +113,24 @@ int main(void) {
 }
 
 /*
-bool bulb_maze (const char *maze)
-{
-  int j = 0;
-  int inv = 0;
-  int rooms = 0;
+bool bulb_maze(const char *m) {
+  for (int i = 0; m[i]; i++)
+    if (m[i] == (i % 2 ? 'x' : 'o')) return false;
+  return true;
+}
 
-  while (maze[rooms] != '\0') {
-    if (maze[rooms] == 'x' || maze[rooms] == ' ') j += pow(2, rooms);
-    rooms++;
+int main(void) {
+  // char *r = "x  ox x x   xo oxo     o o   o ox xox x";
+  char *r = "xo oxox";
+
+  bool rooms = bulb_maze(r);
+
+  if (rooms == 1) {
+    printf("\nHurra geschafft\n");
+  } else {
+    printf("\ndas war nichts\n");
   }
 
-  while (((j & 1) == 1) && (rooms > 0)) {
-    inv = ~j;  // inverse
-    j = inv >> 1;  // shift right
-    rooms--;
-  }
-        return rooms == 0 ? true : false;
+  return 0;
 }
 */
