@@ -4,22 +4,30 @@ CFLAGS=-Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wmissin
 LFLAGS=-L/usr/lib/x86_64-linux-gnu -lcrypto -lssl
 SRC=src
 OBJ=obj
-#SRCS=$(wildcard $(SRC)/*.c)
-#OBJS=$(patsubst $(SRC)/%c, $(OBJ)/%o, $(SRCS))
+SRCS=$(wildcard $(SRC)/*.c)
+OBJS=$(patsubst $(SRC)/%c, $(OBJ)/%o, $(SRCS))
 BINDIR=bin
-#BIN=$(BINDIR)/tls_time_server
+BIN=$(BINDIR)/filedir
 
-test: SRCS=$(SRC)/file.c
-test: OBJS=$(OBJ)/file.o
-test: BIN=$(BINDIR)/mydir
-test: clean
-test: 
-	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
-	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
+all: $(BIN) 
+
+$(BIN): $(OBJS)
+	$(CC) $(CFLAGS) $(OBJS) -o $@
+
+$(OBJ)/%.o: $(SRC)/%.c
+	$(CC) $(CFLAGS) -c $< -o $@ $(LFLAGS)
+
+
+
+#test: BIN=$(BINDIR)/filedir
+#test: clean
+#test: 
+#	$(CC) $(CFLAGS) -c $(SRCS) -o $(OBJS) $(LFLAGS)
+#	$(CC) $(CFLAGS) $(OBJS) -o $(BIN) $(LFLAGS)
 
 
 .PHONY: clean
 clean:
 	@echo "Cleaning..."
-	$(RM) -r $(BINDIR)/mydir $(OBJ)/*
+	$(RM) -r $(BINDIR)/filedir $(OBJ)/*
 	@echo "Finished cleaning."

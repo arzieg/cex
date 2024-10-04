@@ -1,0 +1,5 @@
+Aufruf 
+ filedir <directory> -r -e <excludefile>
+   wenn -r gesetzt ist, dann rekursive Suche
+   wenn -e gesetzt ist mit file, dann lese excludefile
+   
