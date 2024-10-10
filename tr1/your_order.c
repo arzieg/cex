@@ -39,7 +39,9 @@ char *order_words(char *ordered, const char *words) {
     }
   }
 
-  printf("\n\n");
+  "is2 Th1s T4est 3a" ^
+
+      printf("\n\n");
 
   for (int i = 1; i < 10; i++) {
     if (word[i].wordptr != NULL) {
