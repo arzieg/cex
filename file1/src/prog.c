@@ -1,20 +1,22 @@
 // Programm call
 // https://github.com/containers/bubblewrap
 
+#include "filedir.h"
 #include "utils.h"
 #include <argp.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
+#include <unistd.h>
 
 /* -------------------------------------------
-   Arg Parse
+   Arg Parse Initialization
   -------------------------------------------*/
 
 const char *argp_program_version = "filedir 0.1";
 const char *argp_program_bug_address = "<bug@to.me>";
 
-/* Program documentation. */
+/* Program purpose. */
 static char doc[]
     = "filedir - a programm to show files in one or more directories.";
 
@@ -100,6 +102,18 @@ main (int argc, char **argv)
   fprintf (stdout, "verbose = %d\n", arguments.verbose);
   fprintf (stdout, "EXCLUDE = %s\n", arguments.exclude);
 
+  // exists exclude file
+  if (arguments.exclude)
+    {
+      if (access (arguments.exclude, R_OK) != 0)
+        {
+          fprintf (stderr, "Could not access excludefile %s.\n",
+                   arguments.exclude);
+          exit (EXIT_FAILURE);
+        }
+    }
+
+  get_dir (arguments.args[0], arguments.recursive, arguments.exclude);
   // if (arguments.pinteractive) interactive();
   // Stack_t *ConfigFiles;
   // if (arguments.confdir) ConfigFiles =
