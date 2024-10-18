@@ -1,11 +1,13 @@
 #include <openssl/bio.h>
 #include <openssl/evp.h>
+#include <openssl/rand.h>
+#include <stdio.h>
 #include <string.h>
 
-int do_crypt (FILE *in, FILE *out, int do_encrypt);
+int do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv);
 
 int
-do_crypt (FILE *in, FILE *out, int do_encrypt)
+do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv)
 {
   /* Allow enough space in output buffer for additional block */
   unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
@@ -16,7 +18,7 @@ do_crypt (FILE *in, FILE *out, int do_encrypt)
    * another source.
    */
   unsigned char key[] = "0123456789abcdeF0123456789abcdeF";
-  unsigned char iv[] = "12345678876543211234567887654321";
+  // unsigned char iv[] = "1234567887654321";
 
   /* Don't set key or IV right away; we want to check lengths */
   ctx = EVP_CIPHER_CTX_new ();
@@ -27,8 +29,9 @@ do_crypt (FILE *in, FILE *out, int do_encrypt)
       EVP_CIPHER_CTX_free (ctx);
       return 0;
     }
+
   OPENSSL_assert (EVP_CIPHER_CTX_get_key_length (ctx) == 32);
-  OPENSSL_assert (EVP_CIPHER_CTX_get_iv_length (ctx) == 32);
+  OPENSSL_assert (EVP_CIPHER_CTX_get_iv_length (ctx) == 16);
 
   /* Now we can set key and IV */
   if (!EVP_CipherInit_ex2 (ctx, NULL, key, iv, do_encrypt, NULL))
@@ -67,11 +70,13 @@ int
 main (int argc, char *argv[])
 {
 
+  unsigned char iv[16]; // 128-bit IV
+
   int encrypt = 1;
   if (argc < 3)
     {
       fprintf (stderr,
-               "Usage ssl_aes256 <infile> <outfile> <encrypt|decrypt>");
+               "Usage ssl_aes256 <infile> <outfile> <encrypt|decrypt> <iv>");
       exit (EXIT_FAILURE);
     }
 
@@ -91,10 +96,34 @@ main (int argc, char *argv[])
   if (strcmp (argv[3], "encrypt") == 0)
     {
       encrypt = 1;
+
+      if (RAND_bytes (iv, sizeof (iv)) != 1)
+        {
+          fprintf (stderr, "Error generating random bytes.\n");
+          return 1;
+        }
+
+      printf ("Generated IV: ");
+      for (unsigned int i = 0; i < sizeof (iv); i++)
+        {
+          printf ("%02x", iv[i]);
+        }
+      printf ("\n");
     }
   else if (strcmp (argv[3], "decrypt") == 0)
     {
       encrypt = 0;
+      if (strlen (argv[4]) != 32)
+        {
+          fprintf (stderr, "Invalid hex string length.\n");
+          return 1;
+        }
+
+      // Convert the hex string to an unsigned char array
+      for (int i = 0; i < 16; i++)
+        {
+          sscanf (argv[4] + 2 * i, "%2hhx", &iv[i]);
+        }
     }
   else
     {
@@ -102,6 +131,6 @@ main (int argc, char *argv[])
       exit (EXIT_FAILURE);
     }
 
-  do_crypt (filein, fileout, encrypt);
+  do_crypt (filein, fileout, encrypt, iv);
   exit (EXIT_SUCCESS);
 }
