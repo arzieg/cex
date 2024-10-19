@@ -3,8 +3,60 @@
 #include <openssl/rand.h>
 #include <stdio.h>
 #include <string.h>
+/*
+ ToDo:
+   iv ist mit filename in eine Protokolldatei zuschreiben
+   key ist zu übergeben
+   iv ist dann als letztes Argument zu übergeben, da es nur für decrypt
+ benötigt wird
+*/
 
 int do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv);
+void create_iv (unsigned char *iv, size_t size);
+int hexStringToBytes (const char *hexString, unsigned char *iv,
+                      size_t ivArraySize);
+
+void
+create_iv (unsigned char *iv, size_t size)
+{
+  if (RAND_bytes (iv, (int)size) != 1)
+    {
+      fprintf (stderr, "Error generating random bytes\n");
+      exit (EXIT_FAILURE);
+    }
+  printf ("Generated IV: ");
+  for (unsigned int i = 0; i < size; i++)
+    {
+      printf ("%02x", iv[i]);
+    }
+  printf ("\n");
+}
+
+int
+hexStringToBytes (const char *hexString, unsigned char *iv, size_t ivArraySize)
+{
+  size_t hexStringLength = strlen (hexString);
+
+  // Check if the hex string length is twice the byte array size
+  if (hexStringLength != ivArraySize * 2)
+    {
+      fprintf (stderr,
+               "Hex string length does not match the expected size.\n");
+      return EXIT_FAILURE;
+    }
+
+  for (size_t i = 0; i < ivArraySize; i++)
+    {
+      // Convert each pair of hex digits to a byte
+      if (sscanf (hexString + 2 * i, "%2hhx", &iv[i]) != 1)
+        {
+          fprintf (stderr, "Invalid hex string format.\n");
+          return EXIT_FAILURE;
+        }
+    }
+
+  return EXIT_SUCCESS;
+}
 
 int
 do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv)
@@ -96,34 +148,12 @@ main (int argc, char *argv[])
   if (strcmp (argv[3], "encrypt") == 0)
     {
       encrypt = 1;
-
-      if (RAND_bytes (iv, sizeof (iv)) != 1)
-        {
-          fprintf (stderr, "Error generating random bytes.\n");
-          return 1;
-        }
-
-      printf ("Generated IV: ");
-      for (unsigned int i = 0; i < sizeof (iv); i++)
-        {
-          printf ("%02x", iv[i]);
-        }
-      printf ("\n");
+      create_iv (iv, sizeof (iv));
     }
   else if (strcmp (argv[3], "decrypt") == 0)
     {
       encrypt = 0;
-      if (strlen (argv[4]) != 32)
-        {
-          fprintf (stderr, "Invalid hex string length.\n");
-          return 1;
-        }
-
-      // Convert the hex string to an unsigned char array
-      for (int i = 0; i < 16; i++)
-        {
-          sscanf (argv[4] + 2 * i, "%2hhx", &iv[i]);
-        }
+      hexStringToBytes (argv[4], iv, sizeof (iv));
     }
   else
     {
