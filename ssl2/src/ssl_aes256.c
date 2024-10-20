@@ -5,10 +5,15 @@
 #include <string.h>
 /*
  ToDo:
-   iv ist mit filename in eine Protokolldatei zuschreiben
-   key ist zu übergeben
+   iv und key werden in eine rsa geschützt datei gesichert.
    iv ist dann als letztes Argument zu übergeben, da es nur für decrypt
  benötigt wird
+
+file:
+  encypt/decrypt
+  keyfile
+  privatekey
+
 */
 
 int do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *key,
