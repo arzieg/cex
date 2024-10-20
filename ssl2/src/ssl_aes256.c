@@ -11,7 +11,8 @@
  benötigt wird
 */
 
-int do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv);
+int do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *key,
+              unsigned char *iv);
 void create_iv (unsigned char *iv, size_t size);
 int hexStringToBytes (const char *hexString, unsigned char *iv,
                       size_t ivArraySize);
@@ -59,7 +60,8 @@ hexStringToBytes (const char *hexString, unsigned char *iv, size_t ivArraySize)
 }
 
 int
-do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv)
+do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *key,
+          unsigned char *iv)
 {
   /* Allow enough space in output buffer for additional block */
   unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
@@ -69,7 +71,7 @@ do_crypt (FILE *in, FILE *out, int do_encrypt, unsigned char *iv)
    * Bogus key and IV: we'd normally set these from
    * another source.
    */
-  unsigned char key[] = "0123456789abcdeF0123456789abcdeF";
+  // unsigned char key[] = "0123456789abcdeF0123456789abcdeF";
   // unsigned char iv[] = "1234567887654321";
 
   /* Don't set key or IV right away; we want to check lengths */
@@ -122,13 +124,15 @@ int
 main (int argc, char *argv[])
 {
 
-  unsigned char iv[16]; // 128-bit IV
+  unsigned char iv[16];  // 128-bit IV
+  unsigned char key[32]; // 256 BIT AES
 
   int encrypt = 1;
   if (argc < 3)
     {
-      fprintf (stderr,
-               "Usage ssl_aes256 <infile> <outfile> <encrypt|decrypt> <iv>");
+      fprintf (
+          stderr,
+          "Usage ssl_aes256 <infile> <outfile> <encrypt|decrypt> <key> <iv>");
       exit (EXIT_FAILURE);
     }
 
@@ -153,7 +157,7 @@ main (int argc, char *argv[])
   else if (strcmp (argv[3], "decrypt") == 0)
     {
       encrypt = 0;
-      hexStringToBytes (argv[4], iv, sizeof (iv));
+      hexStringToBytes (argv[5], iv, sizeof (iv));
     }
   else
     {
@@ -161,6 +165,8 @@ main (int argc, char *argv[])
       exit (EXIT_FAILURE);
     }
 
-  do_crypt (filein, fileout, encrypt, iv);
+  memcpy (key, argv[4], 32);
+
+  do_crypt (filein, fileout, encrypt, key, iv);
   exit (EXIT_SUCCESS);
 }
