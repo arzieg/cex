@@ -157,12 +157,14 @@ main (int argc, char **argv)
         }
     }
 
-  // save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof
-  // (iv),
-  //                        arguments.keyfile);
+  /*
+    save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
+                           arguments.keyfile);
+  */
 
   load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
                          arguments.keyfile);
+
   // load_encrypted_key_iv ("encrypted.bin", key, iv, "private.pem");
   printf ("\nkey = %s", key);
   printf ("\niv = %s", iv);

@@ -24,7 +24,17 @@ decrypted.txt
 void
 handle_errors (void)
 {
-  ERR_print_errors_fp (stderr);
+  FILE *error_log = fopen ("error.log", "a");
+  if (error_log != NULL)
+    {
+      ERR_print_errors_fp (error_log);
+      fclose (error_log);
+    }
+  else
+    {
+      // Handle the error of not being able to open the log file
+      perror ("Failed to open error.log");
+    }
   abort ();
 }
 
@@ -135,6 +145,7 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
 
   unsigned char encrypted[256];
   fread (encrypted, 1, sizeof (encrypted), file);
+  printf ("\nencrypted = %s", encrypted);
   fclose (file);
 
   unsigned char *plaintext = malloc (key_len + iv_len);
@@ -146,6 +157,7 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
 
   if (EVP_PKEY_decrypt_init (ctx) <= 0)
     handle_errors ();
+  // &plaintext_len
   if (EVP_PKEY_decrypt (ctx, plaintext, &plaintext_len, encrypted,
                         sizeof (encrypted))
       <= 0)
