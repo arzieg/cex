@@ -9,6 +9,8 @@
         openssl genpkey -algorithm RSA -out private.pem -aes256
 Extract the public key:
         openssl rsa -pubout -in private.pem -out public.pem
+in file:
+
 
 */
 
