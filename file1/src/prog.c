@@ -1,9 +1,11 @@
 // Programm call
 // https://github.com/containers/bubblewrap
 
+#include "crypt.h"
 #include "filedir.h"
 #include "utils.h"
 #include <argp.h>
+#include <crypt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
@@ -110,6 +112,8 @@ int
 main (int argc, char **argv)
 {
   struct arguments arguments;
+  unsigned char key[32] = "HalloIchwarInBremenImLetztenSomm";
+  unsigned char iv[16] = "123456789abcdeF";
 
   /* Default values. */
   arguments.recursive = false;
@@ -153,14 +157,16 @@ main (int argc, char **argv)
         }
     }
 
-  get_dir (arguments.args[0], arguments.recursive, arguments.exclude);
-  // if (arguments.pinteractive) interactive();
-  // Stack_t *ConfigFiles;
-  // if (arguments.confdir) ConfigFiles =
-  // get_files_in_confdir(arguments.confdir); if (arguments.confdir)
-  // testmain();
-  // if (arguments.confdir)
-  //  readconf_su (arguments.confdir);
+  // save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof
+  // (iv),
+  //                        arguments.keyfile);
+
+  load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
+                         arguments.keyfile);
+  // load_encrypted_key_iv ("encrypted.bin", key, iv, "private.pem");
+  printf ("\nkey = %s", key);
+  printf ("\niv = %s", iv);
+  // get_dir (arguments.args[0], arguments.recursive, arguments.exclude);
 
   exit (0);
 }

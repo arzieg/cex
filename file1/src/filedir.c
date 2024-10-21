@@ -29,48 +29,51 @@ get_dir (char *path, bool recursive, char *exclude)
           char d_filename[257];
           snprintf (d_filename, sizeof (d_filename), "%s/%s", path,
                     dir->d_name);
-          FILE *file = fopen (exclude, "r");
-          if (file == NULL)
+          if (exclude) // handle exlude file
             {
-              perror ("Error opening file");
-              exit (EXIT_FAILURE);
-            }
-
-          // Buffer to store each line
-          char pattern[256];
-
-          // Read each line from the file
-          while (fgets (pattern, sizeof (pattern), file))
-            {
-              pattern[strcspn (pattern, "\n")] = 0;
-              DEBUG_PRINT ("%sSearch for Pattern %s in file %s\n", NORMAL,
-                           pattern, d_filename);
-              regex_t regex;
-              int reti;
-
-              // compile regex
-              reti = regcomp (&regex, pattern, REG_EXTENDED);
-              if (reti)
+              FILE *file = fopen (exclude, "r");
+              if (file == NULL)
                 {
-                  fprintf (stderr, "Could not compile regex\n");
+                  perror ("Error opening file");
                   exit (EXIT_FAILURE);
                 }
-              reti = regexec (&regex, d_filename, 0, NULL, 0);
-              if (!reti)
-                {
-                  skip = true;
-                  continue;
-                }
-              // Free memory allocated to the pattern buffer by regcomp()
-              regfree (&regex);
-            }
 
-          // Close the file
-          fclose (file);
+              // Buffer to store each line
+              char pattern[256];
+
+              // Read each line from the file
+              while (fgets (pattern, sizeof (pattern), file))
+                {
+                  pattern[strcspn (pattern, "\n")] = 0;
+                  DEBUG_PRINT ("%sSearch for Pattern %s in file %s\n", NORMAL,
+                               pattern, d_filename);
+                  regex_t regex;
+                  int reti;
+
+                  // compile regex
+                  reti = regcomp (&regex, pattern, REG_EXTENDED);
+                  if (reti)
+                    {
+                      fprintf (stderr, "Could not compile regex\n");
+                      exit (EXIT_FAILURE);
+                    }
+                  reti = regexec (&regex, d_filename, 0, NULL, 0);
+                  if (!reti)
+                    {
+                      skip = true;
+                      continue;
+                    }
+                  // Free memory allocated to the pattern buffer by regcomp()
+                  regfree (&regex);
+                }
+
+              // Close the file
+              fclose (file);
+            }
           if (skip)
-            printf ("  %s<FILE>%s\n", GREEN, d_filename);
+            printf ("%s<FILE>%s\n", GREEN, d_filename);
           else
-            printf ("  %s<FILE>%s\n", BLUE, d_filename);
+            printf ("%s<FILE>%s\n", BLUE, d_filename);
         }
       else if (dir->d_type == DT_DIR && strcmp (dir->d_name, ".") != 0
                && strcmp (dir->d_name, "..") != 0)

@@ -1,5 +1,5 @@
 
-#ifndef FILEDIR
+#ifndef _FILEDIR
 
 #include <stdbool.h>
 
