@@ -3,8 +3,14 @@
 #include <openssl/evp.h>
 #include <openssl/pem.h>
 #include <openssl/rand.h>
+#include <openssl/rsa.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+
+#define KEY_LENGTH 2048
+#define PUB_EXP 3
+#define PRINT_KEYS
 
 /*
  Generate the private key:
@@ -38,140 +44,32 @@ handle_errors (void)
   abort ();
 }
 
-EVP_PKEY *
-load_public_key (const char *filename)
+void
+generate_rsa_keys (const char *pub_filename, const char *priv_filename)
 {
-  FILE *pubkey_file = fopen (filename, "r");
-  if (!pubkey_file)
+  EVP_PKEY *pkey = EVP_RSA_gen (KEY_LENGTH);
+  if (!pkey)
+    handle_errors ();
+
+  // Save public key
+  FILE *pub_file = fopen (pub_filename, "wb");
+  if (!pub_file)
     {
-      perror ("Unable to open public key file");
-      return NULL;
-    }
-
-  EVP_PKEY *pubkey = PEM_read_PUBKEY (pubkey_file, NULL, NULL, NULL);
-  fclose (pubkey_file);
-
-  if (!pubkey)
-    {
-      handle_errors ();
-    }
-
-  return pubkey;
-}
-
-EVP_PKEY *
-load_private_key (const char *filename)
-{
-  FILE *privatekey_file = fopen (filename, "r");
-  if (!privatekey_file)
-    {
-      perror ("Unable to open private key file");
-      return NULL;
-    }
-  EVP_PKEY *privatekey
-      = PEM_read_PrivateKey (privatekey_file, NULL, NULL, NULL);
-  fclose (privatekey_file);
-
-  if (!privatekey)
-    {
-      handle_errors ();
-    }
-
-  return privatekey;
-}
-
-/*
-        Save key and iv in a encrypted file
-*/
-size_t
-save_encrypted_key_iv (const char *filename, unsigned char *key,
-                       size_t key_len, unsigned char *iv, size_t iv_len,
-                       const char *pubkey_file)
-{
-  EVP_PKEY *pubkey = load_public_key (pubkey_file);
-  if (!pubkey)
-    {
-      fprintf (stderr, "Failed to load public key.\n");
-      return EXIT_FAILURE;
-    }
-
-  FILE *file = fopen (filename, "wb");
-  if (!file)
-    {
-      perror ("Failed to open file for writing");
+      perror ("Unable to open file for writing public key");
       exit (EXIT_FAILURE);
     }
+  PEM_write_PUBKEY (pub_file, pkey);
+  fclose (pub_file);
 
-  unsigned char *plaintext = malloc (key_len + iv_len);
-  memcpy (plaintext, key, key_len);
-  memcpy (plaintext + key_len, iv, iv_len);
-
-  unsigned char encrypted[256];
-  size_t encrypted_len;
-  EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new (pubkey, NULL);
-  if (!ctx)
-    handle_errors ();
-
-  if (EVP_PKEY_encrypt_init (ctx) <= 0)
-    handle_errors ();
-  if (EVP_PKEY_encrypt (ctx, encrypted, &encrypted_len, plaintext,
-                        key_len + iv_len)
-      <= 0)
-    handle_errors ();
-
-  fwrite (encrypted, 1, encrypted_len, file);
-  fclose (file);
-  EVP_PKEY_CTX_free (ctx);
-  EVP_PKEY_free (pubkey);
-  free (plaintext);
-  return EXIT_SUCCESS;
-}
-
-/*
-        Load key and iv from a encrypted file
-*/
-size_t
-load_decrypted_key_iv (const char *filename, unsigned char *key,
-                       size_t key_len, unsigned char *iv, size_t iv_len,
-                       const char *privatekey_file)
-{
-  EVP_PKEY *privatekey = load_private_key (privatekey_file);
-  FILE *file = fopen (filename, "rb");
-  if (!file)
+  // Save private key
+  FILE *priv_file = fopen (priv_filename, "wb");
+  if (!priv_file)
     {
-      perror ("Failed to open file for reading");
+      perror ("Unable to open file for writing private key");
       exit (EXIT_FAILURE);
     }
+  PEM_write_PrivateKey (priv_file, pkey, NULL, NULL, 0, NULL, NULL);
+  fclose (priv_file);
 
-  unsigned char encrypted[256];
-  fread (encrypted, 1, sizeof (encrypted), file);
-  printf ("\nencrypted = %s", encrypted);
-  fclose (file);
-
-  unsigned char *plaintext = malloc (key_len + iv_len);
-  size_t plaintext_len;
-
-  EVP_PKEY_CTX *ctx = EVP_PKEY_CTX_new (privatekey, NULL);
-  if (!ctx)
-    handle_errors ();
-
-  if (EVP_PKEY_decrypt_init (ctx) <= 0)
-    handle_errors ();
-  // &plaintext_len
-  if (EVP_PKEY_decrypt (ctx, plaintext, &plaintext_len, encrypted,
-                        sizeof (encrypted))
-      <= 0)
-    handle_errors ();
-
-  memcpy (key, plaintext, key_len);
-  memcpy (iv, plaintext + key_len, iv_len);
-
-  printf ("\nin function:");
-  printf ("\nKEY = %s", key);
-  printf ("\nIV = %s\n", iv);
-
-  EVP_PKEY_CTX_free (ctx);
-  EVP_PKEY_free (privatekey);
-  free (plaintext);
-  return EXIT_SUCCESS;
+  EVP_PKEY_free (pkey);
 }
