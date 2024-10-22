@@ -124,8 +124,10 @@ int
 main (int argc, char **argv)
 {
   struct arguments arguments;
-  unsigned char key[32] = "HalloIchwarInBremenImLetztenSomm";
-  unsigned char iv[16] = "123456789abcdeF";
+  // unsigned char key[32] = "HalloIchwarInBremenImLetztenSomm";
+  // unsigned char iv[16] = "123456789abcdeF";
+  unsigned char key[32];
+  unsigned char iv[16];
 
   /* Default values. */
   arguments.recursive = false;
@@ -190,14 +192,13 @@ main (int argc, char **argv)
   */
 
   /*
-    save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof
-    (iv), arguments.keyfile);
+    save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
+                           arguments.pubkey);
   */
 
-  /*
   load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
-                         arguments.keyfile);
-*/
+                         arguments.privkey);
+
   // load_encrypted_key_iv ("encrypted.bin", key, iv, "private.pem");
   printf ("\nkey = %s", key);
   printf ("\niv = %s", iv);
