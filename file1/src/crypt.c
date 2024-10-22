@@ -13,16 +13,23 @@
 #define PRINT_KEYS
 
 /*
- Generate the private key:
-        openssl genpkey -algorithm RSA -out private.pem -aes256
+
+Generate the private key:
+
+  openssl genpkey -algorithm RSA -out private.pem -aes256
+
 Extract the public key:
-        openssl rsa -pubout -in private.pem -out public.pem
+
+  openssl rsa -pubout -in private.pem -out public.pem
+
 Encrypt file:
-        openssl rsautl -encrypt -pubin -inkey public.pem -in plaintext.txt -out
+
+  openssl pkeyutl -encrypt -pubin -inkey key.pub -in plaintext -out
 encrypted.bin
 
-Decrypt file
-         openssl rsautl -decrypt -inkey private.pem -in encrypted.bin -out
+Decrypt file:
+
+  openssl pkeyutl -decrypt -inkey private.pem -in encrypted.bin -out
 decrypted.txt
 
 */
