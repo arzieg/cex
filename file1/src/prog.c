@@ -191,6 +191,18 @@ main (int argc, char **argv)
         }
   */
 
+  /* TODO
+   wann und wie rufe ich das hier auf.
+   createkey generiert einen rsa key zum Verschlüsseln einer Key-Datei die key
+   und iv enthält
+
+   vlt. createkey, aber hier interaktiv:
+   a. soll rsa key erstellt werden
+   b. eingabe von aes256 key
+   c. eingabe von iv key
+   d. speichern in encrypted.bin
+
+   */
   /*
     save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
                            arguments.pubkey);
