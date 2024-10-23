@@ -6,9 +6,10 @@
 #include "utils.h"
 #include <argp.h>
 #include <crypt.h>
-#include <stdbool.h>
+#include <stdbool.h> // true, false
 #include <stdio.h>
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
+#include <string.h> // strlen
 #include <unistd.h>
 
 /*
@@ -19,33 +20,41 @@
    Arg Parse Initialization
   -------------------------------------------*/
 
-const char *argp_program_version = "filedir 0.1";
+const char *argp_program_version = "cryptme 0.1";
 const char *argp_program_bug_address = "<bug@to.me>";
 
 /* Program purpose. */
-static char doc[]
-    = "filedir - a programm to show files in one or more directories.";
+static char doc[] = "cryptme - a programm to encrypt / decrypt files in one "
+                    "or more sub directories.";
 
 /* A description of the arguments we accept. */
 static char args_doc[] = "DIRECTORY";
 
 /* The options we understand. */
 static struct argp_option options[]
-    = { { "verbose", 'v', 0, 0, "Produce verbose output", 0 },
+    = { { 0, 0, 0, 0, "encryption/decryption options:", 3 },
+        { "verbose", 'v', 0, 0, "Produce verbose output", 0 },
         { "recursive", 'r', 0, 0, "run recursive", 0 },
         { "encrypt", 'e', 0, 0, "encrypt files", 0 },
         { "decrypt", 'd', 0, 0, "decrypt files", 0 },
-        { "createkeys", 'c', 0, 0, "create key files", 0 },
         { "exclude", 'x', "EXCLUDEFILE", 0, "exclude file <file>", 0 },
-        { "privkey", 'k', "PRIVKEY", 0, "private keyfile <file>", 0 },
-        { "pubkey", 'p', "PUBKEY", 0, "public keyfile <file>", 0 },
+        { 0, 0, 0, 0, "Options in createkeys and encryption/decryption:", 5 },
+        { "privkey", 'k', "PRIV-KEY", 0, "private keyfile <file>", 0 },
+        { "pubkey", 'p', "PUB-KEY", 0, "public keyfile <file>", 0 },
+        { 0, 0, 0, 0, "Createkey options:", 7 },
+        { "createkeys", 'c', 0, 0, "create key files", 0 },
+        { "aeskey", 'a', "AES-KEY", 0,
+          "key to use for encryption with aes (32 characters)", 0 },
+        { "ivkey", 'i', "IV-KEY", 0,
+          "initialization vector to use encryption for aes (16 characters)",
+          0 },
         { 0 } };
 
 /* Used by main to communicate with parse_opt. */
 struct arguments
 {
   char *args[1]; /* DIRECTORY */
-  char *exclude, *privkey, *pubkey;
+  char *exclude, *privkey, *pubkey, *aeskey, *ivkey;
   bool recursive, verbose, encrypt, decrypt, createkeys;
 };
 
@@ -76,6 +85,12 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'p':
       arguments->pubkey = arg;
+      break;
+    case 'a':
+      arguments->aeskey = arg;
+      break;
+    case 'i':
+      arguments->ivkey = arg;
       break;
     case 'e':
       if (arguments->decrypt)
@@ -135,6 +150,8 @@ main (int argc, char **argv)
   arguments.exclude = NULL;
   arguments.privkey = NULL;
   arguments.pubkey = NULL;
+  arguments.aeskey = NULL;
+  arguments.ivkey = NULL;
   arguments.createkeys = false;
   arguments.decrypt = false;
   arguments.encrypt = false;
@@ -150,10 +167,16 @@ main (int argc, char **argv)
   fprintf (stdout, "CREATEKEYS = %d\n", arguments.createkeys);
   fprintf (stdout, "PRIVKEY = %s\n", arguments.privkey);
   fprintf (stdout, "PUBKEY = %s\n", arguments.pubkey);
+  fprintf (stdout, "AESKEY = %s\n", arguments.aeskey);
+  fprintf (stdout, "IVKEY = %s\n", arguments.ivkey);
   fprintf (stdout, "encrypt = %d\n", arguments.encrypt);
   fprintf (stdout, "decrypt = %d\n", arguments.decrypt);
 
-  // exists exclude file?
+  /*
+   Parameter check
+  */
+  // exclude file accessable? (als funktion schreiben, da auch für pubkey und
+  // privkey benötigt)
   if (arguments.exclude)
     {
       if (access (arguments.exclude, R_OK) != 0)
@@ -163,6 +186,45 @@ main (int argc, char **argv)
           exit (EXIT_FAILURE);
         }
     }
+
+  // aeskey 32 characters? (auch als funktion? )
+  if (strlen (arguments.aeskey) != 32)
+    {
+      fprintf (stderr,
+               "\nAES Key has to be exact 32 Characters long, found %ld "
+               "characters\n",
+               strlen (arguments.aeskey));
+      exit (EXIT_FAILURE);
+    }
+
+  // aeskey 32 characters?
+  if (strlen (arguments.ivkey) != 16)
+    {
+      fprintf (stderr,
+               "\nInitialization vector IV-KEY has to be exact 16 Characters "
+               "long, found %ld "
+               "characters\n",
+               strlen (arguments.ivkey));
+      exit (EXIT_FAILURE);
+    }
+
+  /*
+  logic check
+  */
+
+  /*
+  privkey und pubkey müssen gesetzt sein oder gar nicht. wenn gar nicht, dann
+  darf nicht encrypt/decrypt gesetzt sein
+
+  bei createkey muss privkey und pubkey gesetzt sein. Existiert die Datei wird
+  diese nicht neu erstellt (sollte als Message ausgegeben werden) aeskey und iv
+  müssen gesetzt werden. wenn encrypted.bin existiert, dann sollte hier
+  abgebrochen werden mit dem Hinweis, dass die Datei vorher gelöscht werden
+  muss
+
+
+
+  */
 
   if (arguments.createkeys)
     {
