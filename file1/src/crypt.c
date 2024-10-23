@@ -51,6 +51,9 @@ handle_errors (void)
   abort ();
 }
 
+/*
+ gernerate privkey / pubkey pair
+*/
 void
 generate_rsa_keys (const char *pub_filename, const char *priv_filename)
 {
@@ -80,6 +83,10 @@ generate_rsa_keys (const char *pub_filename, const char *priv_filename)
 
   EVP_PKEY_free (pkey);
 }
+
+/*
+ save key and initialization vector in an encrypted file
+*/
 
 size_t
 save_encrypted_key_iv (const char *filename, unsigned char *key,
@@ -143,6 +150,9 @@ save_encrypted_key_iv (const char *filename, unsigned char *key,
   return EXIT_SUCCESS;
 }
 
+/*
+ load key and initialization vector from an encrypted file
+*/
 size_t
 load_decrypted_key_iv (const char *filename, unsigned char *key,
                        size_t key_len, unsigned char *iv, size_t iv_len,
@@ -198,4 +208,79 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
   EVP_PKEY_CTX_free (ctx);
   free (plaintext);
   return EXIT_SUCCESS;
+}
+
+int
+do_crypt (const char *filein, const char *fileout, int do_encrypt,
+          unsigned char *key, unsigned char *iv)
+{
+  /* Allow enough space in output buffer for additional block */
+  unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
+  int inlen, outlen;
+  EVP_CIPHER_CTX *ctx;
+  /*
+   * Bogus key and IV: we'd normally set these from
+   * another source.
+   */
+  // unsigned char key[] = "0123456789abcdeF0123456789abcdeF";
+  // unsigned char iv[] = "1234567887654321";
+
+  /* Don't set key or IV right away; we want to check lengths */
+  ctx = EVP_CIPHER_CTX_new ();
+  if (!EVP_CipherInit_ex2 (ctx, EVP_aes_256_cbc (), NULL, NULL, do_encrypt,
+                           NULL))
+    {
+      /* Error */
+      EVP_CIPHER_CTX_free (ctx);
+      return 0;
+    }
+
+  OPENSSL_assert (EVP_CIPHER_CTX_get_key_length (ctx) == 32);
+  OPENSSL_assert (EVP_CIPHER_CTX_get_iv_length (ctx) == 16);
+
+  /* Now we can set key and IV */
+  if (!EVP_CipherInit_ex2 (ctx, NULL, key, iv, do_encrypt, NULL))
+    {
+      /* Error */
+      EVP_CIPHER_CTX_free (ctx);
+      return 0;
+    }
+
+  /* open file */
+  FILE *in = fopen (filein, "r");
+  if (in == NULL)
+    {
+      fprintf (stderr, "Error opening %s \n", filein);
+      return (EXIT_FAILURE);
+    }
+  FILE *out = fopen (fileout, "w");
+  if (out == NULL)
+    {
+      fprintf (stderr, "Error opening %s \n", fileout);
+      return (EXIT_FAILURE);
+    }
+
+  for (;;)
+    {
+      inlen = (int)fread (inbuf, 1, 1024, in);
+      if (inlen <= 0)
+        break;
+      if (!EVP_CipherUpdate (ctx, outbuf, &outlen, inbuf, inlen))
+        {
+          /* Error */
+          EVP_CIPHER_CTX_free (ctx);
+          return 0;
+        }
+      fwrite (outbuf, 1, (size_t)outlen, out);
+    }
+  if (!EVP_CipherFinal_ex (ctx, outbuf, &outlen))
+    {
+      /* Error */
+      EVP_CIPHER_CTX_free (ctx);
+      return 0;
+    }
+  fwrite (outbuf, 1, (size_t)outlen, out);
+
+  EVP_CIPHER_CTX_free (ctx);
+  return 1;
 }

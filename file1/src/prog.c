@@ -196,8 +196,14 @@ main (int argc, char **argv)
                            arguments.pubkey);
   */
 
-  load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
-                         arguments.privkey);
+  if (arguments.encrypt || arguments.decrypt)
+    {
+      load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv,
+                             sizeof (iv), arguments.privkey);
+    }
+
+  get_dir (arguments.args[0], arguments.recursive, arguments.exclude,
+           arguments.encrypt, arguments.decrypt, key, iv);
 
   // load_encrypted_key_iv ("encrypted.bin", key, iv, "private.pem");
   printf ("\nkey = %s", key);

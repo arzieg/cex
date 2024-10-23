@@ -1,6 +1,7 @@
 #define _DEFAULT_SOURCE
 
 #include "filedir.h"
+#include "crypt.h"
 #include "utils.h"
 #include <dirent.h>
 #include <regex.h>
@@ -15,7 +16,8 @@
 #define RED "\x1B[31m"
 
 void
-get_dir (char *path, bool recursive, char *exclude)
+get_dir (char *path, bool recursive, char *exclude, bool encrypt, bool decrypt,
+         unsigned char *key, unsigned char *iv)
 {
   DIR *d = opendir (path);
   if (d == NULL)
@@ -66,14 +68,52 @@ get_dir (char *path, bool recursive, char *exclude)
                   // Free memory allocated to the pattern buffer by regcomp()
                   regfree (&regex);
                 }
-
               // Close the file
               fclose (file);
             }
           if (skip)
             printf ("%s<FILE>%s\n", GREEN, d_filename);
           else
-            printf ("%s<FILE>%s\n", BLUE, d_filename);
+            {
+              printf ("%s<FILE>%s", BLUE, d_filename);
+              // crypt?
+              if (encrypt)
+                {
+                  char d_filenameout[263];
+                  strcpy (d_filenameout, d_filename);
+                  strcat (d_filenameout, ".crypt");
+                  do_crypt (d_filename, d_filenameout, 1, key, iv);
+                  printf ("%s... encrypt file to ... %s%s\n", RED,
+                          d_filenameout, NORMAL);
+                  remove (d_filename);
+                }
+              else
+                printf ("\n");
+
+              /* check also for the ending .crypt */
+              if (decrypt)
+                {
+                  char d_filenameout[263];
+                  const char *search = ".crypt";
+                  size_t str_len = strlen (d_filename);
+                  size_t search_len = strlen (search);
+
+                  if (str_len >= search_len
+                      && strcmp (d_filename + str_len - search_len, search)
+                             == 0)
+                    {
+                      strncpy (d_filenameout, d_filename,
+                               str_len - search_len);
+                      d_filenameout[str_len - search_len] = '\0';
+                      do_crypt (d_filename, d_filenameout, 0, key, iv);
+                      printf ("%s... decrypt file to ... %s%s\n", RED,
+                              d_filenameout, NORMAL);
+                      // remove (d_filename);
+                    }
+                }
+              else
+                printf ("\n");
+            }
         }
       else if (dir->d_type == DT_DIR && strcmp (dir->d_name, ".") != 0
                && strcmp (dir->d_name, "..") != 0)
@@ -82,7 +122,7 @@ get_dir (char *path, bool recursive, char *exclude)
           char d_path[257];
           snprintf (d_path, sizeof (d_path), "%s/%s", path, dir->d_name);
           if (recursive)
-            get_dir (d_path, recursive, exclude);
+            get_dir (d_path, recursive, exclude, encrypt, decrypt, key, iv);
         }
     }
   closedir (d);
