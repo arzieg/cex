@@ -1,3 +1,4 @@
+#include <stddef.h> //for size_t
 
 #if 0
 #define debug(...) filedir_log (LOG_DEBUG, __VA_ARGS__)
@@ -27,3 +28,5 @@ __attribute__ ((format (printf, 1, 2)));
 
 void die (const char *format, ...) __attribute__ ((__noreturn__))
 __attribute__ ((format (printf, 1, 2)));
+
+size_t check_file_access (char *filename);

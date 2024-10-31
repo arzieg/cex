@@ -5,20 +5,24 @@
 #include "filedir.h"
 #include "utils.h"
 #include <argp.h>
-#include <crypt.h>
 #include <stdbool.h> // true, false
 #include <stdio.h>
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
 #include <string.h> // strlen
-#include <unistd.h>
-
-/*
-  --verbose --recursive --exclude --encrypt|decrypt --keyfile
-*/
 
 /* -------------------------------------------
    Arg Parse Initialization
   -------------------------------------------*/
+
+/* TODO
+
+  createkey speichert aktuell in eine encryped.bin. hier soll per parameter die
+  encrypted.bin angegeben werden können. diese kann ja auch woanders stehen als
+  im Verzeichnis von filedir. save_encrypted_key_iv ("encrypted.bin", key,
+  sizeof (key), iv, sizeof (iv), arguments.pubkey);
+
+
+*/
 
 const char *argp_program_version = "cryptme 0.1";
 const char *argp_program_bug_address = "<bug@to.me>";
@@ -175,99 +179,132 @@ main (int argc, char **argv)
   /*
    Parameter check
   */
-  // exclude file accessable? (als funktion schreiben, da auch für pubkey und
-  // privkey benötigt)
   if (arguments.exclude)
     {
-      if (access (arguments.exclude, R_OK) != 0)
+      if (check_file_access (arguments.exclude) == EXIT_FAILURE)
         {
-          fprintf (stderr, "Could not access excludefile %s.\n",
-                   arguments.exclude);
+          fprintf (stderr, "Could not access file %s.\n", arguments.exclude);
           exit (EXIT_FAILURE);
         }
     }
 
-  // aeskey 32 characters? (auch als funktion? )
-  if (strlen (arguments.aeskey) != 32)
+  // aeskey 32 bytes?
+  if (arguments.aeskey)
     {
-      fprintf (stderr,
-               "\nAES Key has to be exact 32 Characters long, found %ld "
-               "characters\n",
-               strlen (arguments.aeskey));
+      if (strlen (arguments.aeskey) != 32)
+        {
+          fprintf (stderr,
+                   "\nAES Key has to be exact 32 Characters long, found %ld "
+                   "characters\n",
+                   strlen (arguments.aeskey));
+          exit (EXIT_FAILURE);
+        }
+    }
+
+  // initializue vector iv = 16 bytes
+  if (arguments.ivkey)
+    {
+      if (strlen (arguments.ivkey) != 16)
+        {
+          fprintf (
+              stderr,
+              "\nInitialization vector IV-KEY has to be exact 16 Characters "
+              "long, found %ld "
+              "characters\n",
+              strlen (arguments.ivkey));
+          exit (EXIT_FAILURE);
+        }
+    }
+
+  /*
+     ---------------------------
+     logic check
+     ---------------------------
+  */
+
+  // if createkey is set, then encrypt or decrypt must be unset.
+  if (arguments.createkeys && (arguments.encrypt || arguments.decrypt))
+    {
+      printf (
+          "\nRun program with --createkey or --encrypt/--decrypt but not with "
+          "both\n");
       exit (EXIT_FAILURE);
     }
 
-  // aeskey 32 characters?
-  if (strlen (arguments.ivkey) != 16)
+  // if encrypt or decrypt, then priv.key and pub.key must be set
+  if (arguments.encrypt || arguments.decrypt)
     {
-      fprintf (stderr,
-               "\nInitialization vector IV-KEY has to be exact 16 Characters "
-               "long, found %ld "
-               "characters\n",
-               strlen (arguments.ivkey));
-      exit (EXIT_FAILURE);
-    }
-
-  /*
-  logic check
-  */
-
-  /*
-  privkey und pubkey müssen gesetzt sein oder gar nicht. wenn gar nicht, dann
-  darf nicht encrypt/decrypt gesetzt sein
-
-  bei createkey muss privkey und pubkey gesetzt sein. Existiert die Datei wird
-  diese nicht neu erstellt (sollte als Message ausgegeben werden) aeskey und iv
-  müssen gesetzt werden. wenn encrypted.bin existiert, dann sollte hier
-  abgebrochen werden mit dem Hinweis, dass die Datei vorher gelöscht werden
-  muss
-
-
-
-  */
-
-  if (arguments.createkeys)
-    {
-      generate_rsa_keys (arguments.pubkey, arguments.privkey);
-    }
-
-  /*
+      if (!arguments.privkey || !arguments.pubkey)
+        {
+          printf ("\nPlease set private and public key!\n");
+          exit (EXIT_FAILURE);
+        }
       if (arguments.privkey)
         {
-          if (access (arguments.privkey, R_OK) != 0)
+          if (check_file_access (arguments.privkey) == EXIT_FAILURE)
             {
-              fprintf (stderr, "Could not access private keyfile %s.\n",
+              fprintf (stderr, "Could not access file %s.\n",
                        arguments.privkey);
               exit (EXIT_FAILURE);
             }
         }
-
       if (arguments.pubkey)
         {
-          if (access (arguments.pubkey, R_OK) != 0)
+          if (check_file_access (arguments.pubkey) == EXIT_FAILURE)
             {
-              fprintf (stderr, "Could not access public keyfile %s.\n",
+              fprintf (stderr, "Could not access file %s.\n",
                        arguments.pubkey);
               exit (EXIT_FAILURE);
             }
         }
-  */
+    }
 
-  /* TODO
-   wann und wie rufe ich das hier auf.
-   createkey generiert einen rsa key zum Verschlüsseln einer Key-Datei die key
-   und iv enthält
+  // if createkey is set, then priv.key, pub.key, iv and aes must be set. If
+  // priv.key or pub.key exist, then do not create new keys and exit with
+  // message
+  if (arguments.createkeys)
+    {
+      if (!arguments.privkey || !arguments.pubkey || !arguments.ivkey
+          || !arguments.aeskey)
+        {
+          printf ("\nPlease provide private and public keyfile, iv and aes "
+                  "string\n");
+          exit (EXIT_FAILURE);
+        }
+      if (arguments.privkey)
+        {
+          if (check_file_access (arguments.privkey) == EXIT_SUCCESS)
+            {
+              printf (
+                  "\nFound private keyfile %s. I do not overwrite the file, "
+                  "please remove manually\n",
+                  arguments.privkey);
+              exit (EXIT_FAILURE);
+            }
+        }
+      if (arguments.pubkey)
+        {
 
-   vlt. createkey, aber hier interaktiv:
-   a. soll rsa key erstellt werden
-   b. eingabe von aes256 key
-   c. eingabe von iv key
-   d. speichern in encrypted.bin
+          if (check_file_access (arguments.pubkey) == EXIT_SUCCESS)
+            {
+              printf (
+                  "\nFound public keyfile %s. I do not overwrite the file, "
+                  "please remove manually\n",
+                  arguments.pubkey);
+              exit (EXIT_FAILURE);
+            }
+        }
 
-   */
+      generate_rsa_keys (arguments.pubkey, arguments.privkey);
+      // TODO: make encrypted.bin variable
+      save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv,
+                             sizeof (iv), arguments.pubkey);
+    }
+
+  exit (EXIT_SUCCESS); // Programm Stop
+
   /*
-    save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv, sizeof (iv),
-                           arguments.pubkey);
+  das noch nicht weiter verarbeitet
   */
 
   if (arguments.encrypt || arguments.decrypt)
