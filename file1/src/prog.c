@@ -14,13 +14,15 @@
    Arg Parse Initialization
   -------------------------------------------*/
 
-/* TODO
-
-  createkey speichert aktuell in eine encryped.bin. hier soll per parameter die
-  encrypted.bin angegeben werden können. diese kann ja auch woanders stehen als
-  im Verzeichnis von filedir. save_encrypted_key_iv ("encrypted.bin", key,
-  sizeof (key), iv, sizeof (iv), arguments.pubkey);
-
+/*
+ TODO:
+ Hier ist beim decrypt noch ein Bug.
+ es wird kein null terminierter String verwendet. Insofern ist es theoretisch
+ richtig, d.h. es wird 32 bytes key und 16 bytes iv gelesen. Gibt man das mit
+ printf aus, wird key richtig ausgegeben, iv aber ist iv+key. das passt nicht.
+ nun wäre key auch nicht null terminiert und trotzdem wird es richtig
+ ausgegeben? Das kann daran liegen, das im Speicher erst iv und dann key
+ gespeichert wird und zufällig dann ein \0 nach key erfolgt.
 
 */
 
@@ -45,6 +47,7 @@ static struct argp_option options[]
         { 0, 0, 0, 0, "Options in createkeys and encryption/decryption:", 5 },
         { "privkey", 'k', "PRIV-KEY", 0, "private keyfile <file>", 0 },
         { "pubkey", 'p', "PUB-KEY", 0, "public keyfile <file>", 0 },
+        { "cryptfile", 'f', "CRYPTFILE", 0, "encrypted cryptfile <file>", 0 },
         { 0, 0, 0, 0, "Createkey options:", 7 },
         { "createkeys", 'c', 0, 0, "create key files", 0 },
         { "aeskey", 'a', "AES-KEY", 0,
@@ -58,7 +61,7 @@ static struct argp_option options[]
 struct arguments
 {
   char *args[1]; /* DIRECTORY */
-  char *exclude, *privkey, *pubkey, *aeskey, *ivkey;
+  char *exclude, *privkey, *pubkey, *cryptfile, *aeskey, *ivkey;
   bool recursive, verbose, encrypt, decrypt, createkeys;
 };
 
@@ -89,6 +92,9 @@ parse_opt (int key, char *arg, struct argp_state *state)
       break;
     case 'p':
       arguments->pubkey = arg;
+      break;
+    case 'f':
+      arguments->cryptfile = arg;
       break;
     case 'a':
       arguments->aeskey = arg;
@@ -127,9 +133,6 @@ parse_opt (int key, char *arg, struct argp_state *state)
       return ARGP_ERR_UNKNOWN;
     } // end of switch
 
-  // TODO
-  // check if arguments.pubkey and arguments.privkey are both set. If not then
-  // arpg_error (state, "Both parameter have to be set!")
   return 0;
 }
 
@@ -145,8 +148,8 @@ main (int argc, char **argv)
   struct arguments arguments;
   // unsigned char key[32] = "HalloIchwarInBremenImLetztenSomm";
   // unsigned char iv[16] = "123456789abcdeF";
-  unsigned char key[32];
-  unsigned char iv[16];
+  unsigned char key[32] = "POL8887&&/PPOLKkkcbbdneGHH&&/((f";
+  unsigned char iv[16] = "abcde67pold%&§d";
 
   /* Default values. */
   arguments.recursive = false;
@@ -154,6 +157,7 @@ main (int argc, char **argv)
   arguments.exclude = NULL;
   arguments.privkey = NULL;
   arguments.pubkey = NULL;
+  arguments.cryptfile = NULL;
   arguments.aeskey = NULL;
   arguments.ivkey = NULL;
   arguments.createkeys = false;
@@ -170,6 +174,7 @@ main (int argc, char **argv)
   fprintf (stdout, "EXCLUDE = %s\n", arguments.exclude);
   fprintf (stdout, "CREATEKEYS = %d\n", arguments.createkeys);
   fprintf (stdout, "PRIVKEY = %s\n", arguments.privkey);
+  fprintf (stdout, "CRYPTFILE = %s\n", arguments.cryptfile);
   fprintf (stdout, "PUBKEY = %s\n", arguments.pubkey);
   fprintf (stdout, "AESKEY = %s\n", arguments.aeskey);
   fprintf (stdout, "IVKEY = %s\n", arguments.ivkey);
@@ -231,12 +236,42 @@ main (int argc, char **argv)
       exit (EXIT_FAILURE);
     }
 
-  // if encrypt or decrypt, then priv.key and pub.key must be set
-  if (arguments.encrypt || arguments.decrypt)
+  // if encrypt then pubkey and cryptfile must be set.
+  if (arguments.encrypt)
     {
-      if (!arguments.privkey || !arguments.pubkey)
+      if (!arguments.pubkey || !arguments.cryptfile)
         {
-          printf ("\nPlease set private and public key!\n");
+          printf ("\nYou want to encrypt, please set public key and "
+                  "encyptfile!\n");
+          exit (EXIT_FAILURE);
+        }
+      if (arguments.pubkey)
+        {
+          if (check_file_access (arguments.pubkey) == EXIT_FAILURE)
+            {
+              fprintf (stderr, "Could not access file %s.\n",
+                       arguments.pubkey);
+              exit (EXIT_FAILURE);
+            }
+        }
+      if (arguments.cryptfile)
+        {
+          if (check_file_access (arguments.cryptfile) == EXIT_FAILURE)
+            {
+              fprintf (stderr, "Could not access file %s.\n",
+                       arguments.cryptfile);
+              exit (EXIT_FAILURE);
+            }
+        }
+    }
+
+  // if decrypt then privkey and cryptfile must be set.
+  if (arguments.decrypt)
+    {
+      if (!arguments.privkey || !arguments.cryptfile)
+        {
+          printf ("\nYou want to decrypt, please set private key and "
+                  "cryptfile!\n");
           exit (EXIT_FAILURE);
         }
       if (arguments.privkey)
@@ -248,12 +283,12 @@ main (int argc, char **argv)
               exit (EXIT_FAILURE);
             }
         }
-      if (arguments.pubkey)
+      if (arguments.cryptfile)
         {
-          if (check_file_access (arguments.pubkey) == EXIT_FAILURE)
+          if (check_file_access (arguments.cryptfile) == EXIT_FAILURE)
             {
               fprintf (stderr, "Could not access file %s.\n",
-                       arguments.pubkey);
+                       arguments.cryptfile);
               exit (EXIT_FAILURE);
             }
         }
@@ -265,9 +300,11 @@ main (int argc, char **argv)
   if (arguments.createkeys)
     {
       if (!arguments.privkey || !arguments.pubkey || !arguments.ivkey
-          || !arguments.aeskey)
+          || !arguments.aeskey || !arguments.cryptfile)
         {
-          printf ("\nPlease provide private and public keyfile, iv and aes "
+          printf ("\nPlease provide private keyfile, public keyfile and "
+                  "cryptfile, "
+                  "iv and aes "
                   "string\n");
           exit (EXIT_FAILURE);
         }
@@ -294,32 +331,35 @@ main (int argc, char **argv)
               exit (EXIT_FAILURE);
             }
         }
+      if (arguments.pubkey)
+        {
+
+          if (check_file_access (arguments.cryptfile) == EXIT_SUCCESS)
+            {
+              printf ("\nFound cryptfile %s. I do not overwrite the file, "
+                      "please remove manually\n",
+                      arguments.cryptfile);
+              exit (EXIT_FAILURE);
+            }
+        }
+
+      memcpy (key, arguments.aeskey, 32);
+      memcpy (iv, arguments.ivkey, 16);
 
       generate_rsa_keys (arguments.pubkey, arguments.privkey);
-      // TODO: make encrypted.bin variable
-      save_encrypted_key_iv ("encrypted.bin", key, sizeof (key), iv,
+      save_encrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,
                              sizeof (iv), arguments.pubkey);
     }
 
-  exit (EXIT_SUCCESS); // Programm Stop
-
-  /*
-  das noch nicht weiter verarbeitet
-  */
-
   if (arguments.encrypt || arguments.decrypt)
     {
-      load_decrypted_key_iv ("encrypted.bin", key, sizeof (key), iv,
-                             sizeof (iv), arguments.privkey);
+      DEBUG_PRINT ("\nBefor get_dir\nkey = %s  ", key);
+      DEBUG_PRINT ("\niv = %s  ", iv);
+      /*load_decrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,
+                             sizeof (iv), arguments.privkey);*/
+      get_dir (arguments.args[0], arguments.recursive, arguments.exclude,
+               arguments.encrypt, arguments.decrypt, key, iv);
     }
-
-  get_dir (arguments.args[0], arguments.recursive, arguments.exclude,
-           arguments.encrypt, arguments.decrypt, key, iv);
-
-  // load_encrypted_key_iv ("encrypted.bin", key, iv, "private.pem");
-  printf ("\nkey = %s", key);
-  printf ("\niv = %s", iv);
-  // get_dir (arguments.args[0], arguments.recursive, arguments.exclude);
 
   exit (0);
 }

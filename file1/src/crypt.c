@@ -1,4 +1,5 @@
 #include "crypt.h"
+#include "utils.h"
 #include <openssl/err.h>
 #include <openssl/evp.h>
 #include <openssl/pem.h>
@@ -93,6 +94,14 @@ save_encrypted_key_iv (const char *filename, unsigned char *key,
                        size_t key_len, unsigned char *iv, size_t iv_len,
                        const char *pubkeyfile)
 {
+
+  DEBUG_PRINT ("\nfilename %s  ", filename);
+  DEBUG_PRINT ("\nkey = %s  ", key);
+  DEBUG_PRINT ("\nkeylen = %ld  ", key_len);
+  DEBUG_PRINT ("\niv = %s  ", iv);
+  DEBUG_PRINT ("\nivlen = %ld  ", iv_len);
+  DEBUG_PRINT ("\npubkeyfile = %s  ", pubkeyfile);
+
   // Load RSA public key
   FILE *pubkey_file = fopen (pubkeyfile, "r");
   if (!pubkey_file)
@@ -158,6 +167,13 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
                        size_t key_len, unsigned char *iv, size_t iv_len,
                        const char *privkeyfile)
 {
+  DEBUG_PRINT ("\nfilename %s  ", filename);
+  DEBUG_PRINT ("\nkey = %s  ", key);
+  DEBUG_PRINT ("\nkeylen = %ld  ", key_len);
+  DEBUG_PRINT ("\niv = %s  ", iv);
+  DEBUG_PRINT ("\nivlen = %ld  ", iv_len);
+  DEBUG_PRINT ("\nprivkeyfile = %s  ", privkeyfile);
+
   FILE *privkey_file = fopen (privkeyfile, "r");
   if (!privkey_file)
     {
@@ -201,8 +217,25 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
       <= 0)
     handle_errors ();
 
+  DEBUG_PRINT ("\nBefor memcpy \nkey = %s  ", key);
+  DEBUG_PRINT ("\nkeylen = %ld  ", key_len);
+  DEBUG_PRINT ("\niv = %s  ", iv);
+  DEBUG_PRINT ("\nivlen = %ld  ", iv_len);
+  DEBUG_PRINT ("\nplaintext = %s  ", plaintext);
+
   memcpy (key, plaintext, key_len);
   memcpy (iv, plaintext + key_len, iv_len);
+
+  size_t key_len_tmp = strlen ((char *)key);
+  size_t iv_len_tmp = strlen ((char *)iv);
+  size_t plaintext_len_tmp = strlen ((char *)plaintext);
+
+  DEBUG_PRINT ("\nAfter memcpy \nkey = %s  ", key);
+  DEBUG_PRINT ("\nkeylen = %ld  ", key_len_tmp);
+  DEBUG_PRINT ("\niv = %s  ", iv);
+  DEBUG_PRINT ("\nivlen = %ld  ", iv_len_tmp);
+  DEBUG_PRINT ("\nplaintext = %s  ", plaintext);
+  DEBUG_PRINT ("\nplaintext_len = %ld  ", plaintext_len_tmp);
 
   EVP_PKEY_free (privkey);
   EVP_PKEY_CTX_free (ctx);
@@ -222,8 +255,8 @@ do_crypt (const char *filein, const char *fileout, int do_encrypt,
    * Bogus key and IV: we'd normally set these from
    * another source.
    */
-  // unsigned char key[] = "0123456789abcdeF0123456789abcdeF";
-  // unsigned char iv[] = "1234567887654321";
+  // unsigned char key[] = "POL8887&&/PPOLKkkcbbdneGHH&&/((f";
+  // unsigned char iv[] = "abcde67pold%&§d";
 
   /* Don't set key or IV right away; we want to check lengths */
   ctx = EVP_CIPHER_CTX_new ();
