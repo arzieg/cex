@@ -167,7 +167,8 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
                        size_t key_len, unsigned char *iv, size_t iv_len,
                        const char *privkeyfile)
 {
-  DEBUG_PRINT ("\nfilename %s  ", filename);
+  DEBUG_PRINT ("\n***In function load_decrypted_key_iv\nfilename %s  ",
+               filename);
   DEBUG_PRINT ("\nkey = %s  ", key);
   DEBUG_PRINT ("\nkeylen = %ld  ", key_len);
   DEBUG_PRINT ("\niv = %s  ", iv);
@@ -196,7 +197,12 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
     }
 
   unsigned char encrypted[256];
-  fread (encrypted, 1, sizeof (encrypted), file);
+  size_t ret = fread (encrypted, 1, sizeof (encrypted), file);
+  if (ret != sizeof (encrypted))
+    {
+      fprintf (stderr, "fread() failed: %zu\n", ret);
+      exit (EXIT_FAILURE);
+    }
   fclose (file);
 
   unsigned char *plaintext = malloc (key_len + iv_len);
@@ -217,7 +223,7 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
       <= 0)
     handle_errors ();
 
-  DEBUG_PRINT ("\nBefor memcpy \nkey = %s  ", key);
+  DEBUG_PRINT ("\n***Befor memcpy in crypt.c\nkey = %s  ", key);
   DEBUG_PRINT ("\nkeylen = %ld  ", key_len);
   DEBUG_PRINT ("\niv = %s  ", iv);
   DEBUG_PRINT ("\nivlen = %ld  ", iv_len);
@@ -230,7 +236,7 @@ load_decrypted_key_iv (const char *filename, unsigned char *key,
   size_t iv_len_tmp = strlen ((char *)iv);
   size_t plaintext_len_tmp = strlen ((char *)plaintext);
 
-  DEBUG_PRINT ("\nAfter memcpy \nkey = %s  ", key);
+  DEBUG_PRINT ("\n***After memcpy in crypt.c\nkey = %s  ", key);
   DEBUG_PRINT ("\nkeylen = %ld  ", key_len_tmp);
   DEBUG_PRINT ("\niv = %s  ", iv);
   DEBUG_PRINT ("\nivlen = %ld  ", iv_len_tmp);
@@ -251,12 +257,6 @@ do_crypt (const char *filein, const char *fileout, int do_encrypt,
   unsigned char inbuf[1024], outbuf[1024 + EVP_MAX_BLOCK_LENGTH];
   int inlen, outlen;
   EVP_CIPHER_CTX *ctx;
-  /*
-   * Bogus key and IV: we'd normally set these from
-   * another source.
-   */
-  // unsigned char key[] = "POL8887&&/PPOLKkkcbbdneGHH&&/((f";
-  // unsigned char iv[] = "abcde67pold%&§d";
 
   /* Don't set key or IV right away; we want to check lengths */
   ctx = EVP_CIPHER_CTX_new ();

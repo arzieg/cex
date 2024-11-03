@@ -1,5 +1,8 @@
-// Programm call
-// https://github.com/containers/bubblewrap
+/*
+  crypt.me
+
+  encrypt / decrypt files with private, public key using openssl library
+*/
 
 #include "crypt.h"
 #include "filedir.h"
@@ -10,21 +13,12 @@
 #include <stdlib.h> // EXIT_FAILURE, EXIT_SUCCESS
 #include <string.h> // strlen
 
+#define KEYLENGTH 32 // length of the key without \0
+#define IVLENGTH 16  // length of the iv without \0
+
 /* -------------------------------------------
    Arg Parse Initialization
   -------------------------------------------*/
-
-/*
- TODO:
- Hier ist beim decrypt noch ein Bug.
- es wird kein null terminierter String verwendet. Insofern ist es theoretisch
- richtig, d.h. es wird 32 bytes key und 16 bytes iv gelesen. Gibt man das mit
- printf aus, wird key richtig ausgegeben, iv aber ist iv+key. das passt nicht.
- nun wäre key auch nicht null terminiert und trotzdem wird es richtig
- ausgegeben? Das kann daran liegen, das im Speicher erst iv und dann key
- gespeichert wird und zufällig dann ein \0 nach key erfolgt.
-
-*/
 
 const char *argp_program_version = "cryptme 0.1";
 const char *argp_program_bug_address = "<bug@to.me>";
@@ -147,9 +141,9 @@ main (int argc, char **argv)
 {
   struct arguments arguments;
   // unsigned char key[32] = "HalloIchwarInBremenImLetztenSomm";
-  // unsigned char iv[16] = "123456789abcdeF";
-  unsigned char key[32] = "POL8887&&/PPOLKkkcbbdneGHH&&/((f";
-  unsigned char iv[16] = "abcde67pold%&§d";
+  // unsigned char iv[16] = "1234567890abcdeF";
+  unsigned char key[KEYLENGTH + 1];
+  unsigned char iv[IVLENGTH + 1];
 
   /* Default values. */
   arguments.recursive = false;
@@ -196,7 +190,7 @@ main (int argc, char **argv)
   // aeskey 32 bytes?
   if (arguments.aeskey)
     {
-      if (strlen (arguments.aeskey) != 32)
+      if (strlen (arguments.aeskey) != KEYLENGTH)
         {
           fprintf (stderr,
                    "\nAES Key has to be exact 32 Characters long, found %ld "
@@ -209,7 +203,7 @@ main (int argc, char **argv)
   // initializue vector iv = 16 bytes
   if (arguments.ivkey)
     {
-      if (strlen (arguments.ivkey) != 16)
+      if (strlen (arguments.ivkey) != IVLENGTH)
         {
           fprintf (
               stderr,
@@ -236,13 +230,14 @@ main (int argc, char **argv)
       exit (EXIT_FAILURE);
     }
 
-  // if encrypt then pubkey and cryptfile must be set.
+  // if encrypt then privkey, pubkey and cryptfile must be set.
   if (arguments.encrypt)
     {
-      if (!arguments.pubkey || !arguments.cryptfile)
+      if (!arguments.pubkey || !arguments.cryptfile || !arguments.privkey)
         {
-          printf ("\nYou want to encrypt, please set public key and "
-                  "encyptfile!\n");
+          printf (
+              "\nYou want to encrypt, please set private key, public key and "
+              "encyptfile!\n");
           exit (EXIT_FAILURE);
         }
       if (arguments.pubkey)
@@ -251,6 +246,15 @@ main (int argc, char **argv)
             {
               fprintf (stderr, "Could not access file %s.\n",
                        arguments.pubkey);
+              exit (EXIT_FAILURE);
+            }
+        }
+      if (arguments.privkey)
+        {
+          if (check_file_access (arguments.privkey) == EXIT_FAILURE)
+            {
+              fprintf (stderr, "Could not access file %s.\n",
+                       arguments.privkey);
               exit (EXIT_FAILURE);
             }
         }
@@ -343,8 +347,10 @@ main (int argc, char **argv)
             }
         }
 
-      memcpy (key, arguments.aeskey, 32);
-      memcpy (iv, arguments.ivkey, 16);
+      memcpy (key, arguments.aeskey, KEYLENGTH);
+      memcpy (iv, arguments.ivkey, IVLENGTH);
+      key[KEYLENGTH + 1] = '\0';
+      iv[IVLENGTH + 1] = '\0';
 
       generate_rsa_keys (arguments.pubkey, arguments.privkey);
       save_encrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,
@@ -353,10 +359,13 @@ main (int argc, char **argv)
 
   if (arguments.encrypt || arguments.decrypt)
     {
-      DEBUG_PRINT ("\nBefor get_dir\nkey = %s  ", key);
+      DEBUG_PRINT ("\nBefor load_decrypt_key_iv\nkey = %s  ", key);
       DEBUG_PRINT ("\niv = %s  ", iv);
-      /*load_decrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,
-                             sizeof (iv), arguments.privkey);*/
+      load_decrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,
+                             sizeof (iv), arguments.privkey);
+      DEBUG_PRINT ("\nAfter load_decrypt_key_iv\nkey = %s  ", key);
+      DEBUG_PRINT ("\niv = %s  ", iv);
+
       get_dir (arguments.args[0], arguments.recursive, arguments.exclude,
                arguments.encrypt, arguments.decrypt, key, iv);
     }
