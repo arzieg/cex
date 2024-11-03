@@ -162,18 +162,18 @@ main (int argc, char **argv)
      be reflected in arguments. */
   argp_parse (&argp, argc, argv, 0, 0, &arguments);
 
-  fprintf (stdout, "ARG0 = %s\n", arguments.args[0]);
-  fprintf (stdout, "recursive = %d\n", arguments.recursive);
-  fprintf (stdout, "verbose = %d\n", arguments.verbose);
-  fprintf (stdout, "EXCLUDE = %s\n", arguments.exclude);
-  fprintf (stdout, "CREATEKEYS = %d\n", arguments.createkeys);
-  fprintf (stdout, "PRIVKEY = %s\n", arguments.privkey);
-  fprintf (stdout, "CRYPTFILE = %s\n", arguments.cryptfile);
-  fprintf (stdout, "PUBKEY = %s\n", arguments.pubkey);
-  fprintf (stdout, "AESKEY = %s\n", arguments.aeskey);
-  fprintf (stdout, "IVKEY = %s\n", arguments.ivkey);
-  fprintf (stdout, "encrypt = %d\n", arguments.encrypt);
-  fprintf (stdout, "decrypt = %d\n", arguments.decrypt);
+  DEBUG_PRINT ("\nARG0 = %s\n", arguments.args[0]);
+  DEBUG_PRINT ("\nrecursive = %d\n", arguments.recursive);
+  DEBUG_PRINT ("\nverbose = %d\n", arguments.verbose);
+  DEBUG_PRINT ("\nEXCLUDE = %s\n", arguments.exclude);
+  DEBUG_PRINT ("\nCREATEKEYS = %d\n", arguments.createkeys);
+  DEBUG_PRINT ("\nPRIVKEY = %s\n", arguments.privkey);
+  DEBUG_PRINT ("\nCRYPTFILE = %s\n", arguments.cryptfile);
+  DEBUG_PRINT ("\nPUBKEY = %s\n", arguments.pubkey);
+  DEBUG_PRINT ("\nAESKEY = %s\n", arguments.aeskey);
+  DEBUG_PRINT ("\nIVKEY = %s\n", arguments.ivkey);
+  DEBUG_PRINT ("\nencrypt = %d\n", arguments.encrypt);
+  DEBUG_PRINT ("\ndecrypt = %d\n", arguments.decrypt);
 
   /*
    Parameter check
@@ -349,8 +349,8 @@ main (int argc, char **argv)
 
       memcpy (key, arguments.aeskey, KEYLENGTH);
       memcpy (iv, arguments.ivkey, IVLENGTH);
-      key[KEYLENGTH + 1] = '\0';
-      iv[IVLENGTH + 1] = '\0';
+      key[KEYLENGTH] = '\0';
+      iv[IVLENGTH] = '\0';
 
       generate_rsa_keys (arguments.pubkey, arguments.privkey);
       save_encrypted_key_iv (arguments.cryptfile, key, sizeof (key), iv,

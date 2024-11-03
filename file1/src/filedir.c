@@ -90,26 +90,33 @@ get_dir (char *path, bool recursive, char *exclude, bool encrypt, bool decrypt,
               else
                 printf ("\n");
 
-              /* check also for the ending .crypt */
+              /* only decrypt files with ending .crypt */
               if (decrypt)
                 {
-                  char d_filenameout[263];
+                  char *d_filenameout = (char *)malloc (sizeof (d_filename));
+                  if (d_filenameout == NULL)
+                    {
+                      printf ("\nCould not allocate memory for string\n");
+                      exit (EXIT_FAILURE);
+                    }
                   const char *search = ".crypt";
-                  size_t str_len = strlen (d_filename);
-                  size_t search_len = strlen (search);
+                  char *found = strstr (d_filename, search);
 
-                  if (str_len >= search_len
-                      && strcmp (d_filename + str_len - search_len, search)
-                             == 0)
+                  if (found != NULL
+                      && found
+                             == d_filename + strlen (d_filename)
+                                    - strlen (search))
                     {
                       strncpy (d_filenameout, d_filename,
-                               str_len - search_len);
-                      d_filenameout[str_len - search_len] = '\0';
+                               strlen (d_filename) - strlen (search));
+                      d_filenameout[strlen (d_filename) - strlen (search)]
+                          = '\0';
                       do_crypt (d_filename, d_filenameout, 0, key, iv);
                       printf ("%s... decrypt file to ... %s%s\n", RED,
                               d_filenameout, NORMAL);
                       // remove (d_filename);
                     }
+                  free (d_filenameout);
                 }
               else
                 printf ("\n");

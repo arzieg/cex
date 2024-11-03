@@ -21,7 +21,7 @@ BIN=cryptme
 #
 DBGDIR = debug
 DBGEXE = $(DBGDIR)/$(BIN)
-DBGOBJS = $(addprefix $(OBJ)/, $(OBJS))
+DBGOBJS = $(OBJS)
 DBGCFLAGS = -Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wmissing-prototypes -Wmisleading-indentation -Wduplicated-cond -Wold-style-definition -Wconversion -Wshadow -Winit-self -Wfloat-equal -Wwrite-strings -Wcast-align=strict -Wformat -O0 -g
 
 #
@@ -29,9 +29,7 @@ DBGCFLAGS = -Wpedantic -Wall -Wextra -Werror -std=gnu17 -Wstrict-prototypes  -Wm
 #
 RELDIR = release
 RELEXE = $(RELDIR)/$(BIN)
-#RELOBJS = $(addprefix $(OBJ)/, $(OBJS))
 RELOBJS = $(OBJS)
-$(info $$RELOBJS = $(RELOBJS))
 RELCFLAGS = -O3 -DNDEBUG
 
 .PHONY: all clean debug prep release remake
@@ -45,11 +43,9 @@ all: prep release
 debug: $(DBGEXE)
 
 $(DBGEXE): $(DBGOBJS)
-#$(CC) $(CFLAGS) $(DBGCFLAGS) -o $(DBGEXE) $^
-	$(CC) $(FFLAGS) $(CFLAGS) $(DBGCFLAGS) $(OBJS) -o $@ $(LFLAGS)
+	$(CC) $(FFLAGS) $(CFLAGS) $(DBGCFLAGS) $(DBGOBJS) -o $@ $(LFLAGS)
 
-$(DBGDIR)/%.o: $(SRC)/%.c
-#$(CC) -c $(CFLAGS) $(DBGCFLAGS) -o $@ $<
+$(OBJ)/%.o: $(SRC)/%.c
 	$(CC) $(FFLAGS) $(CFLAGS) $(DBGCFLAGS) -c $< -o $@ $(LFLAGS)
 
 #
@@ -60,11 +56,9 @@ $(info $$RELEXE = $(RELEXE))
 $(info $$RELOBJS = $(RELOBJS))
 
 $(RELEXE): $(RELOBJS)
-#$(CC) $(FFLAGS) $(CFLAGS) $(RELCFLAGS) -o $(RELEXE) $^
 	$(CC) $(FFLAGS) $(CFLAGS) $(RELCFLAGS) $(RELOBJS) -o $@ $(LFLAGS)
 
 $(OBJ)/%.o: $(SRC)/%.c
-#$(CC) -c $(CFLAGS) $(RELCFLAGS) -o $@ $<
 	$(CC) $(FFLAGS) $(CFLAGS) $(RELCFLAGS) -c $< -o $@ $(LFLAGS)
 		
 
