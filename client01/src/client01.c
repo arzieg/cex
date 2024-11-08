@@ -137,6 +137,59 @@ main (int argc, char *argv[])
       printf ("Authentication successful!\n");
     }
 
+  // send command
+  char command[128];
+  do
+    {
+      ssh_channel channel = ssh_channel_new (ssh);
+      if (!channel)
+        {
+          fprintf (stderr, "ssh_channel_new() failed.\n");
+          return 0;
+        }
+
+      if (ssh_channel_open_session (channel) != SSH_OK)
+        {
+          fprintf (stderr, "ssh_channel_open_session() failed\n");
+          return 0;
+        }
+
+      printf ("Remote command to execute: ");
+
+      rv = fgets (command, sizeof (command), stdin);
+      if (!rv)
+        {
+          fprintf (stderr, "Error with fgets");
+          return 1;
+        }
+
+      command[strlen (command) - 1] = 0;
+
+      if (ssh_channel_request_exec (channel, command) != SSH_OK)
+        {
+          fprintf (stderr, "ssh_channel_open_session() failed.\n");
+          return 1;
+        }
+
+      char output[1024];
+      int bytes_received;
+      while ((bytes_received
+              = ssh_channel_read (channel, output, sizeof (output), 0)))
+        {
+          if (bytes_received < 0)
+            {
+              fprintf (stderr, "ssh_channel_read() failed.\n");
+              return 1;
+            }
+          printf ("%.*s", bytes_received, output);
+        }
+
+      ssh_channel_send_eof (channel);
+      ssh_channel_close (channel);
+      ssh_channel_free (channel);
+    }
+  while (strncmp (command, "quit\0", 5));
+
   ssh_disconnect (ssh);
   ssh_free (ssh);
 
