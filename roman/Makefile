@@ -13,7 +13,7 @@ SRC=src
 OBJ=obj
 SRCS=$(wildcard $(SRC)/*.c)
 OBJS=$(patsubst $(SRC)/%c, $(OBJ)/%o, $(SRCS))
-BIN=cryptme
+BIN=roman
 
 
 #
