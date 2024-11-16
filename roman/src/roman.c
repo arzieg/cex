@@ -34,6 +34,7 @@ decode_roman (const char *roman_number)
           number = 1;
           break;
         }
+
       if (predecesor > number)
         {
           value -= number;
